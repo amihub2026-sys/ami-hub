@@ -1,0 +1,95 @@
+<!-- dashboard.component.html -->
+<div class="dashboard-container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="logo">AMI HUB</h2>
+    <ul class="menu">
+      <li class="menu-item active">Dashboard</li>
+      <li class="menu-item">Customers</li>
+      <li class="menu-item">Orders</li>
+      <li class="menu-item">Reports</li>
+      <li class="menu-item">Settings</li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <input type="text" placeholder="Search customers..." [(ngModel)]="searchQuery" class="search-bar">
+      <div class="user-profile">
+        <img src="assets/user-avatar.png" alt="User Avatar">
+        <span>{{ username }}</span>
+      </div>
+    </header>
+
+    <!-- KPI Cards -->
+    <section class="cards-section">
+      <div class="card">
+        <h3>Total Customers</h3>
+        <p>{{ totalCustomers }}</p>
+      </div>
+      <div class="card">
+        <h3>Active Orders</h3>
+        <p>{{ activeOrders }}</p>
+      </div>
+      <div class="card">
+        <h3>New Signups</h3>
+        <p>{{ newSignups }}</p>
+      </div>
+      <div class="card">
+        <h3>Revenue</h3>
+        <p>${{ revenue }}</p>
+      </div>
+    </section>
+
+    <!-- Customer Table -->
+    <section class="table-section">
+      <h2>Customer List</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let customer of customers; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ customer.name }}</td>
+            <td>{{ customer.email }}</td>
+            <td>{{ customer.phone }}</td>
+            <td>
+              <span [class.active]="customer.status==='Active'" [class.inactive]="customer.status==='Inactive'">
+                {{ customer.status }}
+              </span>
+            </td>
+            <td>
+              <button class="edit-btn">Edit</button>
+              <button class="delete-btn">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Charts -->
+    <section class="charts-section">
+      <div class="chart-card">
+        <h3>Customer Growth</h3>
+        <canvas id="customerGrowthChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Revenue Trend</h3>
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </section>
+
+  </main>
+</div>

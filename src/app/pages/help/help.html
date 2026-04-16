@@ -1,0 +1,116 @@
+<div class="help-page">
+  <div class="help-container">
+
+    <!-- HERO -->
+    <div class="help-hero">
+      <h1>Toll Free</h1>
+      <p>Find answers to common questions about buying, selling and using AmiHub</p>
+    </div>
+
+    <!-- CATEGORY BOXES -->
+    <div class="help-categories">
+
+      <div class="help-card">
+        <h3>🛒 Buying</h3>
+        <p>Learn how to find and contact sellers</p>
+      </div>
+
+      <div class="help-card">
+        <h3>📦 Selling</h3>
+        <p>Post ads and manage your listings</p>
+      </div>
+
+      <div class="help-card">
+        <h3>👤 Account</h3>
+        <p>Manage your profile and settings</p>
+      </div>
+
+      <div class="help-card">
+        <h3>💳 Payments</h3>
+        <p>Understand plans and payments</p>
+      </div>
+
+    </div>
+
+    <!-- FAQ SECTION -->
+    <div class="faq-section">
+
+      <h2>Frequently Asked Questions</h2>
+
+      <!-- FAQ 1 -->
+      <div class="faq-item" (click)="toggleFAQ(0)">
+        <div class="faq-question">
+          How do I post an ad?
+          <span>{{ activeIndex === 0 ? '−' : '+' }}</span>
+        </div>
+        <div class="faq-answer" *ngIf="activeIndex === 0">
+          Go to "Post Product" or "Post Service", fill in the details,
+          upload images, and submit your ad. It will go live instantly.
+        </div>
+      </div>
+
+      <!-- FAQ 2 -->
+      <div class="faq-item" (click)="toggleFAQ(1)">
+        <div class="faq-question">
+          How can I contact a seller?
+          <span>{{ activeIndex === 1 ? '−' : '+' }}</span>
+        </div>
+        <div class="faq-answer" *ngIf="activeIndex === 1">
+          You can use the Call or WhatsApp button available on the product page.
+        </div>
+      </div>
+
+      <!-- FAQ 3 -->
+      <div class="faq-item" (click)="toggleFAQ(2)">
+        <div class="faq-question">
+          Are payments secure?
+          <span>{{ activeIndex === 2 ? '−' : '+' }}</span>
+        </div>
+        <div class="faq-answer" *ngIf="activeIndex === 2">
+          AmiHub does not handle transactions between users.
+          Always meet safely and verify before making payments.
+        </div>
+      </div>
+
+      <!-- FAQ 4 -->
+      <div class="faq-item" (click)="toggleFAQ(3)">
+        <div class="faq-question">
+          Can I edit my ad after posting?
+          <span>{{ activeIndex === 3 ? '−' : '+' }}</span>
+        </div>
+        <div class="faq-answer" *ngIf="activeIndex === 3">
+          Yes, you can edit your ad from "My Posts" section anytime.
+        </div>
+      </div>
+
+      <!-- FAQ 5 -->
+      <div class="faq-item" (click)="toggleFAQ(4)">
+        <div class="faq-question">
+          Why are packages non-refundable?
+          <span>{{ activeIndex === 4 ? '−' : '+' }}</span>
+        </div>
+        <div class="faq-answer" *ngIf="activeIndex === 4">
+          Ads are activated instantly after purchase, so the service
+          is considered delivered.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CONTACT SUPPORT -->
+    <div class="help-support">
+      <h2>Still Need Help?</h2>
+      <p>Our support team is here for you 24/7</p>
+
+ <div class="support-actions">
+  <a href="tel:9042111424" class="support-btn call">
+    📞 Call
+  </a>
+
+  <a href="https://wa.me/917550008588" target="_blank" class="support-btn whatsapp">
+    💬 WhatsApp
+  </a>
+</div>
+
+  </div>
+</div>

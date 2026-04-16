@@ -1,0 +1,74 @@
+<div class="cart-page">
+  <div class="cart-container">
+
+    <div class="cart-left">
+      <div class="cart-header">
+        <h2>My Cart</h2>
+        <span>{{ cartItems.length }} Items</span>
+      </div>
+
+      <div *ngIf="loading" class="cart-state">
+        Loading cart...
+      </div>
+
+      <div *ngIf="!loading && errorMessage" class="cart-state error">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="!loading && !errorMessage && cartItems.length === 0" class="cart-state">
+        Your cart is empty.
+      </div>
+
+      <div class="cart-list" *ngIf="!loading && cartItems.length > 0">
+        <div class="cart-card" *ngFor="let item of cartItems">
+          <div class="cart-image">
+            <img [src]="item.image" [alt]="item.name">
+          </div>
+
+          <div class="cart-info">
+            <h3>{{ item.name }}</h3>
+            <p class="cart-price">₹{{ item.price }}</p>
+
+            <div class="cart-qty">
+              <button type="button" (click)="decreaseQty(item)">-</button>
+              <span>{{ item.qty }}</span>
+              <button type="button" (click)="increaseQty(item)">+</button>
+            </div>
+          </div>
+
+          <div class="cart-action">
+            <button type="button" class="remove-btn" (click)="removeItem(item)">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-right">
+      <div class="summary-card">
+        <h3>Order Summary</h3>
+
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>₹{{ subtotal }}</span>
+        </div>
+
+        <div class="summary-row">
+          <span>Delivery</span>
+          <span>₹{{ delivery }}</span>
+        </div>
+
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>₹{{ total }}</span>
+        </div>
+
+        <button class="checkout-btn" type="button" [disabled]="cartItems.length === 0">
+          Proceed to Checkout
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

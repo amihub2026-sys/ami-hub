@@ -1,0 +1,143 @@
+<div class="post-ad-page">
+  <h1>Post Your Product</h1>
+  <p class="subtitle">Fill in the details to publish your ad</p>
+
+  <form class="ad-form" (ngSubmit)="submitAd()">
+
+    <div class="form-group">
+      <label>Ad Title</label>
+      <input
+        type="text"
+        [(ngModel)]="adTitle"
+        name="adTitle"
+        placeholder="Enter ad title"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label>Category</label>
+      <select
+        [(ngModel)]="category"
+        name="category"
+        (change)="onCategoryChange()"
+        required
+      >
+        <option value="">Select Category</option>
+        <option *ngFor="let cat of categories" [value]="cat.categoryname">
+          {{ cat.categoryname }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group" *ngIf="category">
+      <label>Subcategory</label>
+      <select
+        [(ngModel)]="subcategory"
+        name="subcategory"
+        required
+      >
+        <option value="">Select Subcategory</option>
+        <option *ngFor="let sub of subcategories" [value]="sub.subcategoryname">
+          {{ sub.subcategoryname }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea
+        [(ngModel)]="description"
+        name="description"
+        placeholder="Enter description"
+        required
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Price</label>
+      <input
+        type="number"
+        [(ngModel)]="price"
+        name="price"
+        placeholder="Enter price"
+      >
+    </div>
+
+    <div class="form-group">
+      <label>State</label>
+      <select [(ngModel)]="state" name="state" (change)="onStateChange()">
+        <option [ngValue]="null">Select State</option>
+        <option *ngFor="let item of states" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group" *ngIf="districts.length">
+      <label>District</label>
+      <select [(ngModel)]="district" name="district" (change)="onDistrictChange()">
+        <option [ngValue]="null">Select District</option>
+        <option *ngFor="let item of districts" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group" *ngIf="areas.length">
+      <label>Area</label>
+      <select [(ngModel)]="area" name="area">
+        <option [ngValue]="null">Select Area</option>
+        <option *ngFor="let item of areas" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Main Image</label>
+      <input
+        type="file"
+        (change)="onMainImageSelected($event)"
+        accept="image/*"
+      >
+
+      <div class="main-image-preview" *ngIf="mainImage">
+        <img [src]="mainImage" alt="Main image preview">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Additional Images</label>
+      <input
+        type="file"
+        (change)="onAdditionalImagesSelected($event)"
+        multiple
+        accept="image/*"
+      >
+
+      <div class="additional-images-preview" *ngIf="additionalImages.length">
+        <div class="img-box" *ngFor="let img of additionalImages">
+          <img [src]="img" alt="Additional image preview">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Video</label>
+      <input
+        type="file"
+        (change)="onVideoSelected($event)"
+        accept="video/*"
+      >
+
+      <div class="video-preview" *ngIf="video">
+        <p>{{ video.name }}</p>
+      </div>
+    </div>
+
+    <button type="submit" class="post-btn" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Posting...' : 'Post Ad' }}
+    </button>
+  </form>
+</div>

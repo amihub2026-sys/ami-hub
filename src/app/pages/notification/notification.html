@@ -1,0 +1,47 @@
+<div class="notifications-page">
+
+  <div class="notifications-header">
+    <h2>Notifications</h2>
+
+    <button
+      type="button"
+      class="mark-read-btn"
+      (click)="markAllRead()"
+      *ngIf="notifications().length > 0"
+    >
+      Mark all as read
+    </button>
+  </div>
+
+  <div class="loading-state" *ngIf="isLoading()">
+    Loading notifications...
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading() && notifications().length === 0">
+    No notifications available.
+  </div>
+
+  <div class="notifications-list" *ngIf="!isLoading() && notifications().length > 0">
+
+    <div
+      class="notification-card"
+      *ngFor="let n of notifications()"
+      [class.unread]="!n.isread"
+      (click)="markAsRead(n)"
+    >
+
+      <div class="icon">{{ n.icon }}</div>
+
+      <div class="content">
+        <h4>{{ n.title }}</h4>
+        <p>{{ n.message }}</p>
+        <span class="time">{{ n.time }}</span>
+      </div>
+
+      <span class="dot" *ngIf="!n.isread"></span>
+
+    </div>
+
+  </div>
+
+</div>

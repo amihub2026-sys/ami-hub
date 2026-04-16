@@ -1,0 +1,532 @@
+/* General Background */
+.login-bg{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background-color:white;
+  font-family:'Segoe UI',sans-serif;
+  position:relative;
+  padding:20px;
+  box-sizing:border-box;
+  overflow-x:hidden;
+}
+
+/* Glass Card */
+.login-card{
+  width:380px;
+  max-width:100%;
+  padding:40px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(15px);
+  box-shadow:0 8px 32px rgba(40, 163, 212, 0.5);
+  text-align:center;
+  color:rgb(8, 8, 8);
+  animation:floatCard 0.8s ease;
+  box-sizing:border-box;
+  position:relative;
+  z-index:2;
+}
+
+/* Logo */
+.logo{
+  font-size:34px;
+  letter-spacing:2px;
+  margin-bottom:5px;
+}
+
+.tagline{
+  opacity:0.8;
+  margin-bottom:25px;
+  line-height:1.5;
+}
+
+/* Tabs */
+.tabs,
+.user-login-options{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:15px;
+  flex-wrap:wrap;
+}
+
+.tabs button,
+.user-login-options button{
+  padding:8px 15px;
+  border:none;
+  border-radius:8px;
+  background:#ddd;
+  cursor:pointer;
+  transition:0.2s;
+  font-size:14px;
+  white-space:nowrap;
+}
+
+.tabs button.active,
+.user-login-options button.active{
+  background:#0d3b66;
+  color:white;
+}
+
+/* Inputs */
+.input-group{
+  width:100%;
+}
+
+.input-group input{
+  width:100%;
+  display:block;
+  box-sizing:border-box;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  outline:none;
+  margin-bottom:15px;
+  font-size:14px;
+  background:#f2f2f2;
+}
+
+.input-group input:focus{
+  box-shadow:0 0 6px rgba(255,255,255,0.7);
+}
+
+/* Buttons */
+.otp-btn,
+.submit-btn{
+  width:100%;
+  max-width:260px;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  font-size:15px;
+  cursor:pointer;
+  transition:all 0.25s ease;
+}
+
+.otp-btn{
+  background:#ff7a18;
+  color:white;
+}
+
+.otp-btn:hover{
+  background:#ff9a3c;
+  transform:translateY(-2px);
+}
+
+.otp-btn:disabled{
+  opacity:0.7;
+  cursor:not-allowed;
+}
+
+.submit-btn{
+  background:#28a745;
+  color:white;
+  margin-top:10px;
+}
+
+.submit-btn:hover{
+  background:#34ce57;
+  transform:translateY(-2px);
+}
+
+/* Divider */
+.divider{
+  margin:20px 0;
+  opacity:0.8;
+}
+
+/* Social */
+.social{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  cursor:pointer;
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+.google{
+  background:white;
+  color:black;
+}
+
+.google img{
+  width:20px;
+}
+
+/* Resend OTP */
+.resend-section{
+  margin-top:12px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+}
+
+.resend-btn{
+  background:none;
+  border:none;
+  color:#ffd369;
+  font-weight:500;
+  cursor:pointer;
+}
+
+.resend-btn:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
+
+/* Animation */
+@keyframes floatCard{
+  from{
+    transform:translateY(30px);
+    opacity:0;
+  }
+  to{
+    transform:translateY(0);
+    opacity:1;
+  }
+}
+
+/* Side Ads */
+.side-ad{
+  position:fixed;
+  top:50%;
+  transform:translateY(-50%);
+  width:240px;
+  padding:18px;
+  border-radius:16px;
+  color:#fff;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  z-index:1000;
+  box-sizing:border-box;
+}
+
+.side-ad.right{
+  right:20px;
+  background:linear-gradient(135deg, #7c3aed, #4c1d95);
+}
+
+.side-ad.left{
+  left:20px;
+}
+
+.green-ad{
+  background:linear-gradient(135deg, #22c55e, #166534);
+}
+
+.side-ad h4{
+  margin:0 24px 8px 0;
+  font-size:18px;
+  font-weight:700;
+  color:#fff;
+  line-height:1.3;
+}
+
+.side-ad p{
+  margin:0 0 12px;
+  font-size:13px;
+  line-height:1.5;
+  color:#fff;
+}
+
+.side-ad button{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.side-ad.right button{
+  color:#4c1d95;
+}
+
+.green-ad button{
+  color:#166534;
+}
+
+.ad-close{
+  position:absolute;
+  top:6px;
+  right:10px;
+  font-size:18px;
+  color:#fff;
+  cursor:pointer;
+  line-height:1;
+}
+
+/* Tablet */
+@media (max-width: 1024px){
+  .side-ad{
+    width:220px;
+  }
+
+  .side-ad.right{
+    right:12px;
+  }
+
+  .side-ad.left{
+    left:12px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px){
+  .login-bg{
+    padding:20px;
+    min-height:100vh;
+    align-items:flex-start;
+    padding-top:108px;
+    padding-bottom:128px;
+  }
+
+  .login-card{
+    width:100%;
+    max-width:320px;
+    padding:26px 16px;
+    border-radius:18px;
+    margin-top:54px;
+  }
+
+  .logo{
+    font-size:24px;
+    letter-spacing:1px;
+  }
+
+  .tagline{
+    font-size:13px;
+    margin-bottom:18px;
+  }
+
+  .tabs,
+  .user-login-options{
+    gap:8px;
+    margin-bottom:14px;
+  }
+
+  .tabs button,
+  .user-login-options button{
+    font-size:12px;
+    padding:8px 12px;
+  }
+
+  .input-group input{
+    width:100%;
+    height:48px;
+    padding:0 14px;
+    margin-bottom:12px;
+    font-size:14px;
+    border-radius:12px;
+  }
+
+  .otp-btn,
+  .submit-btn{
+    width:100%;
+    max-width:100%;
+    padding:13px;
+    font-size:14px;
+    border-radius:12px;
+  }
+
+  .divider{
+    margin:16px 0;
+    font-size:13px;
+  }
+
+  .social{
+    padding:12px;
+    font-size:13px;
+    gap:8px;
+  }
+
+  .google img{
+    width:18px;
+  }
+
+  .resend-section{
+    flex-wrap:wrap;
+    gap:6px;
+    font-size:12px;
+    text-align:center;
+    line-height:1.4;
+  }
+
+  /* TOP AD */
+  .side-ad.right{
+    display:block !important;
+    position:fixed;
+    top:76px !important;
+    left:50% !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:min(calc(100vw - 24px), 340px) !important;
+    transform:translateX(-50%) !important;
+    padding:10px 12px !important;
+    border-radius:12px;
+    z-index:999;
+    box-sizing:border-box;
+  }
+
+  .side-ad.right h4{
+    font-size:13px;
+    margin:0 18px 4px 0;
+    line-height:1.25;
+  }
+
+  .side-ad.right p{
+    font-size:11px;
+    margin:0 0 8px;
+    line-height:1.35;
+  }
+
+  .side-ad.right button{
+    width:100%;
+    padding:8px;
+    font-size:12px;
+    border-radius:8px;
+  }
+
+  .side-ad.right .ad-close{
+    top:5px;
+    right:8px;
+    font-size:13px;
+  }
+
+  /* BOTTOM AD */
+  .side-ad.left{
+    display:block !important;
+    position:fixed;
+    left:50% !important;
+    right:auto !important;
+    top:auto !important;
+    bottom:10px !important;
+    width:min(calc(100vw - 24px), 340px) !important;
+    transform:translateX(-50%) !important;
+    padding:12px !important;
+    border-radius:16px;
+    z-index:9999;
+    box-sizing:border-box;
+  }
+
+  .side-ad.left h4{
+    font-size:14px;
+    margin:0 20px 4px 0;
+    line-height:1.25;
+  }
+
+  .side-ad.left p{
+    font-size:11px;
+    margin:0 0 8px;
+    line-height:1.35;
+  }
+
+  .side-ad.left button{
+    font-size:13px;
+    padding:9px;
+    border-radius:9px;
+  }
+
+  .side-ad.left .ad-close{
+    font-size:14px;
+    top:5px;
+    right:8px;
+  }
+}
+
+@media (max-width: 480px){
+  .login-bg{
+    padding:16px;
+    padding-top:104px;
+    padding-bottom:124px;
+  }
+
+  .login-card{
+    max-width:312px;
+    padding:22px 14px;
+    border-radius:16px;
+    margin-top:50px;
+  }
+
+  .logo{
+    font-size:22px;
+  }
+
+  .tagline{
+    font-size:12.5px;
+  }
+
+  .tabs button,
+  .user-login-options button{
+    font-size:12px;
+    padding:8px 10px;
+  }
+
+  .input-group input{
+    height:46px;
+    font-size:13px;
+  }
+
+  .otp-btn,
+  .submit-btn{
+    font-size:13px;
+    padding:12px;
+  }
+
+  .social{
+    font-size:13px;
+  }
+
+  .side-ad.right{
+    top:70px !important;
+    width:min(calc(100vw - 16px), 328px) !important;
+    padding:9px 11px !important;
+    border-radius:11px;
+  }
+
+  .side-ad.right h4{
+    font-size:12.5px;
+  }
+
+  .side-ad.right p{
+    font-size:10.5px;
+    margin-bottom:7px;
+  }
+
+  .side-ad.right button{
+    font-size:11px;
+    padding:7px 8px;
+  }
+
+  .side-ad.left{
+    bottom:8px !important;
+    width:min(calc(100vw - 16px), 328px) !important;
+    padding:11px !important;
+    border-radius:14px;
+  }
+
+  .side-ad.left h4{
+    font-size:13px;
+  }
+
+  .side-ad.left p{
+    font-size:10.5px;
+    margin-bottom:7px;
+  }
+
+  .side-ad.left button{
+    font-size:12px;
+    padding:8px;
+  }
+}

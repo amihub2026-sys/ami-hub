@@ -1,0 +1,68 @@
+<div class="subscription-container" [class.blur]="showSuccess || isSaving">
+  <h1>
+    {{ flowType === 'featured' ? 'Choose Your Featured Ad Plan' : 'Choose Your Plan' }}
+  </h1>
+
+  <p class="subtitle">
+    {{
+      flowType === 'featured'
+        ? 'Select a featured plan to boost your post visibility'
+        : 'Select the plan that fits your needs'
+    }}
+  </p>
+
+  <div class="loading-state" *ngIf="isLoadingPlans">
+    <p>Loading plans...</p>
+  </div>
+
+  <div class="plan-cards" *ngIf="!isLoadingPlans">
+    <div
+      class="plan-card"
+      *ngFor="let plan of plans"
+      [class.featured]="isFeaturedCard(plan.planname)"
+    >
+      <h2>{{ plan.planname }}</h2>
+      <p class="price">₹{{ plan.price }} / {{ plan.validitydays }} days</p>
+
+      <ul>
+        <li *ngFor="let feature of getPlanFeatures(plan.planname)">
+          {{ feature }}
+        </li>
+      </ul>
+
+      <button
+        class="btn"
+        [class.btn-primary]="isFeaturedCard(plan.planname)"
+        [disabled]="isSaving"
+        (click)="selectPlan(plan)"
+      >
+        {{
+          isSaving && selectedPlan === plan.planname
+            ? 'Processing...'
+            : ('Choose ' + plan.planname)
+        }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="loading-overlay" *ngIf="isSaving">
+  <div class="loader"></div>
+  <p>Redirecting to payment...</p>
+</div>
+
+<div class="success-overlay" *ngIf="showSuccess">
+  <div class="success-card">
+    <div class="checkmark-circle">
+      <div class="checkmark"></div>
+    </div>
+
+    <h2>{{ successTitle }}</h2>
+    <p>{{ successMessage }}</p>
+
+    <button type="button" class="go-home-btn" (click)="goHome()">
+      Go to Home
+    </button>
+  </div>
+</div>
+

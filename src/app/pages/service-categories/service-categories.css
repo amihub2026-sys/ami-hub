@@ -1,0 +1,99 @@
+/* Container */
+.service-categories-container {
+  max-width: 1200px;
+  margin: 50px auto;
+  padding: 0 20px;
+  text-align: center;
+  color: #9fcffa;
+}
+
+.service-categories-container h1 {
+  font-size: 36px;
+  color: #0d0d0e;
+  margin-bottom: 40px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* Categories Grid */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 30px;
+  justify-items: center;
+}
+
+/* Individual Category Card */
+.cat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  color: #e4eaf3;
+ 
+}
+
+/* Icon Circle */
+.cat-icon {
+  /* background: linear-gradient(135deg, #1f5c99, #3a86ff); */
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  color:white;
+  background-color: #3a89cf;
+}
+
+.cat-icon img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: brightness(0) invert(1); /* white icons */
+  transition: transform 0.3s;
+}
+
+/* Label */
+.cat-card p {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f0f0f;
+  text-align: center;
+}
+
+/* Hover Effects */
+.cat-card:hover .cat-icon {
+  transform: scale(1.2);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cat-card:hover p {
+  color: #3a86ff;
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .categories-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 20px;
+  }
+
+  .cat-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .cat-icon img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .service-categories-container h1 {
+    font-size: 28px;
+  }
+}

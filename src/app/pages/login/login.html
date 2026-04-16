@@ -1,0 +1,81 @@
+<div class="login-bg">
+  <div class="login-card">
+    <h1 class="logo">AMI HUB</h1>
+    <p class="tagline">Buy • Sell • Discover – All in One Hub.</p>
+
+    <div class="user-login-options">
+      <button
+        (click)="selectUserLogin('emailOtp')"
+        [class.active]="userLoginMethod === 'emailOtp'">
+        Email OTP
+      </button>
+
+      <button
+        (click)="selectUserLogin('username')"
+        [class.active]="userLoginMethod === 'username'">
+        Email/Password
+      </button>
+    </div>
+
+    <div *ngIf="userLoginMethod === 'emailOtp'">
+      <div class="input-group">
+        <input type="email" placeholder="Email" [(ngModel)]="email">
+      </div>
+
+      <button class="otp-btn" (click)="sendOtp()" [disabled]="otpSent">
+        Send OTP
+      </button>
+
+      <div *ngIf="otpSent" class="otp-section">
+        <div class="input-group">
+          <input type="text" placeholder="Enter OTP" [(ngModel)]="otp">
+        </div>
+
+        <button class="submit-btn" (click)="verifyOtp()">Verify OTP</button>
+      </div>
+
+      <div *ngIf="showPasswordSet">
+        <div class="input-group">
+          <input type="password" placeholder="Create Password" [(ngModel)]="newPassword">
+        </div>
+
+        <button class="submit-btn" (click)="setPassword()">
+          Set Password & Login
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="userLoginMethod === 'username'">
+      <div class="input-group">
+        <input type="email" placeholder="Email" [(ngModel)]="email">
+      </div>
+
+      <div class="input-group">
+        <input type="password" placeholder="Password" [(ngModel)]="password">
+      </div>
+
+      <button class="submit-btn" (click)="loginWithEmailPassword()">Login</button>
+    </div>
+
+    <div class="divider">OR</div>
+
+    <button class="social google" (click)="googleLogin()">
+      <img src="assets/icons/google.png" alt="Google">
+      Continue with Google
+    </button>
+  </div>
+
+  <div class="side-ad right" *ngIf="showRightAd">
+  <span class="ad-close" (click)="closeAd('right')">×</span>
+  <h4>🔥 Grow Your Business</h4>
+  <p>Get your website, promote services, and reach more customers.</p>
+  <button>Get Started</button>
+</div>
+
+<div class="side-ad left green-ad" *ngIf="showLeftAd">
+  <span class="ad-close" (click)="closeAd('left')">×</span>
+  <h4>🚀 Boost Your Post</h4>
+  <p>Get more views and reach more buyers instantly!</p>
+  <button>Promote Now</button>
+</div>
+</div>

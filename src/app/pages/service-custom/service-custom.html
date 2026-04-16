@@ -1,0 +1,57 @@
+<div class="custom-container">
+
+  <h2>Additional Details</h2>
+
+  <div class="info-box">
+    <p><strong>Category:</strong> {{category}}</p>
+    <p><strong>Subcategory:</strong> {{subcategory}}</p>
+    <p><strong>Location:</strong> {{location}}</p>
+  </div>
+
+  <form (ngSubmit)="submitService()">
+
+    <div *ngFor="let field of fields" class="form-group">
+
+      <label>{{field.label}}</label>
+
+      <input
+        *ngIf="field.type === 'text' || field.type === 'number'"
+        [(ngModel)]="formData[field.name]"
+        [name]="field.name"
+        [type]="field.type"
+        required
+      />
+
+      <select
+        *ngIf="field.type === 'select'"
+        [(ngModel)]="formData[field.name]"
+        [name]="field.name"
+        required
+      >
+        <option value="">Select {{field.label}}</option>
+        <option *ngFor="let opt of field.options" [value]="opt">
+          {{opt}}
+        </option>
+      </select>
+
+    </div>
+
+    <button type="submit" class="btn-submit">
+      Post Service
+    </button>
+
+  </form>
+
+  <!-- Success Overlay -->
+  <div class="overlay" *ngIf="adPosted">
+    <div class="success-box">
+      <h2>YOU DID IT! 🎉</h2>
+      <p>Published ✅</p>
+      <div class="actions">
+        <button (click)="goBack()">GO BACK to Dashboard</button>
+        <button (click)="viewAd()">VIEW AD</button>
+      </div>
+    </div>
+  </div>
+
+</div>

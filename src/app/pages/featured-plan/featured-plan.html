@@ -1,0 +1,45 @@
+<div class="subscription-container">
+  <h1>Choose Your Featured Ad Plan</h1>
+  <p class="subtitle">Select a featured plan to boost your post visibility</p>
+
+  <div class="plan-cards">
+    <div class="plan-card">
+      <h2>Quick Boost</h2>
+      <p class="price">₹1 / 1 day</p>
+      <ul>
+        <li>Boost your ad quickly</li>
+        <li>Short visibility boost</li>
+        <li>Best for instant reach</li>
+      </ul>
+      <button class="btn" (click)="choosePlan('basic')">
+        Choose Quick Boost
+      </button>
+    </div>
+
+    <div class="plan-card featured">
+      <h2>Popular Boost</h2>
+      <p class="price">₹500 / 5 days</p>
+      <ul>
+        <li>Better visibility</li>
+        <li>Longer boost duration</li>
+        <li>Good for higher response</li>
+      </ul>
+      <button class="btn btn-primary" (click)="choosePlan('standard')">
+        Choose Popular Boost
+      </button>
+    </div>
+
+    <div class="plan-card">
+      <h2>Max Boost</h2>
+      <p class="price">₹900 / 9 days</p>
+      <ul>
+        <li>Maximum visibility</li>
+        <li>Longest boost period</li>
+        <li>Best for top exposure</li>
+      </ul>
+      <button class="btn" (click)="choosePlan('premium')">
+        Choose Max Boost
+      </button>
+    </div>
+  </div>
+</div>

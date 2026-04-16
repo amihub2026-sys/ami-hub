@@ -1,0 +1,62 @@
+<div class="my-posts-page">
+  <h2>My Posts</h2>
+
+  <div *ngIf="isLoading()" class="loading-text">
+    Loading your posts...
+  </div>
+
+  <ng-container *ngIf="!isLoading()">
+    <div class="empty-text" *ngIf="posts().length === 0">
+      You have not posted anything yet.
+    </div>
+
+    <div class="posts-grid" *ngIf="posts().length > 0">
+      <div
+        class="post-card"
+        *ngFor="let post of posts(); trackBy: trackByPostId"
+        (click)="openDetails(post)"
+      >
+        <img
+          [src]="getMainImage(post)"
+          [alt]="post.title || 'Post image'"
+          loading="lazy"
+          decoding="async"
+          (error)="onImageError($event)"
+        />
+
+        <h3>{{ post.title || 'Untitled Post' }}</h3>
+
+        <p class="price">₹{{ post.price || 0 }}</p>
+
+        <p class="status">{{ post.status || 'Active' }}</p>
+
+        <div class="post-actions">
+          <button
+            type="button"
+            class="edit-btn"
+            (click)="editPost(post, $event)"
+          >
+            Edit
+          </button>
+
+          <button
+            type="button"
+            class="edit-btn"
+            (click)="featurePost(post, $event)"
+            [disabled]="isFeatured(post)"
+          >
+            {{ isFeatured(post) ? 'Featured' : 'Feature Ad' }}
+          </button>
+
+          <button
+            type="button"
+            class="remove-btn"
+            (click)="removePost(post, $event)"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

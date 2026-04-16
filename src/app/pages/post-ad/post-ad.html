@@ -1,0 +1,141 @@
+<div class="post-ad-page">
+
+<h1>Post Your Product</h1>
+
+<form (ngSubmit)="submitAd()">
+
+<!-- Title -->
+
+<div class="form-group">
+<label>Ad Title</label>
+<input type="text" [(ngModel)]="adTitle" name="adTitle" required>
+</div>
+
+<!-- Category -->
+
+<div class="form-group">
+<label>Category</label>
+
+<select [(ngModel)]="category" name="category" (change)="onCategoryChange()">
+
+<option value="">Select</option>
+
+<option *ngFor="let cat of categoryList" [value]="cat">
+
+{{cat}}
+
+</option>
+
+</select>
+
+</div>
+
+<!-- Subcategory -->
+
+<div class="form-group" *ngIf="category">
+
+<label>Subcategory</label>
+
+<select [(ngModel)]="subcategory" name="subcategory">
+
+<option value="">Select</option>
+
+<option *ngFor="let sub of subcategoryList" [value]="sub">
+
+{{sub}}
+
+</option>
+
+</select>
+
+</div>
+
+<!-- Description -->
+
+<div class="form-group">
+
+<label>Description</label>
+
+<textarea [(ngModel)]="description" name="description"></textarea>
+
+</div>
+
+<!-- Price -->
+
+<div class="form-group">
+
+<label>Price</label>
+
+<input type="number" [(ngModel)]="price" name="price">
+
+</div>
+
+<!-- MAIN IMAGE -->
+
+<div class="form-group">
+
+<label>Main Image</label>
+
+<input type="file" (change)="onMainImageSelected($event)" accept="image/*">
+
+<div *ngIf="mainImagePreview">
+
+<img [src]="mainImagePreview" width="200">
+
+<button type="button" (click)="removeMainImage()">Remove</button>
+
+</div>
+
+</div>
+
+<!-- ADDITIONAL IMAGES -->
+
+<div class="form-group">
+
+<label>Additional Images</label>
+
+<input type="file" (change)="onAdditionalImagesSelected($event)" multiple accept="image/*">
+
+<div *ngIf="additionalImagePreviews.length">
+
+<div *ngFor="let img of additionalImagePreviews; let i=index">
+
+<img [src]="img" width="120">
+
+<button type="button" (click)="removeAdditionalImage(i)">Remove</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- VIDEO -->
+
+<div class="form-group">
+
+<label>Video</label>
+
+<input type="file" (change)="onVideoSelected($event)" accept="video/*">
+
+<div *ngIf="videoPreview">
+
+<video width="250" controls>
+
+<source [src]="videoPreview">
+
+</video>
+
+</div>
+
+</div>
+
+<button type="submit">
+
+Post Ad
+
+</button>
+
+</form>
+
+</div>

@@ -1,0 +1,33 @@
+<div class="all-categories-page">
+  <div class="categories-container">
+    <h1>All Categories</h1>
+
+    <div class="loading-box" *ngIf="isLoading()">Loading...</div>
+
+    <div class="grid" *ngIf="!isLoading() && categories().length > 0">
+      <div
+        class="cat-card"
+        *ngFor="let cat of categories()"
+        (click)="openCategory(cat)"
+      >
+        <div
+          class="cat-image-wrap"
+          [ngClass]="{
+            'mobile-icon': cat.categoryname?.toLowerCase() === 'mobiles'
+          }"
+        >
+          <img
+            [src]="getImage(cat)"
+            [alt]="cat.categoryname"
+            (error)="onImageError($event)"
+          />
+        </div>
+        <p>{{ cat.categoryname }}</p>
+      </div>
+    </div>
+
+    <div class="empty-box" *ngIf="!isLoading() && categories().length === 0">
+      No categories found.
+    </div>
+  </div>
+</div>

@@ -1,0 +1,362 @@
+.payment-page {
+  min-height: 100vh;
+  padding: 32px 16px;
+  background:
+    radial-gradient(circle at top left, rgba(51, 65, 255, 0.10), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(0, 201, 167, 0.10), transparent 25%),
+    linear-gradient(180deg, #f6f8ff 0%, #eef3ff 100%);
+}
+
+.payment-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.brand-card,
+.summary-card,
+.success-card,
+.payment-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(28, 39, 76, 0.08);
+  border-radius: 28px;
+  box-shadow: 0 20px 60px rgba(27, 39, 94, 0.10);
+  backdrop-filter: blur(10px);
+}
+
+.brand-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px;
+  margin-bottom: 22px;
+}
+
+.brand-badge {
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #1f4bff, #6b3df4);
+  box-shadow: 0 14px 32px rgba(67, 78, 255, 0.28);
+}
+
+.brand-card h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #14213d;
+}
+
+.brand-card p {
+  margin: 6px 0 0;
+  color: #5b6478;
+  font-size: 14px;
+}
+
+.summary-card,
+.success-card,
+.payment-card {
+  padding: 28px;
+}
+
+.card-head,
+.payment-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.card-head h2,
+.payment-card-head h3,
+.success-card h2 {
+  margin: 0;
+  color: #14213d;
+  font-weight: 800;
+}
+
+.payment-card-head p,
+.success-card p {
+  margin: 6px 0 0;
+  color: #687289;
+}
+
+.live-badge,
+.amount-pill {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.live-badge {
+  background: rgba(64, 93, 255, 0.10);
+  color: #2f49e6;
+}
+
+.amount-pill {
+  background: linear-gradient(135deg, #1f4bff, #6b3df4);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(67, 78, 255, 0.22);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px solid #edf1f7;
+}
+
+.summary-row span {
+  color: #6a7388;
+  font-size: 14px;
+}
+
+.summary-row strong {
+  color: #14213d;
+  font-size: 15px;
+  text-align: right;
+  word-break: break-word;
+}
+
+.total-row {
+  border-bottom: 0;
+  padding-top: 18px;
+}
+
+.total-row strong,
+.total-row span {
+  font-size: 18px;
+  font-weight: 800;
+  color: #101b36;
+}
+
+.note-box,
+.error-box,
+.failed-box {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.note-box {
+  background: #f7f9ff;
+  color: #4e5c7a;
+  border: 1px solid #e4eafe;
+}
+
+.error-box,
+.failed-box {
+  background: #fff4f4;
+  color: #b3261e;
+  border: 1px solid #ffd6d2;
+}
+
+.method-list {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.method-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid #e8ecf5;
+  background: #fff;
+  transition: 0.25s ease;
+}
+
+.method-item.active {
+  border-color: #4b61ff;
+  background: rgba(75, 97, 255, 0.06);
+  box-shadow: 0 10px 24px rgba(75, 97, 255, 0.08);
+}
+
+.method-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: #f2f5ff;
+  font-size: 20px;
+}
+
+.method-item h4 {
+  margin: 0;
+  color: #17233f;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.method-item p {
+  margin: 4px 0 0;
+  color: #6a7388;
+  font-size: 13px;
+}
+
+.fake-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.fake-form label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #47526a;
+}
+
+.fake-form input {
+  width: 100%;
+  height: 46px;
+  border: 1px solid #e4e9f5;
+  border-radius: 14px;
+  padding: 0 14px;
+  background: #f9fbff;
+  color: #14213d;
+  outline: none;
+}
+
+.action-row,
+.success-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.primary-btn,
+.secondary-btn {
+  min-width: 150px;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 14px;
+  border: 0;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.primary-btn {
+  color: #fff;
+  background: linear-gradient(135deg, #1f4bff, #6b3df4);
+  box-shadow: 0 14px 28px rgba(67, 78, 255, 0.24);
+}
+
+.primary-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.secondary-btn {
+  color: #23304f;
+  background: #eef2ff;
+}
+
+.secondary-btn:hover:not(:disabled) {
+  background: #e4eafe;
+}
+
+.primary-btn:disabled,
+.secondary-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.secure-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #edf1f7;
+  color: #6b748b;
+  font-size: 13px;
+}
+
+.success-card {
+  text-align: center;
+}
+
+.success-icon {
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, #12b76a, #43d67c);
+  box-shadow: 0 16px 36px rgba(18, 183, 106, 0.22);
+}
+
+.success-summary {
+  margin-top: 20px;
+  text-align: left;
+  background: #f9fbff;
+  border: 1px solid #e8eefc;
+  border-radius: 18px;
+  padding: 16px 18px;
+}
+
+@media (max-width: 960px) {
+  .payment-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .payment-page {
+    padding: 18px 12px;
+  }
+
+  .summary-card,
+  .success-card,
+  .payment-card,
+  .brand-card {
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .brand-card h1 {
+    font-size: 22px;
+  }
+
+  .card-head,
+  .payment-card-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .summary-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .summary-row strong {
+    text-align: left;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    width: 100%;
+  }
+}

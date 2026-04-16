@@ -1,0 +1,138 @@
+<div class="page-layout">
+  <aside class="left-panel">
+    <div class="filter-card-shell">
+      <div class="filter-header">
+        <div>
+          <h3>Filter Products</h3>
+          <p>Refine the list quickly and clearly</p>
+        </div>
+        <div class="result-count">{{ displayedPosts().length }}</div>
+      </div>
+
+      <div class="filter-group">
+        <label>Search</label>
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          placeholder="Search products..."
+        />
+      </div>
+
+      <div class="filter-group">
+        <label>Category</label>
+        <select [(ngModel)]="selectedCategoryId" (change)="onCategoryChange()">
+          <option [ngValue]="null">All Categories</option>
+          <option
+            *ngFor="let category of categoriesData"
+            [ngValue]="category.categoryid"
+          >
+            {{ category.categoryname }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Price Range</label>
+        <div class="price-row">
+          <input type="number" [(ngModel)]="minPrice" placeholder="Min" />
+          <input type="number" [(ngModel)]="maxPrice" placeholder="Max" />
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select [(ngModel)]="sortBy">
+          <option value="Newest">Newest</option>
+          <option value="Oldest">Oldest</option>
+          <option value="Price Low to High">Price Low to High</option>
+          <option value="Price High to Low">Price High to Low</option>
+        </select>
+      </div>
+
+      <div class="filter-actions">
+        <button class="apply-btn" type="button" (click)="applyFilters()">
+          Apply Filters
+        </button>
+
+        <button class="reset-btn" type="button" (click)="resetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <section class="right-panel">
+    <div class="right-header">
+      <h2 class="title">
+        {{ selectedCategoryName || 'Latest Products' }}
+      </h2>
+      <div class="subtitle">Clean results with smart filters</div>
+    </div>
+
+    <div
+      *ngIf="subcategories().length > 0"
+      style="display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 16px;"
+    >
+      <button
+        type="button"
+        (click)="showAllSubcategoryPosts()"
+        [style.background]="selectedSubcategoryId === null ? '#111827' : '#ffffff'"
+        [style.color]="selectedSubcategoryId === null ? '#ffffff' : '#111827'"
+        [style.border]="selectedSubcategoryId === null ? '1px solid #111827' : '1px solid #d1d5db'"
+        style="padding:8px 14px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer;"
+      >
+        All
+      </button>
+
+      <button
+        type="button"
+        *ngFor="let sub of subcategories()"
+        (click)="selectSubcategory(sub)"
+        [style.background]="selectedSubcategoryId === sub.subcategoryid ? '#111827' : '#ffffff'"
+        [style.color]="selectedSubcategoryId === sub.subcategoryid ? '#ffffff' : '#111827'"
+        [style.border]="selectedSubcategoryId === sub.subcategoryid ? '1px solid #111827' : '1px solid #d1d5db'"
+        style="display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer;"
+      >
+        <img
+          *ngIf="sub.iconurl"
+          [src]="sub.iconurl"
+          [alt]="sub.subcategoryname"
+          style="width:18px; height:18px; object-fit:contain;"
+        />
+        <span>{{ sub.subcategoryname }}</span>
+      </button>
+    </div>
+
+    <div class="empty-text" *ngIf="!isLoading() && displayedPosts().length === 0">
+      No products found.
+    </div>
+
+    <div class="products" *ngIf="displayedPosts().length > 0">
+      <div class="card" *ngFor="let post of displayedPosts(); trackBy: trackByPostId">
+        <div class="image-wrap">
+          <img
+            [src]="getMainImage(post)"
+            [alt]="post.title"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        <div class="card-body">
+          <h3>{{ post.title }}</h3>
+          <p class="price">₹{{ post.price || 0 }}</p>
+
+          <p class="meta" *ngIf="getShortLocation(post)">
+            {{ getShortLocation(post) }}
+          </p>
+
+          <a [routerLink]="['/details', post.postid]">View Details</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="loading-text" *ngIf="isLoading()">
+      Loading more products...
+    </div>
+  </section>
+</div>

@@ -1,0 +1,42 @@
+<div class="custom-container">
+
+  <!-- Category/Subcategory info box -->
+  <div class="info-box">
+    <p><strong>Category:</strong> {{category}}</p>
+    <p><strong>Subcategory:</strong> {{subcategory}}</p>
+  </div>
+
+  <h2>Additional Details</h2>
+
+  <!-- Dynamic Fields -->
+  <div *ngFor="let field of fields" class="field">
+    <label>{{field.label}}</label>
+
+    <input *ngIf="field.type=='text' || field.type=='number'"
+           [type]="field.type"
+           [name]="field.name"
+           [(ngModel)]="formData[field.name]">
+
+    <select *ngIf="field.type=='select'"
+            [name]="field.name"
+            [(ngModel)]="formData[field.name]">
+      <option value="">Select</option>
+      <option *ngFor="let op of field.options">{{op}}</option>
+    </select>
+  </div>
+
+  <button type="button" class="post-btn" (click)="submitCustomFields()">Post Ad</button>
+
+  <!-- Success Overlay -->
+  <div class="overlay" *ngIf="adPosted">
+    <div class="success-box">
+      <h2>YOU DID IT! </h2>
+      <p>Published ✅</p>
+      <div class="actions">
+        <button (click)="goBack()">GO BACK to Dashboard</button>
+        <button (click)="viewAd()">VIEW AD</button>
+      </div>
+    </div>
+  </div>
+
+</div>

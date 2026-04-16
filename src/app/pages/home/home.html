@@ -1,0 +1,419 @@
+<div class="whole">
+
+  <!-- TOP HERO BANNER -->
+  <section class="top-hero">
+    <div class="top-banner-ad">
+      <div class="slider">
+        <div
+          class="slides"
+          [style.transform]="'translateX(-' + (currentSlide * 100) + '%)'"
+        >
+          <img src="assets/slee1.jpeg" alt="Slide 1">
+          <img src="assets/slee2.jpeg" alt="Slide 2">
+          <img src="assets/sle3.jpeg" alt="Slide 3">
+        </div>
+
+        <button class="prev" (click)="prevSlide()">❮</button>
+        <button class="next" (click)="nextSlide()">❯</button>
+
+        <div class="dots">
+          <span
+            *ngFor="let s of slidesArray; let i = index"
+            [class.active]="i === currentSlide"
+            (click)="currentSlide = i">
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+<section class="mini-promos">
+  <div class="promo-grid">
+
+  <div class="promo-card matrimony-card featured-matrimony-card">
+  <div class="promo-top-line"></div>
+
+  <div class="promo-icon-wrap">
+    <span class="promo-icon">💖</span>
+    <span class="heart-ripple ripple-1"></span>
+    <span class="heart-ripple ripple-2"></span>
+  </div>
+
+  <span class="promo-badge">Top Choice</span>
+
+  <h3>Thirumagal Matrimony</h3>
+
+  <p>
+    Find your perfect life partner with trusted profiles and secure
+    connections.
+  </p>
+
+<div class="promo-action">
+  <a
+    href="https://thirumagalmatrimony.in/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <button type="button">Start Your Journey →</button>
+  </a>
+</div>
+
+  <span class="love-spark spark-1"></span>
+  <span class="love-spark spark-2"></span>
+  <span class="love-spark spark-3"></span>
+  <span class="love-spark spark-4"></span>
+  <span class="love-spark spark-5"></span>
+
+  <span class="bg-orb orb-1"></span>
+  <span class="bg-orb orb-2"></span>
+</div>
+    <!-- Sastha Driving School -->
+    <div class="promo-card driving-card featured-promo">
+      <div class="promo-top-line"></div>
+
+      <div class="promo-icon-wrap">
+        <span class="promo-icon">🚗</span>
+      </div>
+
+      <span class="promo-badge">Top Choice</span>
+
+      <h3>Sastha Driving School</h3>
+
+      <p>
+        Learn driving with expert trainers. Safe, confident and real-road
+        driving experience.
+      </p>
+
+      <div class="promo-action">
+        <button type="button">Book a Lesson →</button>
+      </div>
+    </div>
+
+    <!-- AMI HUB -->
+    <div class="promo-card amihub-card">
+      <div class="promo-top-line"></div>
+
+      <div class="promo-icon-wrap">
+        <span class="promo-icon">🏢</span>
+      </div>
+<span class="promo-badge">Top Choice</span>
+      <h3>AMI HUB</h3>
+
+      <p>
+        Buy, sell and discover products and services near you with ease.
+      </p>
+
+      <div class="promo-action">
+        <button type="button">Explore Now →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+  <!-- TABS SEARCH -->
+  <section class="search-section">
+    <div class="search-block">
+      <h2 class="search-line">
+        <span class="search-text">Search Across</span>
+        <span class="count">&nbsp;5.3 Crore+</span>
+        <span class="rotate-text">
+          <span>Products&nbsp;&amp;&nbsp;Services</span>
+          <span>Businesses</span>
+        </span>
+      </h2>
+
+      <div class="search-area">
+        <div class="tabs">
+          <button
+            class="tab"
+            [class.active]="activeTab === 'all'"
+            (click)="selectTab('all')">
+            All
+          </button>
+
+          <button
+            class="tab"
+            [class.active]="activeTab === 'products'"
+            (click)="selectTab('products')">
+            Products
+          </button>
+
+          <button
+            class="tab"
+            [class.active]="activeTab === 'service-list'"
+            (click)="selectTab('service-list')">
+            Services
+          </button>
+        </div>
+
+        <div class="search-input-wrapper search-main-input">
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            [placeholder]="getSearchPlaceholder()"
+            (keyup.enter)="goToPage()"
+          >
+        </div>
+
+        <button class="search-btn" (click)="goToPage()">Find Now</button>
+      </div>
+
+      <!-- <div class="discover-actions">
+        <a class="discover-btn primary" [routerLink]="['/all-listings']">
+          Discover All Products & Services
+        </a>
+
+        <div class="discover-links">
+          <button (click)="goToProducts()">View Products</button>
+          <button (click)="goToServices()">View Services</button>
+        </div>
+      </div> -->
+    </div>
+  </section>
+
+  <!-- BROWSE CATEGORIES -->
+  <section class="categories-section">
+    <div class="section-head">
+      <h2>Browse Categories</h2>
+    </div>
+
+    <div class="loading-text" *ngIf="isCategoriesLoading()">
+      Loading categories...
+    </div>
+
+    <div class="categories-grid jd-style" *ngIf="browseCategories().length > 0">
+      <div
+        class="jd-item"
+        *ngFor="let cat of browseCategories()"
+        (click)="openCategory(cat)"
+      >
+        <div class="cat-card jd-card">
+          <div class="jd-icon">
+            <img [src]="getCategoryImage(cat)" [alt]="cat.categoryname">
+          </div>
+        </div>
+        <p class="jd-label">{{ cat.categoryname }}</p>
+      </div>
+
+      <!-- POPULAR CATEGORIES BUTTON -->
+      <!-- <div class="jd-item" (click)="goToAllCategories()">
+        <div class="cat-card jd-card popular-card">
+          <div class="jd-icon popular-icon">
+            <span class="menu-line"></span>
+            <span class="menu-line"></span>
+            <span class="menu-line"></span>
+          </div>
+        </div>
+        <p class="jd-label">Popular Categories</p>
+      </div> -->
+    </div>
+  </section>
+
+  <!-- FEATURED PRODUCTS -->
+  <section class="featured-section">
+    <div class="section-head">
+      <h2>Featured Products</h2>
+    </div>
+
+    <div class="loading-text" *ngIf="isFeaturedLoading()">
+      Loading featured products...
+    </div>
+
+    <div class="loading-text" *ngIf="!isFeaturedLoading() && featuredBusinesses().length === 0">
+      No featured products available right now.
+    </div>
+
+    <div class="featured-grid" *ngIf="featuredBusinesses().length > 0">
+      <div class="featured-card" *ngFor="let business of featuredBusinesses()" (click)="openDetails(business)">
+        <div class="card-badge">Featured</div>
+        <div class="fav-btn">♡</div>
+        <img [src]="getFeaturedImage(business)" [alt]="business.title">
+        <div class="card-body">
+          <h4>{{ business.title }}</h4>
+          <p class="price-text">₹{{ business.price || 0 }}</p>
+          <p class="location-text">📍 {{ business.location || business.address || 'Location not available' }}</p>
+          <a class="card-link">View Details ›</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOST CTA -->
+  <section class="boost-banner">
+    <div class="boost-left">
+      <div class="boost-icon">🚀</div>
+      <div>
+        <h3>Boost Your Ad & Reach 10x More Buyers!</h3>
+        <p>Get more visibility with Featured Listings and Premium Placement.</p>
+      </div>
+    </div>
+
+    <button class="boost-btn" (click)="goToSubscriptionPlan()">Upgrade Now</button>
+  </section>
+
+  <!-- TRENDING NEAR YOU -->
+  <section class="trending">
+    <div class="section-head">
+      <h2>Hot Ads</h2>
+      <a class="section-link" (click)="goToAllDeals()">
+        View All Deals →
+      </a>
+    </div>
+
+    <div class="loading-text" *ngIf="isTrendingLoading()">
+      Loading hot ads...
+    </div>
+
+    <div class="loading-text" *ngIf="!isTrendingLoading() && trendingPosts().length === 0">
+      No hot ads available right now.
+    </div>
+
+    <div
+      class="trending-scroll-wrap"
+      *ngIf="trendingPosts().length > 0"
+      (mouseenter)="stopTrendingAutoScroll()"
+      (mouseleave)="startTrendingAutoScroll()"
+    >
+      <div class="trending-row">
+        <div
+          class="product-card trending-card"
+          *ngFor="let post of getVisibleTrendingPosts()"
+          (click)="openDetails(post)"
+        >
+          <div class="deal-tag">Hot</div>
+          <div class="fav-btn">♡</div>
+
+          <img
+            [src]="getTrendingImage(post)"
+            [alt]="post.title"
+            loading="lazy"
+            decoding="async"
+          >
+
+          <div class="card-body">
+            <h3>{{ post.title }}</h3>
+            <p class="price">₹{{ post.price || 0 }}</p>
+            <p class="location-text">📍 {{ post.location || post.address || 'Location not available' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW PRODUCTS -->
+  <section class="featured-deals">
+    <div class="section-head">
+      <h2>New Products</h2>
+      <a class="section-link" (click)="goToAllDeals()">
+        View All Deals →
+      </a>
+    </div>
+
+    <div class="loading-text" *ngIf="isLatestLoading()">
+      Loading new products...
+    </div>
+
+    <div class="loading-text" *ngIf="!isLatestLoading() && latestProducts().length === 0">
+      No new products available right now.
+    </div>
+
+    <div class="deals-grid" *ngIf="latestProducts().length > 0">
+      <div class="deal-card" *ngFor="let post of latestProducts()" (click)="openDetails(post)">
+        <div class="deal-tag">New</div>
+        <div class="fav-btn">♡</div>
+        <img [src]="getLatestProductImage(post)" [alt]="post.title">
+        <div class="card-body">
+          <h4>{{ post.title }}</h4>
+          <p class="price">₹{{ post.price || 0 }}</p>
+          <p class="location-text">📍 {{ post.location || post.address || 'Location not available' }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- STATS SECTION -->
+<section class="achievements-section">
+  <div class="achievements-shell">
+    <div class="achievements-intro">
+      <span class="section-badge">Our Growth</span>
+      <h2 class="section-title">Our Marketplace Achievements</h2>
+      <p class="section-subtitle">
+        Trusted by buyers, sellers, and service providers across the marketplace.
+      </p>
+    </div>
+
+    <div class="achievements-grid">
+      <div class="achievement-card customers-card">
+        <div class="achievement-glow"></div>
+        <div class="achievement-topbar"></div>
+
+        <div class="achievement-meta">
+          <span class="achievement-index">01</span>
+          <span class="achievement-chip">Live Growth</span>
+        </div>
+
+        <div class="achievement-icon-wrap">
+          <div class="achievement-icon">👥</div>
+        </div>
+
+        <h3 class="achievement-number">{{ animatedCustomersCount }}+</h3>
+        <p class="achievement-title">Happy Customers</p>
+        <span class="achievement-desc">Growing trust every day</span>
+      </div>
+
+      <div class="achievement-card highlight-card products-card">
+        <div class="achievement-glow"></div>
+        <div class="achievement-topbar"></div>
+
+        <div class="achievement-meta">
+          <span class="achievement-index">02</span>
+          <span class="achievement-chip">Top Demand</span>
+        </div>
+
+        <div class="achievement-icon-wrap">
+          <div class="achievement-icon">📦</div>
+        </div>
+
+        <h3 class="achievement-number">{{ animatedProductsCount }}+</h3>
+        <p class="achievement-title">Products Sold</p>
+        <span class="achievement-desc">High demand across categories</span>
+      </div>
+
+      <div class="achievement-card services-card">
+        <div class="achievement-glow"></div>
+        <div class="achievement-topbar"></div>
+
+        <div class="achievement-meta">
+          <span class="achievement-index">03</span>
+          <span class="achievement-chip">Reliable Service</span>
+        </div>
+
+        <div class="achievement-icon-wrap">
+          <div class="achievement-icon">🛠️</div>
+        </div>
+
+        <h3 class="achievement-number">{{ animatedServicesCount }}+</h3>
+        <p class="achievement-title">Services Completed</p>
+        <span class="achievement-desc">Reliable service delivery</span>
+      </div>
+
+      <div class="achievement-card sellers-card">
+        <div class="achievement-glow"></div>
+        <div class="achievement-topbar"></div>
+
+        <div class="achievement-meta">
+          <span class="achievement-index">04</span>
+          <span class="achievement-chip">Verified Network</span>
+        </div>
+
+        <div class="achievement-icon-wrap">
+          <div class="achievement-icon">🏪</div>
+        </div>
+
+        <h3 class="achievement-number">{{ animatedSellersCount }}+</h3>
+        <p class="achievement-title">Trusted Sellers</p>
+        <span class="achievement-desc">Verified business growth</span>
+      </div>
+    </div>
+  </div>
+</section>
+</div>

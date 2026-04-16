@@ -1,0 +1,67 @@
+<div class="setup-page">
+  <div class="setup-card">
+    <h1>Complete Your Account</h1>
+    <p class="subtitle">Just one quick step before you continue</p>
+
+    <div class="form-group">
+      <label>Create Password <span class="optional">(Optional)</span></label>
+      <input
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        placeholder="Create password"
+      >
+    </div>
+
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <input
+        type="password"
+        [(ngModel)]="confirmPassword"
+        name="confirmPassword"
+        placeholder="Confirm password"
+      >
+    </div>
+
+    <div class="form-group">
+      <label>User Type <span class="required">*</span></label>
+
+      <div class="option-row">
+        <label class="option-card" [class.active]="userType === 'buyer'">
+          <input type="radio" [(ngModel)]="userType" name="userType" value="buyer">
+          <span>Buyer</span>
+        </label>
+
+        <label class="option-card" [class.active]="userType === 'seller'">
+          <input type="radio" [(ngModel)]="userType" name="userType" value="seller">
+          <span>Seller</span>
+        </label>
+
+        <label class="option-card" [class.active]="userType === 'both'">
+          <input type="radio" [(ngModel)]="userType" name="userType" value="both">
+          <span>Both</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Listing Preference <span class="optional">(Optional)</span></label>
+
+      <div class="option-row">
+        <label class="option-card" [class.active]="listingType === 'product'">
+          <input type="radio" [(ngModel)]="listingType" name="listingType" value="product">
+          <span>Product</span>
+        </label>
+
+        <label class="option-card" [class.active]="listingType === 'service'">
+          <input type="radio" [(ngModel)]="listingType" name="listingType" value="service">
+          <span>Service</span>
+        </label>
+      </div>
+    </div>
+
+    <button class="submit-btn" (click)="submitSetup()" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Saving...' : 'Continue' }}
+    </button>
+  </div>
+</div>
