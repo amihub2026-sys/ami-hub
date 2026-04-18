@@ -381,8 +381,13 @@ export class AdminBoostPlansComponent implements OnInit {
   }
 
   async deleteBoostPlan(item: AdminBoostPlanItem): Promise<void> {
-    const confirmed = confirm(
-      `Are you sure you want to delete boost #${item.boostid}?`
+    if (!item?.boostid) {
+      alert('Invalid boost record.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete boost #${item.boostid}?\nThis action cannot be undone.`
     );
 
     if (!confirmed) return;
