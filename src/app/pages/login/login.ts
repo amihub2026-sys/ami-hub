@@ -65,7 +65,11 @@ closeAd(type: 'left' | 'right') {
       localStorage.removeItem('redirectToAfterLogin');
       return;
     }
-
+    if (!sessionData.session) {
+      localStorage.removeItem('googleLoginPending');
+      localStorage.removeItem('redirectToAfterLogin');
+      return;
+    }
     const { data, error } = await this.supabaseService.syncGoogleUserToPublicUsers();
 
     localStorage.removeItem('googleLoginPending');
