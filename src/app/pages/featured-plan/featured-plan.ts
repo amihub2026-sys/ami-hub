@@ -12,30 +12,115 @@ export class FeaturedPlan {
   postId: number = 0;
   adType: 'service' | 'product' = 'service';
   isSaving = false;
+  postDetails: any = null;
 
   constructor(private router: Router) {
     const nav = this.router.getCurrentNavigation();
+    const navState = nav?.extras?.state || {};
+    const historyState =
+      typeof window !== 'undefined' ? window.history.state || {} : {};
 
-    if (nav?.extras?.state?.['postId']) {
-      this.postId = Number(nav.extras.state['postId']) || 0;
-    } else if (typeof window !== 'undefined') {
-      this.postId = Number(window.history.state?.postId) || 0;
+    this.postId = Number(navState['postId'] || historyState['postId'] || 0);
+
+    this.adType =
+      (navState['adType'] || historyState['adType']) === 'product'
+        ? 'product'
+        : 'service';
+
+    this.postDetails =
+      navState['postDetails'] ||
+      historyState['postDetails'] ||
+      this.getStoredPendingPost();
+
+    if ((!this.postId || this.postId <= 0) && this.postDetails?.postid) {
+      this.postId = Number(this.postDetails.postid) || 0;
     }
 
-    if (nav?.extras?.state?.['adType']) {
-      this.adType =
-        nav.extras.state['adType'] === 'product' ? 'product' : 'service';
-    } else if (typeof window !== 'undefined') {
-      this.adType =
-        window.history.state?.adType === 'product' ? 'product' : 'service';
+    if ((!this.adType || this.adType === 'service') && this.postDetails) {
+      const type = String(
+        this.postDetails?.adtype || this.postDetails?.conditiontype || 'service'
+      )
+        .toLowerCase()
+        .trim();
+
+      this.adType = type === 'product' ? 'product' : 'service';
     }
+
+    if (this.postDetails && this.postId > 0) {
+      this.postDetails = {
+        ...this.postDetails,
+        postid: Number(this.postDetails?.postid || this.postId),
+        adtype:
+          this.postDetails?.adtype ||
+          this.postDetails?.conditiontype ||
+          this.adType,
+        conditiontype:
+          this.postDetails?.conditiontype ||
+          this.postDetails?.adtype ||
+          this.adType,
+      };
+    }
+
+    console.log('FEATURED PLAN POST ID:', this.postId);
+    console.log('FEATURED PLAN AD TYPE:', this.adType);
+    console.log('FEATURED PLAN POST DETAILS:', this.postDetails);
+  }
+
+  private getStoredPendingPost(): any {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      const raw = localStorage.getItem('pending_post_payload');
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+      console.error('Error reading pending_post_payload:', error);
+      return null;
+    }
+  }
+
+  private storePendingPost(): void {
+    if (typeof window === 'undefined') return;
+
+    if (!this.postDetails || !this.postId) {
+      return;
+    }
+
+    const payload = {
+      ...this.postDetails,
+      postid: Number(this.postDetails?.postid || this.postId),
+      adtype:
+        this.postDetails?.adtype ||
+        this.postDetails?.conditiontype ||
+        this.adType,
+      conditiontype:
+        this.postDetails?.conditiontype ||
+        this.postDetails?.adtype ||
+        this.adType,
+    };
+
+    localStorage.setItem('pending_post_payload', JSON.stringify(payload));
+    localStorage.setItem('pending_post_flow', 'featured');
+    localStorage.setItem('pending_post_type', this.adType);
+
+    if (payload?.userid != null) {
+      localStorage.setItem('pending_post_userid', String(payload.userid));
+    }
+
+    console.log('STORED PENDING POST PAYLOAD:', payload);
   }
 
   choosePlan(planType: 'basic' | 'standard' | 'premium') {
     if (this.isSaving) return;
 
+    if (!this.postId || this.postId <= 0) {
+      alert('Post details not found. Please go back and try again.');
+      return;
+    }
+
     try {
       this.isSaving = true;
+
+      this.storePendingPost();
 
       let selectedPlan: any = null;
 
@@ -107,7 +192,14 @@ export class FeaturedPlan {
         console.log('SELECTED PLAN PAYLOAD:', selectedPlan);
       }
 
-      this.router.navigate(['/payment']);
+      this.router.navigate(['/payment'], {
+        state: {
+          postId: this.postId,
+          adType: this.adType,
+          postDetails: this.postDetails,
+          selectedPlan
+        }
+      });
     } catch (err) {
       console.error('choosePlan error:', err);
       alert('Something went wrong');

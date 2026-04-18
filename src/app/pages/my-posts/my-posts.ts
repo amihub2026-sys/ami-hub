@@ -110,6 +110,45 @@ export class MyPosts implements OnInit {
     }
   }
 
+  private buildFeaturePostPayload(post: any): any {
+    return {
+      ...post,
+      postid: Number(post?.postid),
+      userid: post?.userid ?? null,
+      title: post?.title ?? '',
+      description: post?.description ?? '',
+      price: Number(post?.price ?? 0),
+      currencycode: post?.currencycode || 'INR',
+      categoryid: post?.categoryid ?? null,
+      subcategoryid: post?.subcategoryid ?? null,
+      conditiontype: post?.conditiontype || post?.adtype || this.getAdType(post),
+      adtype: post?.adtype || post?.conditiontype || this.getAdType(post),
+      status: post?.status || 'Active',
+      isactive: post?.isactive ?? true,
+      image_url: post?.image_url || '',
+      image_urls: Array.isArray(post?.image_urls) ? post.image_urls : [],
+      video_url: post?.video_url || '',
+      video_urls: Array.isArray(post?.video_urls) ? post.video_urls : [],
+      contactname: post?.contactname || '',
+      contactemail: post?.contactemail || '',
+      contactphone: post?.contactphone || '',
+      whatsappnumber: post?.whatsappnumber || '',
+      location: post?.location || '',
+      cityid: post?.cityid ?? null,
+      areaid: post?.areaid ?? null,
+      full_address: post?.full_address || '',
+      latitude: post?.latitude ?? null,
+      longitude: post?.longitude ?? null,
+      custom_fields: post?.custom_fields ?? null,
+
+      // featured values reset until payment completes
+      isfeatured: false,
+      is_featured: false,
+      featured_plan_id: null,
+      featured_plan_name: null
+    };
+  }
+
   async featurePost(post: any, event: MouseEvent): Promise<void> {
     event.preventDefault();
     event.stopPropagation();
@@ -127,18 +166,40 @@ export class MyPosts implements OnInit {
     }
 
     const adType = this.getAdType(post);
+    const featurePayload = this.buildFeaturePostPayload(post);
 
-    console.log('Opening featured plan for post:', post.postid, 'type:', adType);
+    try {
+      // save edited/existing post so payment page can read it
+      localStorage.setItem(
+        'pending_post_payload',
+        JSON.stringify(featurePayload)
+      );
 
-    const success = await this.router.navigate(['/featured-plan'], {
-      state: {
-        postId: Number(post.postid),
-        adType: adType
+      // mark this as featured/boost flow
+      localStorage.setItem('pending_post_flow', 'featured');
+      localStorage.setItem('pending_post_type', adType);
+      localStorage.setItem(
+        'pending_post_userid',
+        String(featurePayload?.userid ?? '')
+      );
+
+      console.log('Opening featured plan for post:', post.postid, 'type:', adType);
+      console.log('STORED FEATURE POST PAYLOAD:', featurePayload);
+
+      const success = await this.router.navigate(['/featured-plan'], {
+        state: {
+          postId: Number(post.postid),
+          adType: adType,
+          postDetails: featurePayload
+        }
+      });
+
+      if (!success) {
+        console.error('Navigation failed for featured post:', post.postid);
+        alert('Failed to open featured plan');
       }
-    });
-
-    if (!success) {
-      console.error('Navigation failed for featured post:', post.postid);
+    } catch (error) {
+      console.error('Error preparing featured flow:', error);
       alert('Failed to open featured plan');
     }
   }

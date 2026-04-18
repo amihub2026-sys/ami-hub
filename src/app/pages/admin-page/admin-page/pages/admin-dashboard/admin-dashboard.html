@@ -1,0 +1,116 @@
+<div class="dashboard-shell">
+  <div class="dashboard-head">
+    <div>
+      <p class="eyebrow">Admin Analytics</p>
+      <h2>Dashboard Overview</h2>
+      <p class="subtext">
+        Track users, posts, subscriptions, revenue, and latest platform activity.
+      </p>
+    </div>
+
+    <button class="refresh-btn" type="button" (click)="loadDashboard()" [disabled]="isLoading">
+      {{ isLoading ? 'Loading...' : 'Refresh' }}
+    </button>
+  </div>
+
+  <div class="error-card" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="stats-grid" *ngIf="!isLoading; else loadingBlock">
+    <div
+      class="stat-card"
+      *ngFor="let stat of stats; trackBy: trackByStat"
+      [style.background]="stat.bg"
+    >
+      <div class="stat-icon" [style.color]="stat.color">{{ stat.icon }}</div>
+
+      <div class="stat-content">
+        <div class="stat-top">
+          <p>{{ stat.title }}</p>
+          <span>{{ stat.change }}</span>
+        </div>
+        <h3>{{ stat.value }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #loadingBlock>
+    <div class="stats-grid skeleton-grid">
+      <div class="skeleton-card" *ngFor="let i of [1, 2, 3, 4]"></div>
+    </div>
+  </ng-template>
+
+  <div class="dashboard-content">
+    <div class="panel-card overview-card">
+      <div class="card-header">
+        <div>
+          <h3>Overview</h3>
+          <p>Live business snapshot from Supabase</p>
+        </div>
+      </div>
+
+      <div class="overview-grid">
+        <div class="overview-box">
+          <span>Total Users</span>
+          <strong>{{ totalUsers | number : '1.0-0' }}</strong>
+        </div>
+
+        <div class="overview-box">
+          <span>Total Posts</span>
+          <strong>{{ totalPosts | number : '1.0-0' }}</strong>
+        </div>
+
+        <div class="overview-box">
+          <span>Subscriptions</span>
+          <strong>{{ activeSubscriptions | number : '1.0-0' }}</strong>
+        </div>
+
+        <div class="overview-box">
+          <span>Revenue</span>
+          <strong>{{ formattedRevenue }}</strong>
+        </div>
+      </div>
+
+      <div class="chart-placeholder">
+        <div class="chart-inner">
+          <div class="chart-badge">📊</div>
+          <h4>Analytics Chart Area</h4>
+          <p>Once this dashboard is stable, we can connect Chart.js here with real monthly data.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card activity-card">
+      <div class="card-header">
+        <div>
+          <h3>Recent Activity</h3>
+          <p>{{ totalActivities }} latest updates</p>
+        </div>
+      </div>
+
+      <div class="activity-list" *ngIf="recentActivities.length; else noActivity">
+        <div
+          class="activity-item"
+          *ngFor="let item of recentActivities; trackBy: trackByActivity"
+        >
+          <div class="activity-icon">{{ item.icon }}</div>
+
+          <div class="activity-content">
+            <h4>{{ item.title }}</h4>
+            <p>{{ item.subtitle }}</p>
+          </div>
+
+          <div class="activity-time">{{ item.time }}</div>
+        </div>
+      </div>
+
+      <ng-template #noActivity>
+        <div class="empty-state">
+          <div class="empty-icon">🗂️</div>
+          <p>No recent activity found.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

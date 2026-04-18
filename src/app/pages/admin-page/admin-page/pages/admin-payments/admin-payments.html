@@ -1,0 +1,276 @@
+<h1>check</h1>
+<div class="payments-page">
+  <div class="summary-grid">
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Total Payments</div>
+      <div class="mini-stat-value">{{ totalPaymentsCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Paid</div>
+      <div class="mini-stat-value">{{ paidPaymentsCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Pending</div>
+      <div class="mini-stat-value">{{ pendingPaymentsCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Failed</div>
+      <div class="mini-stat-value">{{ failedPaymentsCount }}</div>
+    </div>
+
+    <div class="mini-stat-card revenue-card">
+      <div class="mini-stat-label">Revenue</div>
+      <div class="mini-stat-value">{{ totalRevenueLabel }}</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div class="section-head-left">
+        <h2>Payments</h2>
+        <p class="section-desc">
+          Manage Razorpay payment records, payment status, user mapping, and plans.
+        </p>
+      </div>
+
+      <div class="section-head-right">
+        <div class="users-count-label">
+          Showing {{ filteredPayments.length }} payment(s)
+        </div>
+
+        <button type="button" class="primary-btn" (click)="openCreateForm()">
+          + Add Payment
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="filter-chips">
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="paymentStatusFilter === 'all'"
+          (click)="setPaymentStatusFilter('all')"
+        >
+          All
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="paymentStatusFilter === 'paid'"
+          (click)="setPaymentStatusFilter('paid')"
+        >
+          Paid
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="paymentStatusFilter === 'pending'"
+          (click)="setPaymentStatusFilter('pending')"
+        >
+          Pending
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="paymentStatusFilter === 'failed'"
+          (click)="setPaymentStatusFilter('failed')"
+        >
+          Failed
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="paymentStatusFilter === 'other'"
+          (click)="setPaymentStatusFilter('other')"
+        >
+          Other
+        </button>
+      </div>
+    </div>
+
+    <div class="loading-box" *ngIf="loading">
+      Loading payments...
+    </div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table class="payments-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>Auth User ID</th>
+            <th>Plan ID</th>
+            <th>Plan Name</th>
+            <th>Amount</th>
+            <th>Payment ID</th>
+            <th>Order ID</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th class="actions-header">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of filteredPayments; trackBy: trackByPayment">
+            <td>#{{ item.id }}</td>
+            <td>{{ item.userid ?? '-' }}</td>
+            <td>{{ item.auth_user_id || '-' }}</td>
+            <td>{{ item.plan_id || '-' }}</td>
+            <td>{{ item.plan_name || '-' }}</td>
+            <td>{{ item.amountLabel }}</td>
+            <td>{{ item.razorpay_payment_id || '-' }}</td>
+            <td>{{ item.razorpay_order_id || '-' }}</td>
+
+            <td>
+              <span
+                class="status-badge"
+                [class.status-paid]="item.statusLabel === 'Paid'"
+                [class.status-pending]="item.statusLabel === 'Pending'"
+                [class.status-failed]="item.statusLabel === 'Failed'"
+                [class.status-other]="item.statusLabel !== 'Paid' && item.statusLabel !== 'Pending' && item.statusLabel !== 'Failed'"
+              >
+                {{ item.statusLabel }}
+              </span>
+            </td>
+
+            <td>{{ item.createdLabel }}</td>
+
+            <td class="actions-cell">
+              <div class="row-actions">
+                <button
+                  type="button"
+                  class="table-action-btn"
+                  (click)="openEditForm(item)"
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn success"
+                  (click)="updatePaymentStatus(item, 'paid')"
+                >
+                  Mark Paid
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn warning"
+                  (click)="updatePaymentStatus(item, 'pending')"
+                >
+                  Mark Pending
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn danger"
+                  (click)="updatePaymentStatus(item, 'failed')"
+                >
+                  Mark Failed
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn danger"
+                  [disabled]="deletingId === item.id"
+                  (click)="deletePayment(item)"
+                >
+                  {{ deletingId === item.id ? 'Deleting...' : 'Delete' }}
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!filteredPayments.length">
+            <td colspan="11" class="empty-cell">
+              No payments found for the current search/filter.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="showForm">
+    <div class="modal-card payment-modal">
+      <div class="modal-head">
+        <h3>{{ isEditMode ? 'Edit Payment' : 'Add Payment' }}</h3>
+        <button type="button" class="modal-close" (click)="closeForm()">×</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Plan ID</label>
+          <input type="text" [(ngModel)]="formModel.plan_id" />
+        </div>
+
+        <div class="form-group">
+          <label>Plan Name</label>
+          <input type="text" [(ngModel)]="formModel.plan_name" />
+        </div>
+
+        <div class="form-group">
+          <label>Amount</label>
+          <input type="number" [(ngModel)]="formModel.amount" />
+        </div>
+
+        <div class="form-group">
+          <label>Payment ID</label>
+          <input type="text" [(ngModel)]="formModel.razorpay_payment_id" />
+        </div>
+
+        <div class="form-group">
+          <label>Order ID</label>
+          <input type="text" [(ngModel)]="formModel.razorpay_order_id" />
+        </div>
+
+        <div class="form-group">
+          <label>Signature</label>
+          <input type="text" [(ngModel)]="formModel.razorpay_signature" />
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select [(ngModel)]="formModel.status">
+            <option value="paid">Paid</option>
+            <option value="pending">Pending</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Auth User ID</label>
+          <input type="text" [(ngModel)]="formModel.auth_user_id" />
+        </div>
+
+        <div class="form-group">
+          <label>User ID</label>
+          <input type="number" [(ngModel)]="formModel.userid" />
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" (click)="closeForm()">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="primary-btn"
+          [disabled]="saving"
+          (click)="savePayment()"
+        >
+          {{ saving ? 'Saving...' : (isEditMode ? 'Update Payment' : 'Create Payment') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

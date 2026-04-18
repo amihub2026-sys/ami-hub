@@ -1,95 +1,116 @@
-<!-- dashboard.component.html -->
-<div class="dashboard-container">
+<div class="admin-layout">
+  <div
+    class="sidebar-overlay"
+    [class.show]="sidebarOpen"
+    (click)="closeSidebar()"
+  ></div>
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <h2 class="logo">AMI HUB</h2>
-    <ul class="menu">
-      <li class="menu-item active">Dashboard</li>
-      <li class="menu-item">Customers</li>
-      <li class="menu-item">Orders</li>
-      <li class="menu-item">Reports</li>
-      <li class="menu-item">Settings</li>
-    </ul>
-  </aside>
+  <app-admin-sidebar
+    [activeMenu]="activeMenu"
+    [sidebarOpen]="sidebarOpen"
+    (menuChange)="setActiveMenu($event)"
+  ></app-admin-sidebar>
 
-  <!-- Main Content -->
   <main class="main-content">
+    <app-admin-topbar
+      [username]="username"
+      [pageTitle]="pageTitle"
+      (menuToggle)="toggleSidebar()"
+    ></app-admin-topbar>
 
-    <!-- Topbar -->
-    <header class="topbar">
-      <input type="text" placeholder="Search customers..." [(ngModel)]="searchQuery" class="search-bar">
-      <div class="user-profile">
-        <img src="assets/user-avatar.png" alt="User Avatar">
-        <span>{{ username }}</span>
+    <div class="search-bar-wrap" *ngIf="isSearchVisible">
+      <div class="search-box">
+        <span class="search-icon">🔎</span>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          [placeholder]="searchPlaceholder"
+        />
       </div>
-    </header>
+    </div>
 
-    <!-- KPI Cards -->
-    <section class="cards-section">
-      <div class="card">
-        <h3>Total Customers</h3>
-        <p>{{ totalCustomers }}</p>
-      </div>
-      <div class="card">
-        <h3>Active Orders</h3>
-        <p>{{ activeOrders }}</p>
-      </div>
-      <div class="card">
-        <h3>New Signups</h3>
-        <p>{{ newSignups }}</p>
-      </div>
-      <div class="card">
-        <h3>Revenue</h3>
-        <p>${{ revenue }}</p>
-      </div>
-    </section>
+    <app-admin-dashboard
+      *ngIf="activeMenu === 'dashboard'"
+    ></app-admin-dashboard>
 
-    <!-- Customer Table -->
-    <section class="table-section">
-      <h2>Customer List</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let customer of customers; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ customer.name }}</td>
-            <td>{{ customer.email }}</td>
-            <td>{{ customer.phone }}</td>
-            <td>
-              <span [class.active]="customer.status==='Active'" [class.inactive]="customer.status==='Inactive'">
-                {{ customer.status }}
-              </span>
-            </td>
-            <td>
-              <button class="edit-btn">Edit</button>
-              <button class="delete-btn">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+    <app-admin-users
+      *ngIf="activeMenu === 'users'"
+      [searchQuery]="searchQuery"
+    ></app-admin-users>
 
-    <!-- Charts -->
-    <section class="charts-section">
-      <div class="chart-card">
-        <h3>Customer Growth</h3>
-        <canvas id="customerGrowthChart"></canvas>
-      </div>
-      <div class="chart-card">
-        <h3>Revenue Trend</h3>
-        <canvas id="revenueChart"></canvas>
-      </div>
-    </section>
+    <app-admin-posts
+      *ngIf="activeMenu === 'posts'"
+      [searchQuery]="searchQuery"
+    ></app-admin-posts>
 
+    <app-admin-categories
+      *ngIf="activeMenu === 'categories'"
+      [searchQuery]="searchQuery"
+    ></app-admin-categories>
+
+    <app-admin-subcategories
+      *ngIf="activeMenu === 'subcategories'"
+      [searchQuery]="searchQuery"
+    ></app-admin-subcategories>
+
+    <app-admin-subscriptions
+      *ngIf="activeMenu === 'subscriptions'"
+      [searchQuery]="searchQuery"
+    ></app-admin-subscriptions>
+
+    <app-admin-user-subscriptions
+      *ngIf="activeMenu === 'user-subscriptions'"
+      [searchQuery]="searchQuery"
+    ></app-admin-user-subscriptions>
+
+    <app-admin-boost-plans
+      *ngIf="activeMenu === 'boost-plans'"
+      [searchQuery]="searchQuery"
+    ></app-admin-boost-plans>
+
+    <app-admin-payments
+      *ngIf="activeMenu === 'payments'"
+      [searchQuery]="searchQuery"
+    ></app-admin-payments>
+
+    <div class="content-card" *ngIf="activeMenu === 'services'">
+      <h1>Services</h1>
+      <p>Services module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'matrimony'">
+      <h1>Matrimony</h1>
+      <p>Matrimony module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'jobs'">
+      <h1>Jobs</h1>
+      <p>Jobs module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'reports'">
+      <h1>Reports</h1>
+      <p>Reports module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'locations'">
+      <h1>Locations</h1>
+      <p>Locations module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'banners'">
+      <h1>Banners</h1>
+      <p>Banners module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'notifications'">
+      <h1>Notifications</h1>
+      <p>Notifications module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'settings'">
+      <h1>Settings</h1>
+      <p>Settings module will be connected next.</p>
+    </div>
   </main>
 </div>

@@ -98,6 +98,33 @@ export class App implements OnInit {
     return isPlatformBrowser(this.platformId);
   }
 
+  private async isLoggedIn(): Promise<boolean> {
+    if (!this.isBrowser()) return false;
+
+    try {
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error('Session check error:', error);
+        return false;
+      }
+
+      const user = data.session?.user;
+      const isAdmin = localStorage.getItem('adminToken') === 'loggedAdmin';
+
+      return !!user || isAdmin;
+    } catch (error) {
+      console.error('isLoggedIn error:', error);
+      return false;
+    }
+  }
+
+  private redirectToLogin(redirectTo: string): void {
+    this.router.navigate(['/login'], {
+      state: { redirectTo }
+    });
+  }
+
   get shouldHideGlobalAds(): boolean {
     const url = this.currentUrl.toLowerCase();
 
@@ -183,18 +210,75 @@ export class App implements OnInit {
   }
 
   goToNotifications(): void {
-    this.router.navigate(['/notification']);
+    this.isLoggedIn().then((loggedIn) => {
+      if (!loggedIn) {
+        this.redirectToLogin('notification');
+        return;
+      }
+
+      if (this.router.url === '/notification') {
+        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+          this.router.navigate(['/notification']);
+        });
+        return;
+      }
+
+      this.router.navigate(['/notification']);
+    });
   }
 
   goToFavorites(): void {
-    if (this.router.url === '/favt') {
-      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-        this.router.navigate(['/favt']);
-      });
-      return;
-    }
+    this.isLoggedIn().then((loggedIn) => {
+      if (!loggedIn) {
+        this.redirectToLogin('favt');
+        return;
+      }
 
-    this.router.navigate(['/favt']);
+      if (this.router.url === '/favt') {
+        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+          this.router.navigate(['/favt']);
+        });
+        return;
+      }
+
+      this.router.navigate(['/favt']);
+    });
+  }
+
+  goToChat(): void {
+    this.isLoggedIn().then((loggedIn) => {
+      if (!loggedIn) {
+        this.redirectToLogin('chats');
+        return;
+      }
+
+      if (this.router.url === '/chats') {
+        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+          this.router.navigate(['/chats']);
+        });
+        return;
+      }
+
+      this.router.navigate(['/chats']);
+    });
+  }
+
+  goToProfile(): void {
+    this.isLoggedIn().then((loggedIn) => {
+      if (!loggedIn) {
+        this.redirectToLogin('seller-profile');
+        return;
+      }
+
+      if (this.router.url === '/seller-profile') {
+        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+          this.router.navigate(['/seller-profile']);
+        });
+        return;
+      }
+
+      this.router.navigate(['/seller-profile']);
+    });
   }
 
   onCityChange(): void {
@@ -373,39 +457,41 @@ export class App implements OnInit {
   }
 
   goToMyPosts(): void {
-    const isAdmin = this.isBrowser() && localStorage.getItem('adminToken') === 'loggedAdmin';
-    const isUser = this.isBrowser() && localStorage.getItem('userToken') === 'loggedUser';
+    this.isLoggedIn().then((loggedIn) => {
+      if (!loggedIn) {
+        this.router.navigate(['/login'], {
+          state: { redirectTo: 'my-posts' }
+        });
+        return;
+      }
 
-    if (!isAdmin && !isUser) {
-      this.router.navigate(['/login'], {
-        state: { redirectTo: 'my-posts' }
-      });
-      return;
-    }
-
-    this.router.navigate(['/my-posts']);
+      this.router.navigate(['/my-posts']);
+    });
   }
 
   postProduct(): void {
-    const isAdmin = this.isBrowser() && localStorage.getItem('adminToken') === 'loggedAdmin';
-    const isUser = this.isBrowser() && localStorage.getItem('userToken') === 'loggedUser';
+    this.isLoggedIn().then((loggedIn) => {
+      if (!loggedIn) {
+        this.router.navigate(['/login'], {
+          state: { redirectTo: 'post-ad' }
+        });
+        return;
+      }
 
-    if (!isAdmin && !isUser) {
-      this.router.navigate(['/login'], {
-        state: { redirectTo: 'post-ad' }
+      const isAdmin =
+        this.isBrowser() && localStorage.getItem('adminToken') === 'loggedAdmin';
+      const userTypeId = this.isBrowser()
+        ? Number(localStorage.getItem('userTypeId'))
+        : 0;
+
+      if (isAdmin || userTypeId === 2) {
+        this.router.navigate(['/post-ad']);
+        return;
+      }
+
+      this.router.navigate(['/seller-profile'], {
+        state: { next: 'post-ad' }
       });
-      return;
-    }
-
-    const userTypeId = this.isBrowser() ? Number(localStorage.getItem('userTypeId')) : 0;
-
-    if (isAdmin || userTypeId === 2) {
-      this.router.navigate(['/post-ad']);
-      return;
-    }
-
-    this.router.navigate(['/seller-profile'], {
-      state: { next: 'post-ad' }
     });
   }
 
@@ -497,6 +583,13 @@ export class App implements OnInit {
 
   async logout(): Promise<void> {
     await this.supabaseService.signOut();
+
+    if (this.isBrowser()) {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('userToken');
+      localStorage.removeItem('userTypeId');
+    }
+
     this.closeMenu();
     this.notificationCount = 0;
     this.cdr.detectChanges();

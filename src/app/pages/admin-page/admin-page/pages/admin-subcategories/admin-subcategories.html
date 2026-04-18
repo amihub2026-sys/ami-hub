@@ -1,0 +1,321 @@
+<div class="subcategories-page">
+  <div class="message-card error-card" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="message-card success-card" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+
+  <div class="summary-grid">
+    <div class="mini-stat-card">
+      <h4>Total Subcategories</h4>
+      <h2>{{ totalSubcategoriesCount }}</h2>
+    </div>
+
+    <div class="mini-stat-card">
+      <h4>Active Subcategories</h4>
+      <h2>{{ activeSubcategoriesCount }}</h2>
+    </div>
+
+    <div class="mini-stat-card">
+      <h4>Inactive Subcategories</h4>
+      <h2>{{ inactiveSubcategoriesCount }}</h2>
+    </div>
+
+    <div class="mini-stat-card">
+      <h4>Linked Categories</h4>
+      <h2>{{ totalCategoriesLinkedCount }}</h2>
+    </div>
+  </div>
+
+  <div class="section-card" *ngIf="showForm">
+    <div class="section-head">
+      <div>
+        <h2>{{ editingSubcategoryId ? 'Edit Subcategory' : 'Create Subcategory' }}</h2>
+        <p class="section-desc">
+          Fill all required details and save.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Category *</label>
+        <select [(ngModel)]="form.categoryid">
+          <option [ngValue]="null">Select category</option>
+          <option
+            *ngFor="let category of categories"
+            [ngValue]="category.categoryid"
+          >
+            {{ category.categoryname }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Subcategory Name *</label>
+        <input
+          type="text"
+          [(ngModel)]="form.subcategoryname"
+          (input)="onSubcategoryNameChange()"
+          placeholder="Enter subcategory name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Slug *</label>
+        <input
+          type="text"
+          [(ngModel)]="form.slug"
+          placeholder="Enter slug"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Sort Order *</label>
+        <input
+          type="number"
+          [(ngModel)]="form.sortorder"
+          placeholder="Enter sort order"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Icon Upload</label>
+        <input
+          type="file"
+          accept="image/*"
+          (change)="onIconFileSelected($event)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Image Upload</label>
+        <input
+          type="file"
+          accept="image/*"
+          (change)="onImageFileSelected($event)"
+        />
+      </div>
+
+      <div class="form-group full-width">
+        <label>Current Icon URL</label>
+        <input
+          type="text"
+          [(ngModel)]="form.iconurl"
+          placeholder="Icon public URL"
+        />
+      </div>
+
+      <div class="form-group full-width">
+        <label>Current Image URL</label>
+        <input
+          type="text"
+          [(ngModel)]="form.image"
+          placeholder="Image public URL"
+        />
+      </div>
+
+      <div class="form-group toggle-group">
+        <label class="checkbox-wrap">
+          <input type="checkbox" [(ngModel)]="form.isactive" />
+          <span>Active Subcategory</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="preview-grid">
+      <div class="preview-card">
+        <p>Icon Preview</p>
+        <div class="preview-box">
+          <img *ngIf="form.iconurl" [src]="form.iconurl" alt="Icon preview" />
+          <span *ngIf="!form.iconurl">No icon</span>
+        </div>
+      </div>
+
+      <div class="preview-card">
+        <p>Image Preview</p>
+        <div class="preview-box">
+          <img *ngIf="form.image" [src]="form.image" alt="Image preview" />
+          <span *ngIf="!form.image">No image</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="secondary-btn" (click)="cancelForm()">
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="primary-btn"
+        (click)="saveSubcategory()"
+        [disabled]="isSaving"
+      >
+        {{ isSaving ? 'Saving...' : (editingSubcategoryId ? 'Update Subcategory' : 'Create Subcategory') }}
+      </button>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div>
+        <h2>Subcategories Management</h2>
+        <p class="section-desc">
+          Search, filter, activate, and manage subcategories.
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <div class="users-count-label">
+          Showing {{ filteredSubcategories.length }} subcategory(s)
+        </div>
+
+        <button type="button" class="primary-btn" (click)="openCreateForm()">
+          + Add Subcategory
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="filter-chips">
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="subcategoryStatusFilter === 'all'"
+          (click)="setSubcategoryStatusFilter('all')"
+        >
+          All
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="subcategoryStatusFilter === 'active'"
+          (click)="setSubcategoryStatusFilter('active')"
+        >
+          Active
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="subcategoryStatusFilter === 'inactive'"
+          (click)="setSubcategoryStatusFilter('inactive')"
+        >
+          Inactive
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrap" *ngIf="!isLoading; else loadingBlock">
+      <table class="subcategories-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Subcategory</th>
+            <th>Category</th>
+            <th>Slug</th>
+            <th>Sort Order</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            *ngFor="let subcategory of filteredSubcategories; trackBy: trackBySubcategory"
+          >
+            <td>#{{ subcategory.subcategoryid }}</td>
+
+            <td>
+              <div class="subcategory-cell">
+                <div class="subcategory-thumb" *ngIf="subcategory.iconurl; else noIcon">
+                  <img
+                    [src]="subcategory.iconurl"
+                    [alt]="subcategory.subcategoryname"
+                  />
+                </div>
+
+                <ng-template #noIcon>
+                  <div class="subcategory-thumb subcategory-thumb-placeholder">
+                    <span>IMG</span>
+                  </div>
+                </ng-template>
+
+                <div class="subcategory-info">
+                  <div class="subcategory-title">
+                    {{ subcategory.subcategoryname }}
+                  </div>
+                  <div class="subcategory-sub">
+                    {{ subcategory.image ? 'Has image' : 'No image' }}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <td>{{ subcategory.categoryname }}</td>
+            <td>{{ subcategory.slug || '-' }}</td>
+            <td>{{ subcategory.sortorder }}</td>
+
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="subcategory.isactive"
+                [class.status-inactive]="!subcategory.isactive"
+              >
+                {{ subcategory.isactive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+
+            <td>{{ subcategory.createdLabel }}</td>
+
+            <td>
+              <div class="subcategory-actions">
+                <button
+                  type="button"
+                  class="table-action-btn edit-btn"
+                  (click)="editSubcategory(subcategory)"
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn"
+                  [class.danger]="subcategory.isactive"
+                  (click)="toggleSubcategoryStatus(subcategory)"
+                >
+                  {{ subcategory.isactive ? 'Deactivate' : 'Activate' }}
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn danger"
+                  (click)="deleteSubcategory(subcategory)"
+                >
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!filteredSubcategories.length">
+            <td colspan="8" class="empty-cell">
+              No subcategories found for the current search/filter.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #loadingBlock>
+      <div class="loading-wrap">
+        <div class="loading-card" *ngFor="let i of [1, 2, 3, 4]"></div>
+      </div>
+    </ng-template>
+  </div>
+</div>

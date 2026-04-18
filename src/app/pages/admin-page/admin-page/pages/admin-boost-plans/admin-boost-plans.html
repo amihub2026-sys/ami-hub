@@ -1,0 +1,246 @@
+<div class="boost-plans-page">
+  <div class="summary-grid">
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Total Boosts</div>
+      <div class="mini-stat-value">{{ totalBoostPlansCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Active</div>
+      <div class="mini-stat-value">{{ activeBoostPlansCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Expired</div>
+      <div class="mini-stat-value">{{ expiredBoostPlansCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Inactive</div>
+      <div class="mini-stat-value">{{ inactiveBoostPlansCount }}</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div class="section-head-left">
+        <h2>Boost Plans</h2>
+        <p class="section-desc">
+          Manage post boost records, duration, price, and status.
+        </p>
+      </div>
+
+      <div class="section-head-right">
+        <div class="users-count-label">
+          Showing {{ filteredBoostPlans.length }} boost(s)
+        </div>
+
+        <button type="button" class="primary-btn" (click)="openCreateForm()">
+          + Add Boost
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="filter-chips">
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="boostStatusFilter === 'all'"
+          (click)="setBoostStatusFilter('all')"
+        >
+          All
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="boostStatusFilter === 'active'"
+          (click)="setBoostStatusFilter('active')"
+        >
+          Active
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="boostStatusFilter === 'expired'"
+          (click)="setBoostStatusFilter('expired')"
+        >
+          Expired
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="boostStatusFilter === 'inactive'"
+          (click)="setBoostStatusFilter('inactive')"
+        >
+          Inactive
+        </button>
+      </div>
+    </div>
+
+    <div class="loading-box" *ngIf="loading">
+      Loading boost plans...
+    </div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table class="boost-plans-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>Post ID</th>
+            <th>Boost Plan ID</th>
+            <th>Boost Name</th>
+            <th>Price</th>
+            <th>Duration</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th class="actions-header">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            *ngFor="let item of filteredBoostPlans; trackBy: trackByBoostPlan"
+          >
+            <td>#{{ item.boostid }}</td>
+            <td>{{ item.userid ?? '-' }}</td>
+            <td>{{ item.postid ?? '-' }}</td>
+            <td>{{ item.boost_plan_id || '-' }}</td>
+            <td>{{ item.boost_name || '-' }}</td>
+            <td>₹{{ item.price }}</td>
+            <td>{{ item.duration_days }} day(s)</td>
+            <td>{{ item.startLabel }}</td>
+            <td>{{ item.endLabel }}</td>
+
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="item.statusLabel === 'Active'"
+                [class.status-expired]="item.statusLabel === 'Expired'"
+                [class.status-inactive]="item.statusLabel === 'Inactive'"
+              >
+                {{ item.statusLabel }}
+              </span>
+            </td>
+
+            <td>{{ item.createdLabel }}</td>
+
+            <td class="actions-cell">
+              <div class="row-actions">
+                <button
+                  type="button"
+                  class="table-action-btn"
+                  (click)="openEditForm(item)"
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn warning"
+                  (click)="toggleBoostStatus(item)"
+                >
+                  {{ item.isactive ? 'Deactivate' : 'Activate' }}
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn danger"
+                  [disabled]="deletingId === item.boostid"
+                  (click)="deleteBoostPlan(item)"
+                >
+                  {{ deletingId === item.boostid ? 'Deleting...' : 'Delete' }}
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!filteredBoostPlans.length">
+            <td colspan="12" class="empty-cell">
+              No boost plans found for the current search/filter.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="showForm">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>{{ isEditMode ? 'Edit Boost Plan' : 'Add Boost Plan' }}</h3>
+        <button type="button" class="modal-close" (click)="closeForm()">×</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>User ID</label>
+          <input type="number" [(ngModel)]="formModel.userid" />
+        </div>
+
+        <div class="form-group">
+          <label>Post ID</label>
+          <input type="number" [(ngModel)]="formModel.postid" />
+        </div>
+
+        <div class="form-group">
+          <label>Boost Plan ID</label>
+          <input type="text" [(ngModel)]="formModel.boost_plan_id" />
+        </div>
+
+        <div class="form-group">
+          <label>Boost Name</label>
+          <input type="text" [(ngModel)]="formModel.boost_name" />
+        </div>
+
+        <div class="form-group">
+          <label>Price</label>
+          <input type="number" [(ngModel)]="formModel.price" />
+        </div>
+
+        <div class="form-group">
+          <label>Duration Days</label>
+          <input type="number" [(ngModel)]="formModel.duration_days" />
+        </div>
+
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="datetime-local" [(ngModel)]="formModel.startdate" />
+        </div>
+
+        <div class="form-group">
+          <label>End Date</label>
+          <input type="datetime-local" [(ngModel)]="formModel.enddate" />
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="formModel.isactive" />
+            Is Active
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" (click)="closeForm()">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="primary-btn"
+          [disabled]="saving"
+          (click)="saveBoostPlan()"
+        >
+          {{ saving ? 'Saving...' : (isEditMode ? 'Update Boost' : 'Create Boost') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

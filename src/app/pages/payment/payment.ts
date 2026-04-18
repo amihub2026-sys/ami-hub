@@ -162,6 +162,10 @@ export class Payment implements OnInit {
     );
   }
 
+  private isExistingPostFeaturedFlow(): boolean {
+    return this.isFeaturedPlanFlow() && !!this.postData?.postid;
+  }
+
   private isSubscriptionPlanFlow(): boolean {
     return !this.isFeaturedPlanFlow();
   }
@@ -451,7 +455,91 @@ export class Payment implements OnInit {
     }
   }
 
-  private async savePostAfterPayment(
+  private async saveBoostEntry(
+    paymentPayload: {
+      razorpay_payment_id?: string;
+      razorpay_order_id?: string;
+      razorpay_signature?: string;
+    } = {}
+  ): Promise<void> {
+    const postId = Number(this.postData?.postid || 0);
+    if (!postId) {
+      throw new Error('Post id not found for featured ad');
+    }
+
+    const planId = this.getSelectedPlanId();
+    const planName = this.getSelectedPlanName();
+    const durationDays = Number(this.planData?.duration_days || 0);
+    const amount = Number(this.planData?.amount || this.planData?.price || 0);
+
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setDate(startDate.getDate() + durationDays);
+
+    const boostPayload = {
+      userid: this.postData?.userid ?? null,
+      postid: postId,
+      boost_plan_id: planId,
+      boost_name: planName,
+      price: amount,
+      duration_days: durationDays,
+      startdate: startDate.toISOString(),
+      enddate: endDate.toISOString(),
+      isactive: true,
+      createdon: new Date().toISOString(),
+      razorpay_payment_id: paymentPayload.razorpay_payment_id || null,
+      razorpay_order_id: paymentPayload.razorpay_order_id || null,
+      razorpay_signature: paymentPayload.razorpay_signature || null
+    };
+
+    const { error } = await this.supabaseService.supabase
+      .from('post_boosts')
+      .insert([boostPayload]);
+
+    if (error) {
+      console.warn('post_boosts insert skipped/failed:', error);
+    }
+  }
+
+  private async updateExistingPostAsFeatured(
+    paymentPayload: {
+      razorpay_payment_id?: string;
+      razorpay_order_id?: string;
+      razorpay_signature?: string;
+    } = {}
+  ): Promise<void> {
+    const postId = Number(this.postData?.postid || 0);
+
+    if (!postId) {
+      throw new Error('Post id not found');
+    }
+
+    const selectedPlanId = this.getSelectedPlanId();
+    const selectedPlanName = this.getSelectedPlanName();
+    const selectedIsFeatured = this.getSelectedPlanIsFeatured();
+
+    const updatePayload: any = {
+      isfeatured: selectedIsFeatured,
+      is_featured: selectedIsFeatured,
+      featured_plan_id: selectedPlanId,
+      featured_plan_name: selectedPlanName,
+      status: this.postData?.status || 'Active',
+      isactive: true
+    };
+
+    const { error } = await this.supabaseService.supabase
+      .from('post')
+      .update(updatePayload)
+      .eq('postid', postId);
+
+    if (error) {
+      throw error;
+    }
+
+    await this.saveBoostEntry(paymentPayload);
+  }
+
+  private async insertNewPostAfterPayment(
     paymentPayload: {
       razorpay_payment_id?: string;
       razorpay_order_id?: string;
@@ -475,7 +563,7 @@ export class Payment implements OnInit {
       const oldVideoUrls = this.parseJsonArray<string>(pendingPost.video_urls);
       const oldCatalog = this.parseJsonArray<any>(pendingPost.catalog);
 
-      const finalPayload = {
+      const finalPayload: any = {
         ...pendingPost,
 
         image_url: mainPhoto || pendingPost.image_url || '',
@@ -497,7 +585,11 @@ export class Payment implements OnInit {
         currencycode: pendingPost.currencycode || 'INR'
       };
 
-      console.log('FINAL POST PAYLOAD AFTER PAYMENT:', finalPayload);
+      // avoid duplicate key on new insert
+      delete finalPayload.postid;
+      delete finalPayload.id;
+
+      console.log('FINAL NEW POST PAYLOAD AFTER PAYMENT:', finalPayload);
 
       const { error } = await supabase
         .from('post')
@@ -509,6 +601,34 @@ export class Payment implements OnInit {
 
       if (this.isSubscriptionPlanFlow()) {
         await this.saveUserSubscription(paymentPayload);
+      }
+    } catch (error: any) {
+      console.error('Payment/save error:', error);
+
+      for (const file of uploadedFiles.reverse()) {
+        try {
+          await this.supabaseService.deleteFileByPublicUrl(file.url, file.bucket);
+        } catch (deleteErr) {
+          console.error('Failed to cleanup uploaded file:', deleteErr);
+        }
+      }
+
+      throw error;
+    }
+  }
+
+  private async savePostAfterPayment(
+    paymentPayload: {
+      razorpay_payment_id?: string;
+      razorpay_order_id?: string;
+      razorpay_signature?: string;
+    } = {}
+  ): Promise<void> {
+    try {
+      if (this.isExistingPostFeaturedFlow()) {
+        await this.updateExistingPostAsFeatured(paymentPayload);
+      } else {
+        await this.insertNewPostAfterPayment(paymentPayload);
       }
 
       this.clearVerifiedPaymentState();
@@ -525,16 +645,7 @@ export class Payment implements OnInit {
       this.paymentFailed.set(false);
       this.errorMessage.set('');
     } catch (error: any) {
-      console.error('Payment/save error:', error);
-
-      for (const file of uploadedFiles.reverse()) {
-        try {
-          await this.supabaseService.deleteFileByPublicUrl(file.url, file.bucket);
-        } catch (deleteErr) {
-          console.error('Failed to cleanup uploaded file:', deleteErr);
-        }
-      }
-
+      console.error('Final savePostAfterPayment error:', error);
       this.paymentFailed.set(true);
       this.errorMessage.set(
         error?.message || 'Payment succeeded but post saving failed.'

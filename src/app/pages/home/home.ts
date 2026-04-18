@@ -112,8 +112,15 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
     try {
       const data = await this.supabaseService.getAllBrowseCategories();
-      const allCategories = data || [];
+      const allCategories = (data || []).filter((item: any) => item?.isactive === true);
+
       this.browseCategories.set(allCategories);
+      this.productCategories.set(
+        allCategories.filter((item: any) => item?.category_type === 'product')
+      );
+      this.serviceCategories.set(
+        allCategories.filter((item: any) => item?.category_type === 'service')
+      );
     } catch (error) {
       console.error('Error loading browse categories:', error);
       this.browseCategories.set([]);

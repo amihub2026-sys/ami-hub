@@ -1,0 +1,293 @@
+<div><h1>check</h1></div>
+<div class="categories-page">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">Categories Administration</p>
+      <h2>Categories Management</h2>
+      <p class="page-subtitle">
+        Manage marketplace categories, images, ordering and status.
+      </p>
+    </div>
+
+    <div class="top-actions">
+      <button
+        type="button"
+        class="secondary-btn"
+        (click)="loadCategories()"
+        [disabled]="isLoading"
+      >
+        {{ isLoading ? 'Loading...' : 'Refresh' }}
+      </button>
+
+      <button type="button" class="primary-btn" (click)="openCreateForm()">
+        + Add Category
+      </button>
+    </div>
+  </div>
+
+  <div class="message-card error-card" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="message-card success-card" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card summary-blue">
+      <div class="summary-top">
+        <span>Total Categories</span>
+        <div class="summary-icon">📂</div>
+      </div>
+      <h2>{{ totalCategories }}</h2>
+    </div>
+
+    <div class="summary-card summary-green">
+      <div class="summary-top">
+        <span>Active</span>
+        <div class="summary-icon">✅</div>
+      </div>
+      <h2>{{ activeCategories }}</h2>
+    </div>
+
+    <div class="summary-card summary-red">
+      <div class="summary-top">
+        <span>Inactive</span>
+        <div class="summary-icon">⛔</div>
+      </div>
+      <h2>{{ inactiveCategories }}</h2>
+    </div>
+
+    <div class="summary-card summary-purple">
+      <div class="summary-top">
+        <span>Product Type</span>
+        <div class="summary-icon">🛍️</div>
+      </div>
+      <h2>{{ productCategories }}</h2>
+    </div>
+  </div>
+
+  <div class="section-card form-card" *ngIf="showForm">
+    <div class="section-head">
+      <div>
+        <h3>{{ editingCategoryId ? 'Edit Category' : 'Create Category' }}</h3>
+        <p>Fill all required details and save.</p>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Category Name *</label>
+        <input
+          type="text"
+          [(ngModel)]="form.categoryname"
+          (input)="onCategoryNameChange()"
+          placeholder="Enter category name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Slug *</label>
+        <input
+          type="text"
+          [(ngModel)]="form.slug"
+          placeholder="Enter slug"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Sort Order *</label>
+        <input
+          type="number"
+          [(ngModel)]="form.sortorder"
+          placeholder="Enter sort order"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Category Type *</label>
+        <select [(ngModel)]="form.category_type">
+          <option value="product">Product</option>
+          <option value="service">Service</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Icon Upload</label>
+        <input type="file" accept="image/*" (change)="onIconFileSelected($event)" />
+      </div>
+
+      <div class="form-group">
+        <label>Banner Upload</label>
+        <input type="file" accept="image/*" (change)="onBannerFileSelected($event)" />
+      </div>
+
+      <div class="form-group full-width">
+        <label>Current Icon URL</label>
+        <input
+          type="text"
+          [(ngModel)]="form.iconurl"
+          placeholder="Icon public URL"
+        />
+      </div>
+
+      <div class="form-group full-width">
+        <label>Current Banner URL</label>
+        <input
+          type="text"
+          [(ngModel)]="form.bannerurl"
+          placeholder="Banner public URL"
+        />
+      </div>
+
+      <div class="form-group toggle-group">
+        <label class="checkbox-wrap">
+          <input type="checkbox" [(ngModel)]="form.isactive" />
+          <span>Active Category</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="preview-grid">
+      <div class="preview-card">
+        <p>Icon Preview</p>
+        <div class="preview-box">
+          <img *ngIf="form.iconurl" [src]="form.iconurl" alt="Icon preview" />
+          <span *ngIf="!form.iconurl">No icon</span>
+        </div>
+      </div>
+
+      <div class="preview-card">
+        <p>Banner Preview</p>
+        <div class="preview-box banner-box">
+          <img *ngIf="form.bannerurl" [src]="form.bannerurl" alt="Banner preview" />
+          <span *ngIf="!form.bannerurl">No banner</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="secondary-btn" (click)="cancelForm()">
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="primary-btn"
+        (click)="saveCategory()"
+        [disabled]="isSaving"
+      >
+        {{ isSaving ? 'Saving...' : (editingCategoryId ? 'Update Category' : 'Create Category') }}
+      </button>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div>
+        <h3>Categories List</h3>
+        <p>Live data from Supabase categories table</p>
+      </div>
+
+      <div class="count-badge">
+        {{ filteredCategories.length }} record(s)
+      </div>
+    </div>
+
+    <div class="table-wrap" *ngIf="!isLoading; else loadingBlock">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Category</th>
+            <th>Slug</th>
+            <th>Type</th>
+            <th>Sort Order</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th class="action-col">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of filteredCategories; trackBy: trackByCategory">
+            <td class="id-cell">#{{ item.categoryid }}</td>
+
+            <td>
+              <div class="category-cell">
+                <div class="category-thumb" *ngIf="item.iconurl; else noImage">
+                  <img [src]="item.iconurl" [alt]="item.categoryname" />
+                </div>
+
+                <ng-template #noImage>
+                  <div class="category-thumb no-image">🖼️</div>
+                </ng-template>
+
+                <div class="category-meta">
+                  <div class="category-title">{{ item.categoryname }}</div>
+                  <div class="category-subtitle">
+                    {{ item.bannerurl ? 'Banner added' : 'No banner' }}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <td>{{ item.slug }}</td>
+            <td>{{ item.category_type || '-' }}</td>
+            <td>{{ item.sortorder }}</td>
+
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(item)">
+                {{ getStatusLabel(item) }}
+              </span>
+            </td>
+
+            <td>{{ item.createdon }}</td>
+
+            <td class="action-col">
+              <div class="actions">
+                <button
+                  type="button"
+                  class="mini-btn edit-btn"
+                  (click)="editCategory(item)"
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  class="mini-btn"
+                  [class.activate-btn]="!item.isactive"
+                  [class.block-btn]="item.isactive"
+                  (click)="toggleCategoryStatus(item)"
+                >
+                  {{ item.isactive ? 'Disable' : 'Enable' }}
+                </button>
+
+                <button
+                  type="button"
+                  class="mini-btn delete-btn"
+                  (click)="deleteCategory(item)"
+                >
+                  Deactivate
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!filteredCategories.length && !isLoading">
+            <td colspan="8" class="empty-cell">
+              No categories found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #loadingBlock>
+      <div class="loading-wrap">
+        <div class="loading-card" *ngFor="let i of [1, 2, 3, 4, 5]"></div>
+      </div>
+    </ng-template>
+  </div>
+</div>

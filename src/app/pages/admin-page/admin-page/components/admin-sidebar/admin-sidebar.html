@@ -1,0 +1,26 @@
+<aside class="sidebar" [class.open]="sidebarOpen">
+  <div class="sidebar-header">
+    <div class="brand-wrap">
+      <div class="brand-logo">A</div>
+      <div class="brand-text">
+        <h2>AMI HUB</h2>
+        <p>Admin Panel</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-title">Main Menu</div>
+
+  <nav class="sidebar-nav">
+    <button
+      type="button"
+      class="menu-item"
+      *ngFor="let item of menuItems; trackBy: trackByMenu"
+      [class.active]="activeMenu === item.key"
+      (click)="onMenuClick(item.key)"
+    >
+      <span class="menu-icon">{{ item.icon }}</span>
+      <span class="menu-label">{{ item.label }}</span>
+    </button>
+  </nav>
+</aside>

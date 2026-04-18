@@ -1,0 +1,279 @@
+<div class="user-subscriptions-page">
+  <div class="summary-grid">
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Total Subscriptions</div>
+      <div class="mini-stat-value">{{ totalUserSubscriptionsCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Active</div>
+      <div class="mini-stat-value">{{ activeUserSubscriptionsCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Expired</div>
+      <div class="mini-stat-value">{{ expiredUserSubscriptionsCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Inactive</div>
+      <div class="mini-stat-value">{{ inactiveUserSubscriptionsCount }}</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div class="section-head-left">
+        <h2>User Subscriptions</h2>
+        <p class="section-desc">
+          Manage user subscription records, validity, ads, and payment details.
+        </p>
+      </div>
+
+      <div class="section-head-right">
+        <div class="users-count-label">
+          Showing {{ filteredUserSubscriptions.length }} subscription(s)
+        </div>
+
+        <button type="button" class="primary-btn" (click)="openCreateForm()">
+          + Add User Subscription
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="filter-chips">
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="userSubscriptionStatusFilter === 'all'"
+          (click)="setUserSubscriptionStatusFilter('all')"
+        >
+          All
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="userSubscriptionStatusFilter === 'active'"
+          (click)="setUserSubscriptionStatusFilter('active')"
+        >
+          Active
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="userSubscriptionStatusFilter === 'expired'"
+          (click)="setUserSubscriptionStatusFilter('expired')"
+        >
+          Expired
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="userSubscriptionStatusFilter === 'inactive'"
+          (click)="setUserSubscriptionStatusFilter('inactive')"
+        >
+          Inactive
+        </button>
+      </div>
+    </div>
+
+    <div class="loading-box" *ngIf="loading">
+      Loading user subscriptions...
+    </div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table class="user-subscriptions-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>Plan ID</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Total Ads</th>
+            <th>Remaining</th>
+            <th>Created</th>
+            <th class="actions-header">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            *ngFor="let item of filteredUserSubscriptions; trackBy: trackByUserSubscription"
+          >
+            <td>#{{ item.usersubscriptionid }}</td>
+            <td>{{ item.userid ?? '-' }}</td>
+            <td>{{ item.subscriptionplanid ?? '-' }}</td>
+            <td>{{ item.startLabel }}</td>
+            <td>{{ item.endLabel }}</td>
+            <td>₹{{ item.amountpaid }}</td>
+            <td>{{ item.paymentstatus || '-' }}</td>
+
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="item.statusLabel === 'Active'"
+                [class.status-expired]="item.statusLabel === 'Expired'"
+                [class.status-inactive]="item.statusLabel === 'Inactive'"
+              >
+                {{ item.statusLabel }}
+              </span>
+            </td>
+
+            <td>{{ item.total_ads }}</td>
+            <td>{{ item.remaining_ads }}</td>
+            <td>{{ item.createdLabel }}</td>
+
+            <td class="actions-cell">
+              <div class="row-actions">
+                <button
+                  type="button"
+                  class="table-action-btn"
+                  (click)="openEditForm(item)"
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn warning"
+                  (click)="toggleUserSubscriptionStatus(item)"
+                >
+                  {{ item.isactive ? 'Deactivate' : 'Activate' }}
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn danger"
+                  [disabled]="deletingId === item.usersubscriptionid"
+                  (click)="deleteUserSubscription(item)"
+                >
+                  {{
+                    deletingId === item.usersubscriptionid ? 'Deleting...' : 'Delete'
+                  }}
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!filteredUserSubscriptions.length">
+            <td colspan="12" class="empty-cell">
+              No user subscriptions found for the current search/filter.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="showForm">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>
+          {{ isEditMode ? 'Edit User Subscription' : 'Add User Subscription' }}
+        </h3>
+        <button type="button" class="modal-close" (click)="closeForm()">×</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>User ID</label>
+          <input type="number" [(ngModel)]="formModel.userid" />
+        </div>
+
+        <div class="form-group">
+          <label>Subscription Plan ID</label>
+          <input type="number" [(ngModel)]="formModel.subscriptionplanid" />
+        </div>
+
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="datetime-local" [(ngModel)]="formModel.startdate" />
+        </div>
+
+        <div class="form-group">
+          <label>End Date</label>
+          <input type="datetime-local" [(ngModel)]="formModel.enddate" />
+        </div>
+
+        <div class="form-group">
+          <label>Amount Paid</label>
+          <input type="number" [(ngModel)]="formModel.amountpaid" />
+        </div>
+
+        <div class="form-group">
+          <label>Payment Status</label>
+          <input type="text" [(ngModel)]="formModel.paymentstatus" />
+        </div>
+
+        <div class="form-group">
+          <label>Total Ads</label>
+          <input type="number" [(ngModel)]="formModel.total_ads" />
+        </div>
+
+        <div class="form-group">
+          <label>Remaining Ads</label>
+          <input type="number" [(ngModel)]="formModel.remaining_ads" />
+        </div>
+
+        <div class="form-group">
+          <label>Plan UUID</label>
+          <input type="text" [(ngModel)]="formModel.plan_uuid" />
+        </div>
+
+        <div class="form-group">
+          <label>Auth User ID</label>
+          <input type="text" [(ngModel)]="formModel.auth_user_id" />
+        </div>
+
+        <div class="form-group full-width">
+          <label>Razorpay Payment ID</label>
+          <input type="text" [(ngModel)]="formModel.razorpay_payment_id" />
+        </div>
+
+        <div class="form-group full-width">
+          <label>Razorpay Order ID</label>
+          <input type="text" [(ngModel)]="formModel.razorpay_order_id" />
+        </div>
+
+        <div class="form-group full-width">
+          <label>Razorpay Signature</label>
+          <input type="text" [(ngModel)]="formModel.razorpay_signature" />
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="formModel.isactive" />
+            Is Active
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" (click)="closeForm()">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="primary-btn"
+          [disabled]="saving"
+          (click)="saveUserSubscription()"
+        >
+          {{
+            saving
+              ? 'Saving...'
+              : (isEditMode ? 'Update Subscription' : 'Create Subscription')
+          }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

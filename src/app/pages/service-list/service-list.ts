@@ -123,7 +123,6 @@ export class ServiceList implements OnInit {
         .from('categories')
         .select('categoryid, categoryname, category_type, isactive, sortorder')
         .eq('isactive', true)
-        .eq('category_type', 'service')
         .order('sortorder', { ascending: true });
 
       if (error) {
@@ -133,7 +132,7 @@ export class ServiceList implements OnInit {
       }
 
       this.categoriesData = (data || []) as CategoryItem[];
-      console.log('Service categories:', this.categoriesData);
+      console.log('All categories for filter:', this.categoriesData);
     } catch (error) {
       console.error('Error loading categories:', error);
       this.categoriesData = [];
