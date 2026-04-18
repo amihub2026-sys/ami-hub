@@ -7,30 +7,15 @@
     </button>
 
     <div class="title-wrap">
-      <p class="welcome-text">Welcome back, {{ username }}</p>
+      <p class="welcome-text">Welcome back</p>
       <h1>{{ pageTitle }}</h1>
-      <span class="subtitle">{{ pageSubtitle }}</span>
     </div>
   </div>
 
   <div class="topbar-right">
-    <div class="search-box">
-      <span class="search-icon">⌕</span>
-      <input
-        type="text"
-        [ngModel]="searchQuery"
-        (ngModelChange)="onSearchChange($event)"
-        placeholder="Search here..."
-      />
-    </div>
-
-    <button type="button" class="icon-btn" aria-label="Notifications">
-      🔔
-    </button>
-
-    <div class="profile-chip">
+    <div class="admin-chip">
       <div class="avatar">{{ username.charAt(0) }}</div>
-      <div class="profile-info">
+      <div class="admin-info">
         <strong>{{ username }}</strong>
         <span>Administrator</span>
       </div>

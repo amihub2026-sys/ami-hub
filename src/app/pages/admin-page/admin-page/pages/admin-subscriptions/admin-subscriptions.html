@@ -91,7 +91,7 @@
             <th>Video</th>
             <th>Status</th>
             <th>Created</th>
-            <th>Actions</th>
+            <th class="actions-header">Actions</th>
           </tr>
         </thead>
 
@@ -137,7 +137,7 @@
 
             <td>{{ plan.createdLabel }}</td>
 
-            <td>
+            <td class="actions-cell">
               <div class="plan-actions">
                 <button
                   type="button"
@@ -149,8 +149,7 @@
 
                 <button
                   type="button"
-                  class="table-action-btn"
-                  [class.danger]="plan.isactive && plan.is_active"
+                  class="table-action-btn warning"
                   (click)="toggleSubscriptionStatus(plan)"
                 >
                   {{ plan.isactive && plan.is_active ? 'Deactivate' : 'Activate' }}
