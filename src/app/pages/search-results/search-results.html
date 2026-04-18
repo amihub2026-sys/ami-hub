@@ -1,0 +1,183 @@
+<div class="results-page">
+  <div class="top-search-bar">
+    <div class="search-tabs">
+      <button
+        type="button"
+        [class.active]="selectedType === 'all'"
+        (click)="selectType('all')"
+      >
+        All
+      </button>
+
+      <button
+        type="button"
+        [class.active]="selectedType === 'product'"
+        (click)="selectType('product')"
+      >
+        Products
+      </button>
+
+      <button
+        type="button"
+        [class.active]="selectedType === 'service'"
+        (click)="goToServiceList()"
+      >
+        Services
+      </button>
+    </div>
+
+    <input
+      type="text"
+      [(ngModel)]="searchText"
+      placeholder="Search products or services..."
+      (keyup.enter)="searchNow()"
+    />
+
+    <button type="button" (click)="searchNow()">Search</button>
+  </div>
+
+  <h2 class="results-title">
+    Results for "{{ searchText || 'All' }}"
+  </h2>
+
+  <div class="results-layout">
+    <div class="filters-panel">
+      <h3>🔍 Filters</h3>
+
+      <div class="filter-card">
+        <label>Search</label>
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          placeholder="Search products..."
+          (keyup.enter)="searchNow()"
+        />
+      </div>
+
+      <div class="filter-card">
+        <label>Category</label>
+        <select [(ngModel)]="selectedCategoryId" (change)="onCategoryChange()">
+          <option [ngValue]="null">All Categories</option>
+          <option
+            *ngFor="let category of categories"
+            [ngValue]="category.categoryid"
+          >
+            {{ category.categoryname }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-card">
+        <label>Price Range</label>
+        <div class="budget-row">
+          <input
+            type="number"
+            [(ngModel)]="minPrice"
+            placeholder="Min price"
+          />
+          <input
+            type="number"
+            [(ngModel)]="maxPrice"
+            placeholder="Max price"
+          />
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" class="apply-btn" (click)="applyFilters()">
+          Apply Filters
+        </button>
+
+        <button type="button" class="reset-btn" (click)="resetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+
+    <div class="results-content">
+      <div class="subcategory-bar" *ngIf="subcategories.length > 0">
+        <button
+          type="button"
+          class="subcategory-chip"
+          [class.active]="selectedSubcategoryId === null"
+          (click)="showAllSubcategoryPosts()"
+        >
+          All
+        </button>
+
+        <button
+          type="button"
+          class="subcategory-chip"
+          *ngFor="let sub of subcategories"
+          [class.active]="selectedSubcategoryId === sub.subcategoryid"
+          (click)="selectSubcategory(sub)"
+        >
+          <img
+            *ngIf="sub.iconurl"
+            [src]="sub.iconurl"
+            [alt]="sub.subcategoryname"
+          />
+          <span>{{ sub.subcategoryname }}</span>
+        </button>
+      </div>
+
+      <div class="results-list">
+        <div class="loading-text" *ngIf="isLoading">
+          Loading results...
+        </div>
+
+        <div
+          class="empty-text"
+          *ngIf="!isLoading && filteredResults.length === 0"
+        >
+          No matching posts found.
+        </div>
+
+        <div
+          class="result-card"
+          *ngFor="let item of filteredResults"
+          (click)="openDetails(item)"
+        >
+          <img
+            class="result-image"
+            [src]="item.mainImage"
+            [alt]="item.displayTitle"
+            loading="lazy"
+          />
+
+          <div class="result-content-inner">
+            <div class="result-top">
+              <span
+                class="type-badge"
+                [class.service]="item.displayType === 'service'"
+              >
+                {{ item.displayType === 'service' ? 'Service' : 'Product' }}
+              </span>
+            </div>
+
+            <h4>{{ item.displayTitle }}</h4>
+
+            <div class="price" *ngIf="item.displayPrice > 0">
+              ₹{{ item.displayPrice }}
+            </div>
+
+            <div
+              class="price"
+              *ngIf="item.displayPrice <= 0 && item.displayType === 'service'"
+            >
+              Service
+            </div>
+
+            <div class="meta">
+              {{ item.displayLocation }}
+            </div>
+
+            <p class="desc">
+              {{ item.description || 'No description available' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

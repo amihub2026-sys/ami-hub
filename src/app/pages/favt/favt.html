@@ -1,0 +1,51 @@
+<div class="favorites-page">
+  <div class="favorites-container">
+
+    <div class="favorites-header">
+      <div>
+        <h2>My Favorites</h2>
+        <p>Saved products and services you may want to check later.</p>
+      </div>
+      <span class="favorites-count">{{ favoriteItems.length }} Items</span>
+    </div>
+
+    <div *ngIf="loading" class="favorites-state">
+      Loading favorites...
+    </div>
+
+    <div *ngIf="!loading && errorMessage" class="favorites-state error">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!loading && !errorMessage && favoriteItems.length === 0" class="favorites-state">
+      No favorite items yet.
+    </div>
+
+    <div class="favorites-grid" *ngIf="!loading && !errorMessage && favoriteItems.length > 0">
+      <div class="favorite-card" *ngFor="let item of favoriteItems">
+
+        <div class="favorite-image">
+          <img [src]="item.image" [alt]="item.name">
+          <button class="favorite-badge" type="button">❤</button>
+        </div>
+
+        <div class="favorite-content">
+          <h3>{{ item.name }}</h3>
+          <p class="favorite-price">₹{{ item.price }}</p>
+          <p class="favorite-location">📍 {{ item.location }}</p>
+
+          <div class="favorite-actions">
+            <button type="button" class="view-btn" (click)="viewDetails(item)">
+              View Details
+            </button>
+            <button type="button" class="remove-btn" (click)="removeItem(item)">
+              Remove
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

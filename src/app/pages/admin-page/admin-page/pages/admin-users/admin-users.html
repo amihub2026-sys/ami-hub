@@ -1,0 +1,146 @@
+<div class="users-page">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">User Administration</p>
+      <h2>Users Management</h2>
+      <p class="page-subtitle">
+        Manage all registered users from one place.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-btn"
+      (click)="loadUsers()"
+      [disabled]="isLoading"
+    >
+      {{ isLoading ? 'Loading...' : 'Refresh' }}
+    </button>
+  </div>
+
+  <div class="error-card" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card summary-blue">
+      <div class="summary-top">
+        <span>Total Users</span>
+        <div class="summary-icon">👥</div>
+      </div>
+      <h2>{{ totalUsers }}</h2>
+    </div>
+
+    <div class="summary-card summary-green">
+      <div class="summary-top">
+        <span>Active Users</span>
+        <div class="summary-icon">✅</div>
+      </div>
+      <h2>{{ activeUsers }}</h2>
+    </div>
+
+    <div class="summary-card summary-red">
+      <div class="summary-top">
+        <span>Blocked Users</span>
+        <div class="summary-icon">⛔</div>
+      </div>
+      <h2>{{ blockedUsers }}</h2>
+    </div>
+
+    <div class="summary-card summary-orange">
+      <div class="summary-top">
+        <span>Pending Users</span>
+        <div class="summary-icon">⏳</div>
+      </div>
+      <h2>{{ pendingUsers }}</h2>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div>
+        <h3>Users List</h3>
+        <p>Live data from Supabase users table</p>
+      </div>
+
+      <div class="count-badge">
+        {{ filteredUsers.length }} record(s)
+      </div>
+    </div>
+
+    <div class="table-wrap" *ngIf="!isLoading; else loadingBlock">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th class="action-col">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let user of filteredUsers; trackBy: trackByUser">
+            <td class="id-cell">#{{ user.id }}</td>
+
+            <td>
+              <div class="user-cell">
+                <div class="avatar">
+                  {{ user.avatar }}
+                </div>
+
+                <div class="user-meta">
+                  <div class="user-name">{{ user.name }}</div>
+                  <div class="user-email">{{ user.email }}</div>
+                </div>
+              </div>
+            </td>
+
+            <td>{{ user.phone }}</td>
+            <td>{{ user.role }}</td>
+
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="user.status === 'Active'"
+                [class.status-blocked]="user.status === 'Blocked'"
+                [class.status-pending]="user.status === 'Pending'"
+              >
+                {{ user.status }}
+              </span>
+            </td>
+
+            <td>{{ user.joinedOn }}</td>
+
+            <td class="action-col">
+              <button
+                type="button"
+                class="action-btn"
+                [class.block-btn]="user.status === 'Active'"
+                [class.activate-btn]="user.status !== 'Active'"
+                (click)="toggleStatus(user)"
+              >
+                {{ getActionLabel(user) }}
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="!filteredUsers.length && !isLoading">
+            <td colspan="7" class="empty-cell">
+              No users found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #loadingBlock>
+      <div class="loading-wrap">
+        <div class="loading-card" *ngFor="let i of [1, 2, 3, 4, 5]"></div>
+      </div>
+    </ng-template>
+  </div>
+</div>

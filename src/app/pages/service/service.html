@@ -1,0 +1,361 @@
+<div [hidden]="!isPageLoading">Loading...</div>
+  <!-- <div class="horse-loader-card">
+    <div id="horseAnimation" class="lottie-box"></div>
+    <h2>AMI HUB</h2>
+    <p>Preparing the best experience for you...</p>
+  </div>
+</div> -->
+
+<div class="service-page" [hidden]="isPageLoading || !adType">
+  <div class="header">
+    <h2>
+      {{
+        isEditMode
+          ? (adType === 'service' ? 'Update Service' : 'Update Product')
+          : (adType === 'service' ? 'Post Your Service' : 'Post Your Product')
+      }}
+    </h2>
+    <p>
+      {{
+        adType === 'service'
+          ? 'Select service and fill the form below.'
+          : 'Select product and fill the form below.'
+      }}
+    </p>
+  </div>
+
+  <form (ngSubmit)="submitByType()">
+    <div class="section">
+      <h2 class="section-title">What are you posting?</h2>
+
+      <div class="type-grid" *ngIf="!isEditMode">
+        <label class="type-card">
+          <input
+            type="radio"
+            name="adType"
+            value="service"
+            [(ngModel)]="adType"
+            (change)="onAdTypeChange()"
+          />
+          <span>Service</span>
+        </label>
+
+        <label class="type-card">
+          <input
+            type="radio"
+            name="adType"
+            value="product"
+            [(ngModel)]="adType"
+            (change)="onAdTypeChange()"
+          />
+          <span>Product</span>
+        </label>
+      </div>
+
+      <div class="type-grid" *ngIf="isEditMode">
+        <label class="type-card">
+          <input
+            type="radio"
+            name="lockedAdType"
+            [checked]="adType === 'service'"
+            disabled
+          />
+          <span>Service</span>
+        </label>
+
+        <label class="type-card">
+          <input
+            type="radio"
+            name="lockedAdType"
+            [checked]="adType === 'product'"
+            disabled
+          />
+          <span>Product</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">
+        {{ adType === 'service' ? 'Main Service Details' : 'Main Product Details' }}
+      </h2>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>{{ adType === 'service' ? 'Service Title' : 'Product Title' }}</label>
+          <input
+            type="text"
+            name="mainTitle"
+            [(ngModel)]="mainAd.title"
+            [placeholder]="adType === 'service' ? 'Enter main service title' : 'Enter main product title'"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Price</label>
+          <input
+            type="number"
+            name="mainPrice"
+            [(ngModel)]="mainAd.price"
+            placeholder="Enter price"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea
+          name="description"
+          [(ngModel)]="mainAd.description"
+          [placeholder]="adType === 'service' ? 'Enter service description' : 'Enter product description'"
+        ></textarea>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Category</label>
+          <select
+            name="category"
+            [(ngModel)]="mainAd.category"
+            (change)="onCategoryChange()"
+          >
+            <option value="">Select Category</option>
+            <option *ngFor="let c of categories" [value]="c.categoryname">
+              {{ c.categoryname }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Sub Category</label>
+          <select
+            name="subcategory"
+            [(ngModel)]="mainAd.subcategory"
+          >
+            <option value="">Select Sub Category</option>
+            <option *ngFor="let sub of subcategoriesList" [value]="sub.subcategoryname">
+              {{ sub.subcategoryname }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" *ngIf="isServiceType">
+      <div class="section-head">
+        <h2 class="section-title">Catalog / Services</h2>
+        <button type="button" class="add-btn" (click)="addAnotherService()">
+          + Add Another Service
+        </button>
+      </div>
+
+      <div
+        class="catalog-card"
+        *ngFor="let service of serviceBlocks; let i = index"
+      >
+        <div class="catalog-top">
+          <h3>Service {{ i + 1 }}</h3>
+          <button
+            type="button"
+            class="remove-btn"
+            *ngIf="serviceBlocks.length > 1"
+            (click)="removeService(i)"
+          >
+            Remove
+          </button>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Service Title</label>
+            <input
+              type="text"
+              [name]="'serviceTitle' + i"
+              [(ngModel)]="service.title"
+              placeholder="Enter service title"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Price</label>
+            <input
+              type="number"
+              [name]="'servicePrice' + i"
+              [(ngModel)]="service.price"
+              placeholder="Enter service price"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Service Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            [name]="'serviceImage' + i"
+            (change)="onServiceImageChange($event, i)"
+          />
+          <small *ngIf="service.image">{{ service.image.name }}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">
+        {{ adType === 'service' ? 'Main Service Media' : 'Main Product Media' }}
+      </h2>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Main Photo</label>
+          <input type="file" accept="image/*" (change)="onMainPhotoChange($event)" />
+          <small *ngIf="mainAd.mainPhoto">{{ mainAd.mainPhoto.name }}</small>
+
+          <div *ngIf="isEditMode && existingMainImageUrl" style="margin-top: 10px;">
+            <img
+              [src]="existingMainImageUrl"
+              alt="Main photo"
+              style="width: 120px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;"
+            />
+            <div style="margin-top: 8px;">
+              <button type="button" class="remove-btn" (click)="removeExistingMainImage()">
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Other Images</label>
+          <input type="file" accept="image/*" multiple (change)="onOtherImagesChange($event)" />
+          <small *ngIf="mainAd.otherImages.length">
+            {{ mainAd.otherImages.length }} image(s) selected
+          </small>
+
+          <div *ngIf="isEditMode && existingImageUrls.length" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
+            <div *ngFor="let img of existingImageUrls; let i = index">
+              <img
+                [src]="img"
+                alt="Other image"
+                style="width: 120px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;"
+              />
+              <div style="margin-top: 8px;">
+                <button type="button" class="remove-btn" (click)="removeExistingOtherImage(i)">
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Videos</label>
+        <input type="file" accept="video/*" multiple (change)="onVideosChange($event)" />
+        <small *ngIf="mainAd.videos.length">
+          {{ mainAd.videos.length }} video(s) selected
+        </small>
+
+        <div *ngIf="isEditMode && existingVideoUrls.length" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
+          <div *ngFor="let video of existingVideoUrls; let i = index">
+            <video
+              [src]="video"
+              controls
+              style="width: 220px; max-width: 100%; border-radius: 8px; border: 1px solid #ddd;"
+            ></video>
+            <div style="margin-top: 8px;">
+              <button type="button" class="remove-btn" (click)="removeExistingVideo(i)">
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Location</h2>
+
+      <app-location-picker
+        (locationSelected)="onMapLocationSelected($event)">
+      </app-location-picker>
+
+      <div class="form-grid"></div>
+      <div class="form-grid"></div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Contact Details</h2>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input
+            type="text"
+            [(ngModel)]="mainAd.contactphone"
+            name="phone"
+            placeholder="Enter phone number"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>WhatsApp Number</label>
+          <input
+            type="text"
+            [(ngModel)]="mainAd.whatsappnumber"
+            name="whatsapp"
+            placeholder="Enter WhatsApp number"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-actions">
+      <button
+        type="button"
+        class="submit-btn"
+        [disabled]="isSubmitting"
+        (click)="submitByType('normal')"
+      >
+        {{
+          isSubmitting
+            ? (isEditMode ? 'Updating...' : 'Submitting...')
+            : (
+                isEditMode
+                  ? (adType === 'service' ? 'Update Service' : 'Update Product')
+                  : (adType === 'service' ? 'Post Your Service' : 'Post Your Product')
+              )
+        }}
+      </button>
+
+      <button
+        *ngIf="isEditMode"
+        type="button"
+        class="submit-btn featured-btn"
+        [disabled]="isSubmitting"
+        (click)="goToFeatureAd()"
+      >
+        {{
+          isSubmitting
+            ? 'Please wait...'
+            : (adType === 'service' ? 'Feature This Service' : 'Feature This Product')
+        }}
+      </button>
+    </div>
+  </form>
+</div>
+
+<div class="success-overlay" *ngIf="showSuccess">
+  <div class="success-card">
+    <div class="checkmark-circle">
+      <div class="checkmark"></div>
+    </div>
+
+    <h2>You Are Close To</h2>
+    <p>Your ad is live! Boost it with a subscription.</p>
+
+    <button class="primary-btn" (click)="goToSubscriptionPlans()">
+      View Subscription Plans
+    </button>
+  </div>
+</div>

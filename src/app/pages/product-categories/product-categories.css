@@ -1,0 +1,123 @@
+/* Container */
+.product-categories-container {
+  max-width: 1200px;
+  margin: 50px auto;
+  padding:  center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Heading */
+.product-categories-container h1 {
+  width: 100%;
+  text-align: center;
+  font-size: 36px;
+  color: #0d0d0e;
+  margin: 0 0 40px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 1.2;
+  text-align: center;
+  }
+
+/* Categories Grid */
+.categories-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 160px));
+  gap: 30px;
+  justify-content: center;
+  justify-items: center;
+}
+
+/* Individual Category Card */
+.cat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+}
+
+/* Icon Circle */
+.cat-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #3a89cf;
+  flex-shrink: 0;
+}
+
+.cat-icon img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  transition: transform 0.3s ease;
+}
+
+/* Label */
+.cat-card p {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f0f0f;
+  text-align: center;
+  margin: 0;
+  line-height: 1.4;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hover Effects */
+.cat-card:hover .cat-icon {
+  transform: scale(1.12);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cat-card:hover p {
+  color: #3a86ff;
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .product-categories-container {
+    margin: 35px auto;
+    padding: 0 16px;
+  }
+
+  .product-categories-container h1 {
+    font-size: 28px;
+    margin-bottom: 30px;
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 120px));
+    gap: 20px;
+  }
+
+  .cat-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .cat-icon img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .cat-card p {
+    font-size: 13px;
+    min-height: 34px;
+  }
+}

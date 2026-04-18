@@ -1,0 +1,116 @@
+<div class="admin-layout">
+  <div
+    class="sidebar-overlay"
+    [class.show]="sidebarOpen"
+    (click)="closeSidebar()"
+  ></div>
+
+  <app-admin-sidebar
+    [activeMenu]="activeMenu"
+    [sidebarOpen]="sidebarOpen"
+    (menuChange)="setActiveMenu($event)"
+  ></app-admin-sidebar>
+
+  <main class="main-content">
+    <app-admin-topbar
+      [username]="username"
+      [pageTitle]="pageTitle"
+      (menuToggle)="toggleSidebar()"
+    ></app-admin-topbar>
+
+    <div class="search-bar-wrap" *ngIf="isSearchVisible">
+      <div class="search-box">
+        <span class="search-icon">🔎</span>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          [placeholder]="searchPlaceholder"
+        />
+      </div>
+    </div>
+
+    <app-admin-dashboard
+      *ngIf="activeMenu === 'dashboard'"
+    ></app-admin-dashboard>
+
+    <app-admin-users
+      *ngIf="activeMenu === 'users'"
+      [searchQuery]="searchQuery"
+    ></app-admin-users>
+
+    <app-admin-posts
+      *ngIf="activeMenu === 'posts'"
+      [searchQuery]="searchQuery"
+    ></app-admin-posts>
+
+    <app-admin-categories
+      *ngIf="activeMenu === 'categories'"
+      [searchQuery]="searchQuery"
+    ></app-admin-categories>
+
+    <app-admin-subcategories
+      *ngIf="activeMenu === 'subcategories'"
+      [searchQuery]="searchQuery"
+    ></app-admin-subcategories>
+
+    <app-admin-subscriptions
+      *ngIf="activeMenu === 'subscriptions'"
+      [searchQuery]="searchQuery"
+    ></app-admin-subscriptions>
+
+    <app-admin-user-subscriptions
+      *ngIf="activeMenu === 'user-subscriptions'"
+      [searchQuery]="searchQuery"
+    ></app-admin-user-subscriptions>
+
+    <app-admin-boost-plans
+      *ngIf="activeMenu === 'boost-plans'"
+      [searchQuery]="searchQuery"
+    ></app-admin-boost-plans>
+
+    <app-admin-payments
+      *ngIf="activeMenu === 'payments'"
+      [searchQuery]="searchQuery"
+    ></app-admin-payments>
+
+    <div class="content-card" *ngIf="activeMenu === 'services'">
+      <h1>Services</h1>
+      <p>Services module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'matrimony'">
+      <h1>Matrimony</h1>
+      <p>Matrimony module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'jobs'">
+      <h1>Jobs</h1>
+      <p>Jobs module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'reports'">
+      <h1>Reports</h1>
+      <p>Reports module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'locations'">
+      <h1>Locations</h1>
+      <p>Locations module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'banners'">
+      <h1>Banners</h1>
+      <p>Banners module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'notifications'">
+      <h1>Notifications</h1>
+      <p>Notifications module will be connected next.</p>
+    </div>
+
+    <div class="content-card" *ngIf="activeMenu === 'settings'">
+      <h1>Settings</h1>
+      <p>Settings module will be connected next.</p>
+    </div>
+  </main>
+</div>

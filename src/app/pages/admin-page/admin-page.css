@@ -1,0 +1,190 @@
+* {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.admin-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 25%),
+    linear-gradient(180deg, #f8fafc 0%, #eef3f9 100%);
+  font-family: Arial, sans-serif;
+  color: #162033;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 28px;
+  margin-left: 8px;
+  overflow-x: hidden;
+}
+
+.search-bar-wrap {
+  margin: 0 0 18px;
+}
+
+.search-box {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.search-box:focus-within {
+  border-color: #93c5fd;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.search-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.search-box input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.search-box input::placeholder {
+  color: #94a3b8;
+}
+
+.content-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 26px;
+  border: 1px solid #e9eef5;
+  box-shadow: 0 14px 32px rgba(18, 38, 63, 0.06);
+}
+
+.content-card h1 {
+  margin: 0 0 10px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.15;
+}
+
+.content-card p {
+  margin: 0;
+  color: #667085;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 18, 31, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.25s ease;
+  z-index: 1001;
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Helps child admin modules like payments, boost plans, subscriptions */
+app-admin-dashboard,
+app-admin-users,
+app-admin-posts,
+app-admin-categories,
+app-admin-subcategories,
+app-admin-subscriptions,
+app-admin-user-subscriptions,
+app-admin-boost-plans,
+app-admin-payments {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 1200px) {
+  .main-content {
+    padding: 22px;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 991px) {
+  .admin-layout {
+    overflow: visible;
+  }
+
+  .main-content {
+    width: 100%;
+    padding: 16px;
+    margin-left: 0;
+  }
+
+  .search-box {
+    height: 50px;
+    border-radius: 16px;
+  }
+
+  .content-card {
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .content-card h1 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 576px) {
+  .main-content {
+    padding: 12px;
+  }
+
+  .search-bar-wrap {
+    margin-bottom: 14px;
+  }
+
+  .search-box {
+    height: 48px;
+    padding: 0 14px;
+    border-radius: 14px;
+  }
+
+  .content-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .content-card h1 {
+    font-size: 22px;
+  }
+
+  .content-card p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}

@@ -1,0 +1,179 @@
+
+
+<div class="posts-page">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">Posts Administration</p>
+      <h2>Posts Management</h2>
+      <p class="page-subtitle">
+        Manage all marketplace posts from one place.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-btn"
+      (click)="loadPosts()"
+      [disabled]="isLoading"
+    >
+      {{ isLoading ? 'Loading...' : 'Refresh' }}
+    </button>
+  </div>
+
+  <div class="error-card" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card summary-blue">
+      <div class="summary-top">
+        <span>Total Posts</span>
+        <div class="summary-icon">📝</div>
+      </div>
+      <h2>{{ totalPosts }}</h2>
+    </div>
+
+    <div class="summary-card summary-green">
+      <div class="summary-top">
+        <span>Active Posts</span>
+        <div class="summary-icon">✅</div>
+      </div>
+      <h2>{{ activePosts }}</h2>
+    </div>
+
+    <div class="summary-card summary-purple">
+      <div class="summary-top">
+        <span>Featured Posts</span>
+        <div class="summary-icon">⭐</div>
+      </div>
+      <h2>{{ featuredPosts }}</h2>
+    </div>
+
+    <div class="summary-card summary-red">
+      <div class="summary-top">
+        <span>Inactive Posts</span>
+        <div class="summary-icon">⛔</div>
+      </div>
+      <h2>{{ inactivePosts }}</h2>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div>
+        <h3>Posts List</h3>
+        <p>Live data from Supabase post table</p>
+      </div>
+
+      <div class="count-badge">
+        {{ filteredPosts.length }} record(s)
+      </div>
+    </div>
+
+    <div class="table-wrap" *ngIf="!isLoading; else loadingBlock">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Post</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Featured</th>
+            <th>Created</th>
+            <th class="action-col">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let post of filteredPosts; trackBy: trackByPost">
+            <td class="id-cell">#{{ post.id }}</td>
+
+            <td>
+              <div class="post-cell">
+                <div class="post-thumb" *ngIf="post.imageUrl; else noImage">
+                  <img [src]="post.imageUrl" [alt]="post.title" />
+                </div>
+
+                <ng-template #noImage>
+                  <div class="post-thumb no-image">🖼️</div>
+                </ng-template>
+
+                <div class="post-meta">
+                  <div class="post-title">{{ post.title }}</div>
+                  <div class="post-subtitle">
+                    User ID: {{ post.userId }} • {{ post.adType }}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <div class="category-text">{{ post.category }}</div>
+              <div class="subcategory-text">{{ post.subcategory }}</div>
+            </td>
+
+            <td>{{ post.type }}</td>
+
+            <td>₹{{ post.price | number : '1.0-0' }}</td>
+
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(post)">
+                {{ getStatusLabel(post) }}
+              </span>
+            </td>
+
+            <td>
+              <button
+                type="button"
+                class="mini-btn"
+                [class.featured-on]="post.isFeatured"
+                [class.featured-off]="!post.isFeatured"
+                (click)="toggleFeatured(post)"
+              >
+                {{ post.isFeatured ? 'Yes' : 'No' }}
+              </button>
+            </td>
+
+            <td>{{ post.createdOn }}</td>
+
+            <td class="action-col">
+              <div class="actions">
+                <button
+                  type="button"
+                  class="mini-btn"
+                  [class.activate-btn]="!post.isActive"
+                  [class.block-btn]="post.isActive"
+                  (click)="togglePostStatus(post)"
+                >
+                  {{ post.isActive ? 'Disable' : 'Enable' }}
+                </button>
+
+                <button
+                  type="button"
+                  class="mini-btn delete-btn"
+                  (click)="deletePost(post)"
+                >
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!filteredPosts.length && !isLoading">
+            <td colspan="9" class="empty-cell">
+              No posts found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #loadingBlock>
+      <div class="loading-wrap">
+        <div class="loading-card" *ngFor="let i of [1, 2, 3, 4, 5]"></div>
+      </div>
+    </ng-template>
+  </div>
+</div>

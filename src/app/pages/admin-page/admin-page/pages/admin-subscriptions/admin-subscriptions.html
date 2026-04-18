@@ -1,0 +1,274 @@
+<div class="subscriptions-page">
+  <div class="summary-grid">
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Total Plans</div>
+      <div class="mini-stat-value">{{ totalSubscriptionPlansCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Active Plans</div>
+      <div class="mini-stat-value">{{ activeSubscriptionPlansCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Inactive Plans</div>
+      <div class="mini-stat-value">{{ inactiveSubscriptionPlansCount }}</div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-label">Video Enabled</div>
+      <div class="mini-stat-value">{{ videoEnabledPlansCount }}</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div class="section-head-left">
+        <h2>Subscription Plans</h2>
+        <p class="section-desc">
+          Search, filter, activate, create, edit, and manage subscription plans.
+        </p>
+      </div>
+
+      <div class="section-head-right">
+        <div class="users-count-label">
+          Showing {{ filteredSubscriptionPlans.length }} plan(s)
+        </div>
+
+        <button type="button" class="primary-btn" (click)="openCreateForm()">
+          + Add Plan
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="filter-chips">
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="subscriptionStatusFilter === 'all'"
+          (click)="setSubscriptionStatusFilter('all')"
+        >
+          All
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="subscriptionStatusFilter === 'active'"
+          (click)="setSubscriptionStatusFilter('active')"
+        >
+          Active
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="subscriptionStatusFilter === 'inactive'"
+          (click)="setSubscriptionStatusFilter('inactive')"
+        >
+          Inactive
+        </button>
+      </div>
+    </div>
+
+    <div class="loading-box" *ngIf="loading">
+      Loading subscription plans...
+    </div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table class="subscriptions-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Plan</th>
+            <th>Plan ID</th>
+            <th>Price</th>
+            <th>Validity</th>
+            <th>Post Limit</th>
+            <th>Ad Limit</th>
+            <th>Remaining</th>
+            <th>Video</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            *ngFor="let plan of filteredSubscriptionPlans; trackBy: trackBySubscription"
+          >
+            <td>#{{ plan.subscriptionplanid }}</td>
+
+            <td>
+              <div class="plan-info">
+                <div class="plan-title">{{ plan.planname }}</div>
+                <div class="plan-sub">{{ plan.description || '-' }}</div>
+              </div>
+            </td>
+
+            <td>{{ plan.plan_id || '-' }}</td>
+            <td>₹{{ plan.price }}</td>
+            <td>{{ plan.validitydays }} days</td>
+            <td>{{ plan.postlimit }}</td>
+            <td>{{ plan.ad_limit }}</td>
+            <td>{{ plan.remaining_ads }}</td>
+
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="plan.video_enabled"
+                [class.status-inactive]="!plan.video_enabled"
+              >
+                {{ plan.video_enabled ? 'Enabled' : 'Disabled' }}
+              </span>
+            </td>
+
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="plan.isactive && plan.is_active"
+                [class.status-inactive]="!(plan.isactive && plan.is_active)"
+              >
+                {{ plan.isactive && plan.is_active ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+
+            <td>{{ plan.createdLabel }}</td>
+
+            <td>
+              <div class="plan-actions">
+                <button
+                  type="button"
+                  class="table-action-btn"
+                  (click)="openEditForm(plan)"
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn"
+                  [class.danger]="plan.isactive && plan.is_active"
+                  (click)="toggleSubscriptionStatus(plan)"
+                >
+                  {{ plan.isactive && plan.is_active ? 'Deactivate' : 'Activate' }}
+                </button>
+
+                <button
+                  type="button"
+                  class="table-action-btn danger"
+                  [disabled]="deletingId === plan.subscriptionplanid"
+                  (click)="deleteSubscription(plan)"
+                >
+                  {{
+                    deletingId === plan.subscriptionplanid ? 'Deleting...' : 'Delete'
+                  }}
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!filteredSubscriptionPlans.length">
+            <td colspan="12" class="empty-cell">
+              No subscription plans found for the current search/filter.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="showForm">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>{{ isEditMode ? 'Edit Subscription Plan' : 'Add Subscription Plan' }}</h3>
+        <button type="button" class="modal-close" (click)="closeForm()">×</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Plan Name</label>
+          <input type="text" [(ngModel)]="formModel.planname" />
+        </div>
+
+        <div class="form-group">
+          <label>Plan ID</label>
+          <input type="text" [(ngModel)]="formModel.plan_id" />
+        </div>
+
+        <div class="form-group full-width">
+          <label>Description</label>
+          <textarea rows="3" [(ngModel)]="formModel.description"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Price</label>
+          <input type="number" [(ngModel)]="formModel.price" />
+        </div>
+
+        <div class="form-group">
+          <label>Validity Days</label>
+          <input type="number" [(ngModel)]="formModel.validitydays" />
+        </div>
+
+        <div class="form-group">
+          <label>Post Limit</label>
+          <input type="number" [(ngModel)]="formModel.postlimit" />
+        </div>
+
+        <div class="form-group">
+          <label>Ad Limit</label>
+          <input type="number" [(ngModel)]="formModel.ad_limit" />
+        </div>
+
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" [(ngModel)]="formModel.name" />
+        </div>
+
+        <div class="form-group">
+          <label>Remaining Ads</label>
+          <input type="number" [(ngModel)]="formModel.remaining_ads" />
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="formModel.video_enabled" />
+            Video Enabled
+          </label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="formModel.isactive" />
+            isactive
+          </label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="formModel.is_active" />
+            is_active
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" (click)="closeForm()">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="primary-btn"
+          [disabled]="saving"
+          (click)="saveSubscription()"
+        >
+          {{ saving ? 'Saving...' : (isEditMode ? 'Update Plan' : 'Create Plan') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

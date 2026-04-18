@@ -2,7 +2,8 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": "414cbe84-dbb2-4148-a53e-e9d68fa690a1"
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -21,10 +22,18 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "src/assets",
+                "output": "/assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "public",
+                "output": "/"
               }
             ],
             "styles": [
+              "node_modules/@ng-select/ng-select/themes/default.theme.css",
+              "node_modules/leaflet/dist/leaflet.css",
               "src/styles.css"
             ],
             "server": "src/main.server.ts",
@@ -50,7 +59,9 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": false
             },
             "development": {
               "optimization": false,
@@ -58,7 +69,7 @@
               "sourceMap": true
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular/build:dev-server",

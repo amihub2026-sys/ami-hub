@@ -1,0 +1,215 @@
+/* =======================
+   Post Ad Page Container
+======================= */
+.post-ad-page {
+  max-width: 850px;
+  margin: 30px auto;
+  padding: 35px 30px;
+  background: linear-gradient(135deg, #fdfbfb, #ebedee);
+  border-radius: 25px;
+  box-shadow:0 8px 32px rgba(40, 163, 212, 0.5);
+
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+}
+
+/* Header */
+.post-ad-page h1 {
+  text-align: center;
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 35px;
+}
+
+/* =======================
+   Form Layout
+======================= */
+.ad-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Form Groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Inputs, Selects, Textarea */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 14px 18px;
+  font-size: 15px;
+  border-radius: 15px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: 0.3s;
+  background: #fff;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 10px rgba(255,107,107,0.2);
+}
+
+/* Textarea */
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* File Input */
+.form-group input[type="file"] {
+  padding: 8px;
+}
+
+/* =======================
+   ng-select Styling
+======================= */
+.ng-select {
+  border-radius: 15px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.ng-select .ng-select-container {
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 15px;
+  border: 1px solid #ccc;
+  transition: 0.3s;
+}
+
+.ng-select .ng-select-container:hover,
+.ng-select.ng-select-focused .ng-select-container {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 10px rgba(255,107,107,0.2);
+}
+
+.ng-select .ng-value,
+.ng-select .ng-placeholder {
+  font-size: 15px;
+}
+
+/* =======================
+   Submit Button
+======================= */
+.post-btn {
+  padding: 16px;
+  background: linear-gradient(90deg, #ff6b6b, #ff4757);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.post-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 25px rgba(255,71,87,0.4);
+}
+
+/* =======================
+   Responsive
+======================= */
+@media (max-width: 768px) {
+  .post-ad-page {
+    padding: 25px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-ad-page {
+    margin: 15px;
+    padding: 20px;
+  }
+
+  .post-ad-page h1 {
+    font-size: 28px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .ng-select .ng-select-container {
+    font-size: 14px;
+  }
+
+  .post-btn {
+    font-size: 15px;
+    padding: 14px;
+  }
+}
+/* Horizontal scroll container */
+.additional-images-preview {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 5px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  min-height: 100px;
+}
+
+/* Individual image box */
+.img-box {
+  position: relative;
+  flex: 0 0 auto;
+  width: 100px;
+  height: 100px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Remove button overlay */
+.remove-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background-color: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
+  padding: 0;
+}
+
+.remove-btn:hover {
+  background-color: rgba(255,0,0,0.8);
+}

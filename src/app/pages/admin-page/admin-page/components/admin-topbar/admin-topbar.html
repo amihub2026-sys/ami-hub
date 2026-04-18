@@ -1,0 +1,39 @@
+<header class="topbar">
+  <div class="topbar-left">
+    <button type="button" class="menu-toggle" (click)="onMenuToggle()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="title-wrap">
+      <p class="welcome-text">Welcome back, {{ username }}</p>
+      <h1>{{ pageTitle }}</h1>
+      <span class="subtitle">{{ pageSubtitle }}</span>
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <input
+        type="text"
+        [ngModel]="searchQuery"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Search here..."
+      />
+    </div>
+
+    <button type="button" class="icon-btn" aria-label="Notifications">
+      🔔
+    </button>
+
+    <div class="profile-chip">
+      <div class="avatar">{{ username.charAt(0) }}</div>
+      <div class="profile-info">
+        <strong>{{ username }}</strong>
+        <span>Administrator</span>
+      </div>
+    </div>
+  </div>
+</header>

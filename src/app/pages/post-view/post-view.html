@@ -1,0 +1,259 @@
+<div class="loading-state" *ngIf="isLoading()">
+  Loading product details...
+</div>
+
+<div class="empty-state" *ngIf="!isLoading() && !postData()">
+  Product not found.
+</div>
+
+<div class="post-view-container" *ngIf="!isLoading() && postData()">
+
+  <div class="media-section">
+
+    <ng-container *ngIf="selectedMedia().type === 'image'">
+      <img [src]="selectedMedia().url" alt="Main Image" class="main-img">
+    </ng-container>
+
+    <ng-container *ngIf="selectedMedia().type === 'video'">
+      <video class="main-img" [src]="selectedMedia().url" controls></video>
+    </ng-container>
+
+    <div class="thumbnail-slider" *ngIf="postData()?.images?.length || postData()?.videos?.length">
+
+      <img
+        *ngFor="let img of postData()?.images"
+        [src]="img"
+        class="thumb-img"
+        [class.active]="selectedMedia().url === img"
+        (click)="selectMedia('image', img)"
+      >
+
+      <div
+        *ngFor="let video of postData()?.videos"
+        class="thumb-video"
+        [class.active]="selectedMedia().url === video"
+        (click)="selectMedia('video', video)"
+      >
+        <video [src]="video"></video>
+        <span class="play-icon">▶</span>
+      </div>
+
+    </div>
+
+    <!-- SERVICE CATALOG -->
+    <div class="service-catalog-section" *ngIf="isServicePost()">
+      <h3>Services Offered</h3>
+
+      <div class="review-empty" *ngIf="!hasCatalog()">
+        No services found
+      </div>
+
+      <div class="catalog-grid" *ngIf="hasCatalog()">
+        <div class="catalog-card" *ngFor="let item of postData()?.catalogItems">
+          <img
+            *ngIf="item.imageUrl"
+            [src]="item.imageUrl"
+            [alt]="item.title || 'Service image'"
+            class="catalog-img"
+          >
+          <div class="catalog-body">
+            <h4>{{ item.title || 'Service' }}</h4>
+            <p *ngIf="item.price !== null">₹ {{ item.price }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reviews-section">
+      <h6 (click)="toggleReviewForm()" class="write-review-tab">
+        Write a Review
+        <span *ngIf="!showReviewForm()">▼</span>
+        <span *ngIf="showReviewForm()">▲</span>
+      </h6>
+
+      <form *ngIf="showReviewForm()" (ngSubmit)="submitReview()" class="review-form">
+
+        <div class="star-select">
+          <span
+            *ngFor="let star of [1,2,3,4,5]"
+            (click)="setRating(star)"
+            (mouseenter)="setHoverRating(star)"
+            (mouseleave)="clearHoverRating()"
+            [class.active]="star <= (hoverRating || selectedRating)"
+          >
+            ★
+          </span>
+        </div>
+
+        <div class="selected-rating-text">
+          Selected Rating: {{ selectedRating }}/5
+        </div>
+
+        <div class="review-input-wrapper">
+          <textarea
+            [(ngModel)]="reviewText"
+            name="reviewText"
+            placeholder="Write your review here..."
+            required
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="preview-images">
+          <img *ngFor="let img of reviewImages" [src]="img">
+        </div>
+
+        <div class="preview-video" *ngIf="reviewVideo">
+          <video [src]="reviewVideo" controls></video>
+        </div>
+
+        <button type="submit" [disabled]="!reviewText || selectedRating === 0 || isReviewSubmitting()">
+          {{ isReviewSubmitting() ? 'Submitting...' : 'Submit Review' }}
+        </button>
+      </form>
+    </div>
+
+    <div class="reviews-display">
+      <h3>User Reviews</h3>
+
+      <div *ngIf="isReviewsLoading()" class="review-loading">
+        Loading reviews...
+      </div>
+
+      <div *ngIf="!isReviewsLoading() && reviews().length === 0" class="review-empty">
+        No reviews yet
+      </div>
+
+      <div class="review-list" *ngIf="reviews().length > 0">
+        <div class="review-card" *ngFor="let r of reviews()">
+
+          <div class="stars">
+            <span *ngFor="let s of [1,2,3,4,5]" [class.filled]="s <= (r.rating || 0)">
+              ★
+            </span>
+          </div>
+
+          <p class="review-text">{{ r.reviewtext }}</p>
+
+          <div class="review-images" *ngIf="r.reviewimages?.length">
+            <img *ngFor="let img of r.reviewimages" [src]="img">
+          </div>
+
+          <div *ngIf="r.reviewvideo">
+            <video [src]="r.reviewvideo" controls></video>
+          </div>
+
+          <span class="review-date">
+            {{ r.createdat | date:'medium' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <button class="report-btn" (click)="toggleReportForm()">
+        Report Ad
+      </button>
+
+      <div *ngIf="showReportForm()" class="report-form">
+        <textarea
+          [(ngModel)]="reportText"
+          name="reportText"
+          placeholder="Describe the issue with this ad..."
+          rows="3"
+        ></textarea>
+
+        <button type="button" (click)="submitReport()">
+          Submit Report
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="details-section">
+
+    <h2>{{ postData()?.title }}</h2>
+
+    <p class="price">₹ {{ postData()?.price || 0 }}</p>
+
+    <div class="ratings">
+      <span class="stars">
+        <span *ngFor="let s of [1,2,3,4,5]" [class.filled]="s <= averageRating()">
+          ★
+        </span>
+      </span>
+      <span>{{ averageRating() }}/5 ({{ reviews().length }} Reviews)</span>
+    </div>
+
+    <div class="actions">
+      <button (click)="callSeller()">Call</button>
+      <button (click)="whatsappSeller()">WhatsApp</button>
+      <button type="button" (click)="sharePost()">Share</button>
+    </div>
+
+    <div class="quick-actions">
+      <!-- <button class="quick-btn cart-btn" (click)="addToCart()">🛒 Add to Cart</button> -->
+      <button class="quick-btn favorite-btn" (click)="addToFavorites()">❤ Favorite</button>
+      <button class="quick-btn chat-btn" (click)="chatSeller()">💬 Chat Seller</button>
+    </div>
+
+    <div class="seller-card">
+      <img [src]="postData()?.sellerImage" alt="Seller image">
+
+      <div>
+        <h4>{{ postData()?.sellerName }}</h4>
+        <p>{{ postData()?.location }}</p>
+      </div>
+
+      <button type="button">Follow</button>
+    </div>
+
+    <div class="highlights">
+      <ul *ngIf="postData()?.detailItems?.length">
+        <li *ngFor="let item of postData()?.detailItems">
+          <strong>{{ item.label }}:</strong> {{ item.value }}
+        </li>
+      </ul>
+
+      <p>{{ postData()?.description || 'No description available.' }}</p>
+    </div>
+
+    <!-- NEW ADDRESS SECTION -->
+    <div class="posted-location-card" *ngIf="postData()?.displayAddress || postData()?.location">
+      <h3>Posted in</h3>
+
+      <div class="posted-location-text">
+        <span class="location-pin">📍</span>
+        <span>{{ postData()?.displayAddress || postData()?.location }}</span>
+      </div>
+
+      <div class="posted-map-wrap" *ngIf="hasCoordinates()">
+        <iframe
+          class="posted-map"
+          [src]="mapEmbedUrl()"
+          width="100%"
+          height="220"
+          style="border:0;"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+
+      <button
+  type="button"
+  class="view-map-btn google-map-btn"
+  (click)="openMap()"
+>
+  View on Google Map
+</button>
+    </div>
+
+    <div class="map-icon">
+      <img src="assets/icons/map.jpg" alt="Map">
+      <span>{{ postData()?.displayAddress || postData()?.location }}</span>
+    </div>
+
+  </div>
+
+</div>

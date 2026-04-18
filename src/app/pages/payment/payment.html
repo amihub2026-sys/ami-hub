@@ -1,0 +1,213 @@
+<div class="payment-page">
+  <div class="payment-shell">
+
+    <!-- LEFT SIDE -->
+    <div class="payment-left">
+
+      <!-- BRAND -->
+      <div class="brand-card">
+        <div class="brand-badge">R</div>
+        <div>
+          <h1>Razorpay</h1>
+          <p>Secure static payment preview</p>
+        </div>
+      </div>
+
+      <!-- ORDER SUMMARY -->
+      <div class="summary-card" *ngIf="!paymentSuccess()">
+        <div class="card-head">
+          <h2>Order Summary</h2>
+          <span class="live-badge">Test Flow</span>
+        </div>
+
+        <div class="summary-row">
+          <span>Post Title</span>
+          <strong>{{ postTitle }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Seller</span>
+          <strong>{{ sellerName }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Ad Type</span>
+          <strong>{{ adType | titlecase }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Plan Name</span>
+          <strong>{{ planName }}</strong>
+        </div>
+
+        <div class="summary-row total-row">
+          <span>Total Amount</span>
+          <strong>₹ {{ formatAmount(amount) }}</strong>
+        </div>
+
+        <div class="note-box">
+          Secure Razorpay checkout enabled.
+          After successful payment, your post will be saved into the database.
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="success-card" *ngIf="paymentSuccess()">
+        <div class="success-icon">✓</div>
+
+        <h2>Payment Successful</h2>
+        <p>Your payment was completed and your post is now live.</p>
+
+        <div class="success-summary">
+          <div class="summary-row">
+            <span>Post</span>
+            <strong>{{ postTitle }}</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Plan</span>
+            <strong>{{ planName }}</strong>
+          </div>
+
+          <div class="summary-row total-row">
+            <span>Paid</span>
+            <strong>₹ {{ formatAmount(amount) }}</strong>
+          </div>
+        </div>
+
+        <div class="success-actions">
+          <button class="primary-btn" (click)="goHome()">Go to Home</button>
+          <button class="secondary-btn" (click)="goToMyAds()">Go to My Ads</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="payment-right" *ngIf="!paymentSuccess()">
+
+      <div class="payment-card">
+
+        <!-- HEADER -->
+        <div class="payment-card-head">
+          <div>
+            <h3>Complete Payment</h3>
+            <p>Choose any method below</p>
+          </div>
+
+          <div class="amount-pill">
+            ₹ {{ formatAmount(amount) }}
+          </div>
+        </div>
+
+        <!-- METHODS -->
+        <div class="method-list">
+
+          <div class="method-item active">
+            <div class="method-icon">◎</div>
+            <div>
+              <h4>UPI</h4>
+              <p>Google Pay, PhonePe, Paytm</p>
+            </div>
+          </div>
+
+          <div class="method-item">
+            <div class="method-icon">💳</div>
+            <div>
+              <h4>Card</h4>
+              <p>Visa, MasterCard, RuPay</p>
+            </div>
+          </div>
+
+          <div class="method-item">
+            <div class="method-icon">🏦</div>
+            <div>
+              <h4>Net Banking</h4>
+              <p>All major Indian banks</p>
+            </div>
+          </div>
+
+          <div class="method-item">
+            <div class="method-icon">👛</div>
+            <div>
+              <h4>Wallet</h4>
+              <p>Paytm, Mobikwik</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- FORM PREVIEW -->
+        <div class="fake-form">
+          <label>Customer Name</label>
+          <input type="text" [value]="sellerName" readonly>
+
+          <label>Plan</label>
+          <input type="text" [value]="planName" readonly>
+
+          <label>Amount</label>
+          <input type="text" [value]="'₹ ' + formatAmount(amount)" readonly>
+        </div>
+
+        <!-- ERROR -->
+        <div class="error-box" *ngIf="errorMessage()">
+          {{ errorMessage() }}
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="action-row" *ngIf="!paymentFailed()">
+          <button
+            class="secondary-btn"
+            (click)="goBackToPlans()"
+            [disabled]="isPaying()"
+          >
+            Back
+          </button>
+
+          <button
+            class="primary-btn"
+            (click)="payNow()"
+            [disabled]="isPaying()"
+          >
+            <span *ngIf="!isPaying()">
+              Pay ₹ {{ formatAmount(amount) }}
+            </span>
+
+            <span *ngIf="isPaying()">
+              Processing Payment...
+            </span>
+          </button>
+        </div>
+
+        <!-- FAILURE -->
+        <div class="failed-box" *ngIf="paymentFailed()">
+          <p>Payment may have completed, but post saving failed.</p>
+
+          <div class="action-row">
+            <button class="secondary-btn" (click)="goBackToPlans()">
+              Back
+            </button>
+
+            <button
+              class="primary-btn"
+              (click)="retrySavePost()"
+              [disabled]="isRetryingSave()"
+            >
+              <span *ngIf="!isRetryingSave()">Retry Save Post</span>
+              <span *ngIf="isRetryingSave()">Saving Post...</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECURE NOTE -->
+        <div class="secure-note">
+          <span>🔒</span>
+          <p>100% secure Razorpay checkout</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

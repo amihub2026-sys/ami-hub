@@ -1,0 +1,85 @@
+<div class="news-page">
+  <div class="news-header">
+    <h1>Latest News & Offers</h1>
+    <p>Stay updated with general news, seller offers, and AMI HUB announcements.</p>
+  </div>
+
+  <div class="news-tabs">
+    <button
+      *ngFor="let tab of tabs"
+      type="button"
+      [class.active]="selectedType === tab.key"
+      (click)="loadNews(tab.key)"
+    >
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <div class="loading" *ngIf="loading">Loading news...</div>
+
+  <ng-container *ngIf="!loading">
+    <div class="featured-strip" *ngIf="featuredNews.length > 0">
+      <div
+        class="featured-card"
+        *ngFor="let item of featuredNews; trackBy: trackByNewsId"
+        (click)="openLink(item)"
+      >
+        <img
+          *ngIf="item.image_url"
+          [src]="item.image_url"
+          [alt]="item.title"
+        />
+
+        <div class="featured-content">
+          <span class="badge featured-badge">{{ getTypeLabel(item.type) }}</span>
+          <h2>{{ item.title }}</h2>
+          <p>{{ item.summary || item.content }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty" *ngIf="newsList.length === 0">
+      No news available right now.
+    </div>
+
+    <div class="news-grid" *ngIf="newsList.length > 0">
+      <div
+        class="news-card"
+        *ngFor="let item of newsList; trackBy: trackByNewsId"
+      >
+        <div class="news-image-wrap" *ngIf="item.image_url">
+          <img [src]="item.image_url" [alt]="item.title" class="news-image" />
+        </div>
+
+        <div class="news-card-body">
+          <div class="news-top-row">
+            <span class="badge">{{ getTypeLabel(item.type) }}</span>
+            <span class="source">{{ item.source_type | titlecase }}</span>
+          </div>
+
+          <h3>{{ item.title }}</h3>
+
+          <p>
+            {{ item.summary || item.content || 'No description available.' }}
+          </p>
+
+          <div class="news-meta">
+            <span>{{ item.city || 'All Cities' }}</span>
+            <span>
+              {{ item.created_at | date: 'mediumDate' }}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            class="read-more-btn"
+            *ngIf="item.link_url"
+            (click)="openLink(item)"
+          >
+            Read More
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

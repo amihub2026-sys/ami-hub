@@ -1,0 +1,63 @@
+<div class="chat-page">
+  <div class="chat-layout">
+
+    <div class="chat-sidebar">
+      <div class="chat-sidebar-header">Chats</div>
+
+      <div class="chat-list" *ngIf="conversations().length > 0">
+        <div
+          class="chat-list-item"
+          *ngFor="let chat of conversations()"
+          [class.active]="isSelected(chat)"
+          (click)="openChat(chat)"
+        >
+          <div class="chat-avatar">
+            {{ (chat.otherUserName || 'U').charAt(0) }}
+          </div>
+
+          <div class="chat-info">
+            <h4>{{ chat.otherUserName || 'User' }}</h4>
+            <p>{{ chat.lastMessage || 'No messages yet' }}</p>
+            <small>Post ID: {{ chat.post_id }}</small>
+          </div>
+
+          <div class="chat-meta">
+            <span class="chat-time">{{ getTime(chat.created_at) }}</span>
+            <span class="unread-badge" *ngIf="chat.unreadCount > 0">{{ chat.unreadCount }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-empty" *ngIf="!isLoading() && conversations().length === 0">
+        No chats available
+      </div>
+    </div>
+
+    <div class="chat-container">
+      <div class="chat-header">
+        {{ selectedChat()?.otherUserName || 'Chat' }}
+      </div>
+
+      <div class="messages">
+        <div
+          *ngFor="let m of messages()"
+          class="message"
+          [class.me]="m.sender_id === currentUser?.id"
+          [attr.data-time]="getTime(m.created_at)"
+        >
+          {{ m.message }}
+        </div>
+      </div>
+
+      <div class="input-box" *ngIf="selectedChat()">
+        <input
+          [(ngModel)]="newMessage"
+          placeholder="Type message..."
+          (keyup.enter)="sendMessage()"
+        />
+        <button class="send-btn" (click)="sendMessage()" aria-label="Send">➤</button>
+      </div>
+    </div>
+
+  </div>
+</div>

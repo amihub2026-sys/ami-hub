@@ -1,0 +1,131 @@
+<div class="contact-page">
+  <div class="contact-wrapper">
+
+    <div class="contact-left">
+      <h1>Contact Us</h1>
+
+      <div class="contact-card">
+        <h2>Send us a Message</h2>
+        <p>
+          Get in touch with us! Whether you have questions, feedback, or just want to say hello,
+          our contact page is the gateway to reaching our team.
+        </p>
+
+        <form (ngSubmit)="submitForm()" #contactForm="ngForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Name<span>*</span></label>
+              <input
+                type="text"
+                name="name"
+                [(ngModel)]="formData.name"
+                placeholder="Enter your name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Phone<span>*</span></label>
+              <input
+                type="text"
+                name="phone"
+                [(ngModel)]="formData.phone"
+                placeholder="Enter phone number"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                name="email"
+                [(ngModel)]="formData.email"
+                placeholder="Enter your email"
+              />
+            </div>
+          </div>
+
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Subject<span>*</span></label>
+              <input
+                type="text"
+                name="subject"
+                [(ngModel)]="formData.subject"
+                placeholder="Enter your subject"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Message<span>*</span></label>
+              <textarea
+                name="message"
+                [(ngModel)]="formData.message"
+                placeholder="Enter your message"
+                rows="5"
+                required
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="submit-wrap">
+            <button type="submit" [disabled]="!contactForm.valid">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="contact-right">
+      <h2>Contact information</h2>
+
+      <div class="info-item">
+        <div class="info-icon">📍</div>
+        <div class="info-text">
+          4B/1, New Ramnad Road, Teppakulam South Street,<br>
+          Madurai - 625 009, Tamil Nadu, India.
+        </div>
+      </div>
+
+      <div class="info-item">
+        <div class="info-icon">✉️</div>
+        <div class="info-text">
+          amihub@gmail.com
+        </div>
+      </div>
+
+      <div class="info-item">
+        <div class="info-icon">📞</div>
+        <div class="info-text">
+          75500 08588<br>
+          90421 11424
+        </div>
+      </div>
+
+      <h3>Social Media</h3>
+
+      <div class="social-links">
+        <a href="#">Facebook</a>
+        <a href="#">Instagram</a>
+        <a href="#">YouTube</a>
+      </div>
+
+      <div class="map-box">
+        <iframe
+          src="https://www.google.com/maps?q=Teppakulam%20South%20Street%20Madurai&output=embed"
+          width="100%"
+          height="220"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy">
+        </iframe>
+      </div>
+    </div>
+
+  </div>
+</div>

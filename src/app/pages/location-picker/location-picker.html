@@ -1,0 +1,49 @@
+<div class="location-picker">
+  <div class="search-row">
+    <input
+      type="text"
+      [(ngModel)]="query"
+      (input)="onSearchInput()"
+      placeholder="Search city, area, address..."
+      autocomplete="off"
+    />
+
+    <button type="button" (click)="useCurrentLocation()">
+      Use Current Location
+    </button>
+  </div>
+
+  <div
+    class="selected-location"
+    *ngIf="currentResult && currentResult.displayName"
+  >
+    <strong>Selected:</strong> {{ currentResult.displayName }}
+  </div>
+
+  <div class="suggestions" *ngIf="suggestions.length > 0">
+    <button
+      type="button"
+      class="suggestion-item"
+      *ngFor="let item of suggestions"
+      (click)="chooseLocation(item)"
+    >
+      {{ item.displayName }}
+    </button>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    Searching...
+  </div>
+
+  <div *ngIf="isBrowser" #mapRef class="map-box"></div>
+
+  <div class="confirm-section">
+  <button
+    type="button"
+    class="confirm-btn location-confirm-btn"
+    (click)="confirmLocation()"
+  >
+    Confirm Location
+  </button>
+</div>
+</div>

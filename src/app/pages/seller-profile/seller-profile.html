@@ -1,0 +1,119 @@
+<div class="profile-container">
+
+  <h2>{{ isEditMode ? 'Edit Profile' : 'Profile Setup' }}</h2>
+
+  <div class="profile-image-wrapper">
+    <div class="image-box">
+      <img
+        [src]="seller.profileImage ? seller.profileImage : 'assets/icons/user.png'"
+        class="profile-img"
+      >
+
+      <label class="edit-btn">
+        ✏
+        <input
+          type="file"
+          accept="image/*"
+          (change)="uploadProfileImage($event)"
+          [disabled]="isLoading"
+          hidden>
+      </label>
+
+      <button
+        type="button"
+        *ngIf="seller.profileImage"
+        class="remove-btn"
+        (click)="removeProfileImage()"
+        [disabled]="isLoading">
+        ✖
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="seller.verified" class="verified-badge">
+    ✔ Verified Seller
+  </div>
+
+  <div class="rating">
+    <span *ngFor="let star of stars">
+      <!-- <span class="star" [ngClass]="{ filled: star <= seller.rating }">
+        ★
+      </span> -->
+    </span>
+  </div>
+
+  <input
+    type="text"
+    placeholder="Seller Name"
+    [(ngModel)]="seller.name"
+    [disabled]="isLoading">
+
+  <input
+    type="email"
+    placeholder="Email"
+    [(ngModel)]="seller.email"
+    [disabled]="isLoading">
+
+  <input
+    type="text"
+    placeholder="Phone Number"
+    [(ngModel)]="seller.phone"
+    [disabled]="isLoading">
+
+  <select [(ngModel)]="seller.accountType" [disabled]="isLoading">
+    <option value="">Select Account Type</option>
+    <option *ngFor="let type of accountTypes" [value]="type">
+      {{ type }}
+    </option>
+  </select>
+
+  <select [(ngModel)]="seller.category" [disabled]="isLoading">
+    <option value="">Select Category</option>
+    <option *ngFor="let cat of categories" [value]="cat">
+      {{ cat }}
+    </option>
+  </select>
+
+  <h3>KYC Document</h3>
+  <input
+    type="file"
+    accept="image/*"
+    (change)="uploadKYC($event)"
+    [disabled]="isLoading">
+
+  <img
+    *ngIf="seller.kycImage"
+    [src]="seller.kycImage"
+    class="preview">
+
+  <h3>Payment QR Code</h3>
+  <input
+    type="file"
+    accept="image/*"
+    (change)="uploadQR($event)"
+    [disabled]="isLoading">
+
+  <img
+    *ngIf="seller.qrCodeImage"
+    [src]="seller.qrCodeImage"
+    class="preview">
+
+  <label class="terms">
+    <input
+      type="checkbox"
+      [(ngModel)]="seller.termsAccepted"
+      [disabled]="isLoading">
+    <span>I accept Terms & Conditions</span>
+  </label>
+
+  <button
+    type="button"
+    class="submit-btn"
+    (click)="submitProfile()"
+    [disabled]="isLoading">
+
+    {{ isLoading ? 'Please wait...' : submitButtonText }}
+
+  </button>
+
+</div>
