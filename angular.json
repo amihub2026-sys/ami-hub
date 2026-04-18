@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "student-app": {
+    "amihub-app": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -75,10 +75,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "student-app:build:production"
+              "buildTarget": "amihub-app:build:production"
             },
             "development": {
-              "buildTarget": "student-app:build:development"
+              "buildTarget": "amihub-app:build:development"
             }
           },
           "defaultConfiguration": "development"
