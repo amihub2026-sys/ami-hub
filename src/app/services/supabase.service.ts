@@ -1074,19 +1074,19 @@ export class SupabaseService {
   }
 
   // ---------------- OAuth ----------------
-  async signInWithOAuth(provider: 'google' | 'github') {
-    const redirectTo =
-      typeof window !== 'undefined'
-        ? `${window.location.origin}/login`
-        : undefined;
+async signInWithOAuth(provider: 'google' | 'github') {
+  const redirectTo =
+    window.location.hostname === 'localhost'
+      ? 'http://localhost:4200/login'
+      : 'https://amihub.in/login';
 
-    return this.supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo
-      }
-    });
-  }
+  return this.supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo
+    }
+  });
+}
 
   async signOut() {
     await this.supabase.auth.signOut();
