@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../../../services/supabase.service';
@@ -57,7 +57,10 @@ export class AdminBoostPlansComponent implements OnInit {
     isactive: true,
   };
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.fetchBoostPlans();
@@ -141,6 +144,7 @@ export class AdminBoostPlansComponent implements OnInit {
 
   async fetchBoostPlans(): Promise<void> {
     this.loading = true;
+    this.cdr.detectChanges();
 
     try {
       const { data, error } = await this.supabase
@@ -151,22 +155,27 @@ export class AdminBoostPlansComponent implements OnInit {
       if (error) {
         console.error('Fetch boost plans error:', error);
         alert(error.message || 'Failed to load boost plans.');
+        this.cdr.detectChanges();
         return;
       }
 
       this.allBoostPlans = (data || []).map((item: any) =>
         this.mapBoostPlan(item)
       );
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Fetch boost plans exception:', err);
       alert('Something went wrong while loading boost plans.');
+      this.cdr.detectChanges();
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
   setBoostStatusFilter(filter: BoostStatusFilter): void {
     this.boostStatusFilter = filter;
+    this.cdr.detectChanges();
   }
 
   get filteredBoostPlans(): AdminBoostPlanItem[] {
@@ -223,6 +232,7 @@ export class AdminBoostPlansComponent implements OnInit {
     this.editingId = null;
     this.showForm = true;
     this.resetForm();
+    this.cdr.detectChanges();
   }
 
   openEditForm(item: AdminBoostPlanItem): void {
@@ -241,6 +251,8 @@ export class AdminBoostPlansComponent implements OnInit {
       enddate: this.toDateTimeLocal(item.enddate),
       isactive: !!item.isactive,
     };
+
+    this.cdr.detectChanges();
   }
 
   closeForm(): void {
@@ -248,6 +260,7 @@ export class AdminBoostPlansComponent implements OnInit {
     this.isEditMode = false;
     this.editingId = null;
     this.resetForm();
+    this.cdr.detectChanges();
   }
 
   resetForm(): void {
@@ -262,40 +275,48 @@ export class AdminBoostPlansComponent implements OnInit {
       enddate: '',
       isactive: true,
     };
+    this.cdr.detectChanges();
   }
 
   async saveBoostPlan(): Promise<void> {
     if (!this.formModel.userid) {
       alert('User ID is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.postid) {
       alert('Post ID is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.boost_plan_id.trim()) {
       alert('Boost Plan ID is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.boost_name.trim()) {
       alert('Boost Name is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.startdate) {
       alert('Start date is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.enddate) {
       alert('End date is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     this.saving = true;
+    this.cdr.detectChanges();
 
     const payload = {
       userid: this.formModel.userid,
@@ -319,6 +340,7 @@ export class AdminBoostPlansComponent implements OnInit {
         if (error) {
           console.error('Update boost plan error:', error);
           alert(error.message || 'Failed to update boost plan.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -336,6 +358,7 @@ export class AdminBoostPlansComponent implements OnInit {
         if (error) {
           console.error('Create boost plan error:', error);
           alert(error.message || 'Failed to create boost plan.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -347,8 +370,10 @@ export class AdminBoostPlansComponent implements OnInit {
     } catch (err) {
       console.error('Save boost plan exception:', err);
       alert('Something went wrong while saving boost plan.');
+      this.cdr.detectChanges();
     } finally {
       this.saving = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -366,6 +391,7 @@ export class AdminBoostPlansComponent implements OnInit {
       if (error) {
         console.error('Toggle boost status error:', error);
         alert(error.message || 'Failed to update status.');
+        this.cdr.detectChanges();
         return;
       }
 
@@ -374,15 +400,18 @@ export class AdminBoostPlansComponent implements OnInit {
         isactive: item.isactive,
         enddate: item.enddate,
       });
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Toggle boost status exception:', err);
       alert('Something went wrong while updating status.');
+      this.cdr.detectChanges();
     }
   }
 
   async deleteBoostPlan(item: AdminBoostPlanItem): Promise<void> {
     if (!item?.boostid) {
       alert('Invalid boost record.');
+      this.cdr.detectChanges();
       return;
     }
 
@@ -393,6 +422,7 @@ export class AdminBoostPlansComponent implements OnInit {
     if (!confirmed) return;
 
     this.deletingId = item.boostid;
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabase
@@ -403,6 +433,7 @@ export class AdminBoostPlansComponent implements OnInit {
       if (error) {
         console.error('Delete boost plan error:', error);
         alert(error.message || 'Failed to delete boost plan.');
+        this.cdr.detectChanges();
         return;
       }
 
@@ -411,11 +442,14 @@ export class AdminBoostPlansComponent implements OnInit {
       );
 
       alert('Boost plan deleted successfully.');
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Delete boost plan exception:', err);
       alert('Something went wrong while deleting boost plan.');
+      this.cdr.detectChanges();
     } finally {
       this.deletingId = null;
+      this.cdr.detectChanges();
     }
   }
 

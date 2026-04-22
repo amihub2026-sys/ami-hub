@@ -26,6 +26,8 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
     name: '',
     email: '',
     phone: '',
+    username: '',
+    password: '',
     accountType: '',
     category: '',
     profileImage: null,
@@ -43,6 +45,7 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
   isLoading = false;
   isEditMode = false;
   authChecked = false;
+  showPassword = false;
 
   private hasLoadedProfile = false;
   private authSubscription: { unsubscribe: () => void } | null = null;
@@ -59,17 +62,24 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
     return this.isEditMode ? 'Edit Profile' : 'Create Profile';
   }
 
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
   async ngOnInit() {
     const nav = this.router.getCurrentNavigation();
     if (nav?.extras?.state) {
       this.redirectTo = nav.extras.state['next'] || '';
     }
 
-    if (!isPlatformBrowser(this.platformId)) {
+    if (!this.isBrowser()) {
       return;
     }
 
-    // Listen for auth restore/login and reload immediately inside Angular zone
     const { data } = this.supabaseService.supabase.auth.onAuthStateChange(
       async (_event, session) => {
         await this.zone.run(async () => {
@@ -87,10 +97,8 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
 
     this.authSubscription = data?.subscription ?? null;
 
-    // First load
     await this.loadSellerProfile(false);
 
-    // Safety retry for slow session restore
     setTimeout(async () => {
       if (!this.destroyed && !this.hasLoadedProfile) {
         await this.zone.run(async () => {
@@ -99,7 +107,6 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
       }
     }, 1200);
 
-    // Second safety retry
     setTimeout(async () => {
       if (!this.destroyed && !this.hasLoadedProfile) {
         await this.zone.run(async () => {
@@ -115,7 +122,7 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
   }
 
   async loadSellerProfile(forceRetry: boolean = false) {
-    if (!isPlatformBrowser(this.platformId)) return;
+    if (!this.isBrowser()) return;
     if (this.destroyed) return;
     if (this.isLoading && !forceRetry) return;
     if (this.hasLoadedProfile && !forceRetry) return;
@@ -126,11 +133,62 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
     try {
       await this.supabaseService.waitForSession(2500);
 
-      let user = await this.supabaseService.getCurrentUser();
+      const session = await this.supabaseService.getEffectiveAuthUser();
+
+      if (!session.isAuthenticated) {
+        this.authChecked = true;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+        return;
+      }
+
+      if (!session.authUser && session.userid) {
+        const { data: profileById, error: profileError } =
+          await this.supabaseService.getUserById(Number(session.userid));
+
+        if (profileError) {
+          console.error('Profile load by local user id error:', profileError);
+          this.authChecked = true;
+          this.isLoading = false;
+          this.cdr.detectChanges();
+          return;
+        }
+
+        this.zone.run(() => {
+          this.seller = {
+            ...this.seller,
+            name: profileById?.name || profileById?.fullname || session.name || '',
+            email: profileById?.email || session.email || '',
+            phone: profileById?.phone_number || profileById?.phonenumber || '',
+            username: profileById?.username || session.username || '',
+            password: profileById?.password || '',
+            accountType: profileById?.accounttype || '',
+            category: profileById?.category || '',
+            profileImage: profileById?.profileimageurl || profileById?.avatar_url || null,
+            kycImage: profileById?.kycimage || null,
+            qrCodeImage: profileById?.qrcodeimage || null,
+            rating: profileById?.rating ?? 4,
+            verified: profileById?.isverified ?? true,
+            termsAccepted: profileById?.termsaccepted ?? false
+          };
+
+          this.isEditMode = this.hasExistingProfileData(profileById);
+          this.hasLoadedProfile = true;
+          this.authChecked = true;
+          this.isLoading = false;
+
+          this.cdr.detectChanges();
+        });
+
+        return;
+      }
+
+      let user = session.authUser;
 
       if (!user) {
         await this.delay(600);
-        user = await this.supabaseService.getCurrentUser();
+        const retrySession = await this.supabaseService.getEffectiveAuthUser();
+        user = retrySession.authUser;
       }
 
       if (!user) {
@@ -167,9 +225,12 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
             profile?.fullname ||
             user?.user_metadata?.['full_name'] ||
             user?.user_metadata?.['name'] ||
+            session.name ||
             '',
-          email: profile?.email || user?.email || '',
+          email: profile?.email || user?.email || session.email || '',
           phone: profile?.phone_number || profile?.phonenumber || '',
+          username: profile?.username || session.username || '',
+          password: profile?.password || '',
           accountType: profile?.accounttype || '',
           category: profile?.category || '',
           profileImage: profile?.profileimageurl || profile?.avatar_url || null,
@@ -237,15 +298,62 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
       this.showMessage('Accept Terms');
       return;
     }
+    // ✅ ADD THIS ONLY
+if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
+  this.showMessage('Phone number must be exactly 10 digits');
+  return;
+}
 
-    if (!isPlatformBrowser(this.platformId)) return;
+    if (!this.isBrowser()) return;
 
     this.isLoading = true;
     this.cdr.detectChanges();
 
     try {
-      await this.supabaseService.waitForSession(1500);
-      await this.supabaseService.upsertSellerProfileToUsers(this.seller);
+      const session = await this.supabaseService.getEffectiveAuthUser();
+
+      if (!session.isAuthenticated) {
+        this.showMessage('Please login first');
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      if (!session.authUser && session.userid) {
+        const payload = {
+          fullname: this.seller.name || '',
+          name: this.seller.name || '',
+          email: this.seller.email || '',
+          phonenumber: this.seller.phone || '',
+          phone_number: this.seller.phone || '',
+          username: this.seller.username || '',
+          password: this.seller.password || '',
+          profileimageurl: this.seller.profileImage || null,
+          avatar_url: this.seller.profileImage || null,
+          accounttype: this.seller.accountType || '',
+          category: this.seller.category || '',
+          kycimage: this.seller.kycImage || null,
+          qrcodeimage: this.seller.qrCodeImage || null,
+          rating: this.seller.rating ?? 4,
+          isverified: this.seller.verified ?? true,
+          isactive: true,
+          termsaccepted: this.seller.termsAccepted ?? false,
+          isonboardingcompleted: true,
+          updatedon: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+
+        const { error } = await this.supabaseService.supabase
+          .from('users')
+          .update(payload)
+          .eq('userid', Number(session.userid));
+
+        if (error) {
+          throw error;
+        }
+      } else {
+        await this.supabaseService.waitForSession(1500);
+        await this.supabaseService.upsertSellerProfileToUsers(this.seller);
+      }
 
       this.zone.run(() => {
         this.isEditMode = true;
@@ -283,6 +391,8 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
     return !!(
       profile?.phonenumber ||
       profile?.phone_number ||
+      profile?.username ||
+      profile?.password ||
       profile?.accounttype ||
       profile?.category ||
       profile?.profileimageurl ||
@@ -298,7 +408,7 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
   }
 
   private showMessage(message: string) {
-    if (isPlatformBrowser(this.platformId)) {
+    if (this.isBrowser()) {
       alert(message);
     } else {
       console.log(message);

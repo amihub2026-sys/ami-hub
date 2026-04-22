@@ -34,11 +34,51 @@ export class Service implements OnInit {
 
   goToFeatureAd(): void {
     if (!this.editPostId) {
-      alert('Post id not found');
+      this.showAlert('Post id not found');
       return;
     }
 
     const finalType = this.lockedAdType || this.adType || 'service';
+
+    if (typeof window !== 'undefined') {
+      const featureEditContext = {
+        postId: Number(this.editPostId),
+        adType: finalType,
+        postData: {
+          postid: Number(this.editPostId),
+          userid: null,
+          title: this.mainAd.title?.trim() || '',
+          description: this.mainAd.description?.trim() || '',
+          price: this.mainAd.price ?? 0,
+          category: this.mainAd.category || '',
+          subcategory: this.mainAd.subcategory || '',
+          conditiontype: finalType,
+          adtype: finalType,
+          contactphone: this.mainAd.contactphone || '',
+          whatsappnumber: this.mainAd.whatsappnumber || '',
+          location: this.mainAd.full_address || '',
+          address: this.mainAd.full_address || '',
+          full_address: this.mainAd.full_address || '',
+          latitude: this.mainAd.latitude,
+          longitude: this.mainAd.longitude,
+          place_name: this.mainAd.place_name || '',
+          location_source: this.mainAd.location_source || 'google',
+          country: this.mainAd.country || 'India',
+          state: this.mainAd.state || '',
+          district: this.mainAd.district || '',
+          area: this.mainAd.area || '',
+          image_url: this.existingMainImageUrl || '',
+          image_urls: this.existingImageUrls || [],
+          video_urls: this.existingVideoUrls || [],
+          catalog: finalType === 'service' ? this.buildCatalogDraft() : []
+        }
+      };
+
+      localStorage.setItem(
+        'feature_edit_post_context',
+        JSON.stringify(featureEditContext)
+      );
+    }
 
     this.router.navigate(['/featured-plan'], {
       state: {
@@ -108,6 +148,18 @@ export class Service implements OnInit {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
   ) {}
+
+  private isBrowser(): boolean {
+    return typeof window !== 'undefined';
+  }
+
+  private showAlert(message: string): void {
+    if (this.isBrowser()) {
+      alert(message);
+    } else {
+      console.log(message);
+    }
+  }
 
   async ngOnInit(): Promise<void> {
     this.ngZone.run(() => {
@@ -203,13 +255,13 @@ export class Service implements OnInit {
 
       if (error) {
         console.error('Error loading post for edit:', error);
-        alert('Error loading post');
+        this.showAlert('Error loading post');
         this.router.navigate(['/my-posts']);
         return;
       }
 
       if (!data) {
-        alert('Post not found');
+        this.showAlert('Post not found');
         this.router.navigate(['/my-posts']);
         return;
       }
@@ -235,7 +287,7 @@ export class Service implements OnInit {
       }
     } catch (error) {
       console.error('Error initializing page:', error);
-      alert('Error opening edit page');
+      this.showAlert('Error opening edit page');
       this.router.navigate(['/my-posts']);
     } finally {
       this.ngZone.run(() => {
@@ -639,36 +691,36 @@ export class Service implements OnInit {
 
   confirmLocation(): void {
     if (!this.mainAd.full_address?.trim()) {
-      alert('Please enter full address');
+      this.showAlert('Please enter full address');
       return;
     }
 
     if (this.mainAd.latitude == null || this.mainAd.longitude == null) {
-      alert('Please move pin or select location on map');
+      this.showAlert('Please move pin or select location on map');
       return;
     }
 
-    alert('Location confirmed');
+    this.showAlert('Location confirmed');
   }
 
   private validateForm(): boolean {
     if (!this.mainAd.title.trim()) {
-      alert('Enter title');
+      this.showAlert('Enter title');
       return false;
     }
 
     if (!this.mainAd.description.trim()) {
-      alert('Enter description');
+      this.showAlert('Enter description');
       return false;
     }
 
     if (!this.mainAd.category) {
-      alert('Select category');
+      this.showAlert('Select category');
       return false;
     }
 
     if (!this.mainAd.subcategory) {
-      alert('Select subcategory');
+      this.showAlert('Select subcategory');
       return false;
     }
 
@@ -677,10 +729,18 @@ export class Service implements OnInit {
       this.mainAd.latitude == null ||
       this.mainAd.longitude == null
     ) {
-      alert('Please select location');
+      this.showAlert('Please select location');
       return false;
     }
+if (this.mainAd.contactphone && !/^\d{10}$/.test(this.mainAd.contactphone)) {
+  this.showAlert('Phone number must be exactly 10 digits');
+  return false;
+}
 
+if (this.mainAd.whatsappnumber && !/^\d{10}$/.test(this.mainAd.whatsappnumber)) {
+  this.showAlert('WhatsApp number must be exactly 10 digits');
+  return false;
+}
     return true;
   }
 
@@ -703,17 +763,28 @@ export class Service implements OnInit {
     if (!this.validateForm()) return;
 
     if (!this.isEditMode && flowType === 'featured') {
-      alert('Please post your product or service first. After posting, you can feature the ad later.');
+      this.showAlert('Please post your product or service first. After posting, you can feature the ad later.');
       return;
     }
 
     this.isSubmitting = true;
 
     try {
-      const user = await this.supabaseService.getCurrentUser();
+      const session = await this.supabaseService.getEffectiveAuthUser();
 
-      if (!user) {
-        alert('Please login first');
+      if (!session.isAuthenticated) {
+        this.showAlert('Please login first');
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      const authUserId = session.authUser?.id || '';
+      const localUserId = session.userid || '';
+      const resolvedUuid = await this.supabaseService.resolveEffectiveUserUuid();
+      const effectiveUserId = authUserId || resolvedUuid || localUserId;
+
+      if (!effectiveUserId) {
+        this.showAlert('User id not found');
         this.router.navigate(['/login']);
         return;
       }
@@ -786,17 +857,17 @@ export class Service implements OnInit {
 
         if (error) {
           console.error('Error updating post:', error);
-          alert('Error updating post');
+          this.showAlert('Error updating post');
           return;
         }
 
-        alert('Post updated successfully');
+        this.showAlert('Post updated successfully');
         this.router.navigate(['/my-posts']);
         return;
       }
 
       const rawPayload: any = {
-        userid: String(user.id),
+        userid: String(effectiveUserId),
         categoryid: selectedCategory?.categoryid ?? null,
         subcategoryid: selectedSubcategory?.subcategoryid ?? null,
         title: this.mainAd.title.trim(),
@@ -818,11 +889,15 @@ export class Service implements OnInit {
         areaid: selectedArea?.areaid ?? null,
 
         contactname:
-          user.user_metadata?.['full_name'] ||
-          user.user_metadata?.['name'] ||
+          session.name ||
+          session.authUser?.user_metadata?.['full_name'] ||
+          session.authUser?.user_metadata?.['name'] ||
           '',
         contactphone: this.mainAd.contactphone || '',
-        contactemail: user.email || '',
+        contactemail:
+          session.email ||
+          session.authUser?.email ||
+          '',
         whatsappnumber: this.mainAd.whatsappnumber || '',
 
         image_url: '',
@@ -867,7 +942,7 @@ export class Service implements OnInit {
         serviceBlocks: this.serviceBlocks,
         flowType: 'normal',
         postId: null,
-        userId: String(user.id)
+        userId: String(effectiveUserId)
       });
 
       if (typeof window !== 'undefined') {
@@ -878,7 +953,7 @@ export class Service implements OnInit {
         );
         localStorage.setItem('pending_post_flow', 'normal');
         localStorage.setItem('pending_post_type', this.adType);
-        localStorage.setItem('pending_post_userid', String(user.id));
+        localStorage.setItem('pending_post_userid', String(effectiveUserId));
       }
 
       this.router.navigate(['/subscription-plan'], {
@@ -886,7 +961,7 @@ export class Service implements OnInit {
       });
     } catch (err) {
       console.error('Error preparing post:', err);
-      alert('Error preparing post');
+      this.showAlert('Error preparing post');
     } finally {
       this.isSubmitting = false;
       this.ngZone.run(() => this.cdr.detectChanges());

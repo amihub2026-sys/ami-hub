@@ -3299,3 +3299,70 @@ router-outlet {
   /* makes logo visible */
   filter: brightness(0) invert(1);
 }
+/* ===== FIX SIDE MENU FOOTER ALIGNMENT ===== */
+.menu-footer {
+  padding: 0 20px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.menu-footer .logout-btn,
+.menu-footer a[href*="login"] {
+  width: 100%;
+  max-width: 260px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+/* spacing between buttons */
+.menu-footer {
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Login button style (match your UI) */
+.menu-footer a[href*="login"] {
+  border: 1px solid #b7cdfd;
+  background: #edf4ff;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+/* Logout button already exists — just normalize */
+.menu-footer .logout-btn {
+  margin: 0 !important;
+}
+/* ===== SIDE MENU FONT CONSISTENCY FIX ===== */
+.links-container a,
+.links-container .menu-item {
+  font-weight: 500 !important;
+  font-size: 15px;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* remove bold effect from router links */
+.links-container a {
+  font-weight: 500 !important;
+}
+
+/* ensure icons don't affect alignment */
+.links-container i {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+/* fix hover consistency */
+.links-container a:hover,
+.links-container .menu-item:hover {
+  color: #3A77FF;
+}

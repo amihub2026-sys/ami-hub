@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
+import { supabase } from '../../../supabaseClient';
 
 @Component({
   selector: 'app-notification',
@@ -23,26 +24,122 @@ export class Notification implements OnInit {
     await this.loadNotifications();
   }
 
+  private isBrowser(): boolean {
+    return typeof window !== 'undefined';
+  }
+
+  private hasLocalUserLogin(): boolean {
+    return this.isBrowser() && localStorage.getItem('userToken') === 'loggedUser';
+  }
+
+  private getLocalUserEmail(): string {
+    if (!this.isBrowser()) return '';
+    return localStorage.getItem('userEmail') || '';
+  }
+
+  private getLocalSupabaseUid(): string {
+    if (!this.isBrowser()) return '';
+    return localStorage.getItem('supabase_uid') || '';
+  }
+
+  private setLocalSupabaseUid(value: string): void {
+    if (!this.isBrowser()) return;
+    if (value) {
+      localStorage.setItem('supabase_uid', value);
+    }
+  }
+
+  private async resolveNotificationUserUuid(): Promise<string> {
+    const localSupabaseUid = this.getLocalSupabaseUid();
+    if (localSupabaseUid) {
+      return localSupabaseUid;
+    }
+
+    const localUserEmail = this.getLocalUserEmail();
+    if (!localUserEmail) {
+      return '';
+    }
+
+    const { data, error } = await supabase
+      .from('users')
+      .select('supabase_uid, auth_user_id, user_id')
+      .eq('email', localUserEmail)
+      .maybeSingle();
+
+    if (error || !data) {
+      return '';
+    }
+
+    const resolvedUuid =
+      data.supabase_uid ||
+      data.auth_user_id ||
+      data.user_id ||
+      '';
+
+    if (resolvedUuid) {
+      this.setLocalSupabaseUid(resolvedUuid);
+    }
+
+    return resolvedUuid;
+  }
+
+  private mergeNotifications(...lists: any[][]): any[] {
+    const map = new Map<any, any>();
+
+    for (const list of lists) {
+      for (const item of list || []) {
+        const key = item?.notificationid;
+        if (key != null && !map.has(key)) {
+          map.set(key, item);
+        }
+      }
+    }
+
+    return Array.from(map.values()).sort((a: any, b: any) => {
+      const aTime = new Date(a?.createdat || 0).getTime();
+      const bTime = new Date(b?.createdat || 0).getTime();
+      return bTime - aTime;
+    });
+  }
+
   async loadNotifications() {
     this.isLoading.set(true);
 
     try {
       const user = await this.supabaseService.getCurrentUser();
+      const localLoggedIn = this.hasLocalUserLogin();
 
-      if (!user) {
+      if (!user && !localLoggedIn) {
         this.notifications.set([]);
         return;
       }
 
-      const data = await this.supabaseService.getNotificationsByUser(user.id);
+      const results: any[][] = [];
 
-      const mapped = (data || []).map((item: any) => ({
+      if (user?.id) {
+        const data = await this.supabaseService.getNotificationsByUser(user.id);
+        results.push(Array.isArray(data) ? data : []);
+      }
+
+      let resolvedUuid = await this.resolveNotificationUserUuid();
+
+      if (!resolvedUuid && user?.id) {
+        resolvedUuid = user.id;
+        this.setLocalSupabaseUid(resolvedUuid);
+      }
+
+      if (resolvedUuid && resolvedUuid !== user?.id) {
+        const data = await this.supabaseService.getNotificationsByUser(resolvedUuid);
+        results.push(Array.isArray(data) ? data : []);
+      }
+
+      const merged = this.mergeNotifications(...results).map((item: any) => ({
         ...item,
         icon: this.getNotificationIcon(item.type),
         time: this.getTimeAgo(item.createdat)
       }));
 
-      this.notifications.set(mapped);
+      this.notifications.set(merged);
     } catch (error) {
       console.error('Error loading notifications:', error);
       this.notifications.set([]);
@@ -116,10 +213,15 @@ export class Notification implements OnInit {
   async markAllRead(): Promise<void> {
     try {
       const user = await this.supabaseService.getCurrentUser();
+      let resolvedUuid = await this.resolveNotificationUserUuid();
 
-      if (!user) return;
+      if (!resolvedUuid && user?.id) {
+        resolvedUuid = user.id;
+      }
 
-      await this.supabaseService.markAllNotificationsAsRead(user.id);
+      if (!resolvedUuid) return;
+
+      await this.supabaseService.markAllNotificationsAsRead(resolvedUuid);
 
       this.notifications.update((list) =>
         list.map((item) => ({ ...item, isread: true }))

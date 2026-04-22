@@ -37,21 +37,60 @@ export class Payment implements OnInit {
 
   private readonly razorpayKey = 'rzp_live_S7g9JgHJea4xYt';
   private readonly verifiedPaymentStorageKey = 'verified_payment_payload';
+  private readonly featureEditContextStorageKey = 'feature_edit_post_context';
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     if (!this.isBrowser) return;
-    this.loadStoredData();
+    await this.loadStoredData();
     this.loadRazorpayScript();
     this.restoreVerifiedPaymentState();
   }
 
-  loadStoredData(): void {
+  async loadStoredData(): Promise<void> {
     try {
       const rawPlan = localStorage.getItem('selected_plan_payload');
       const rawPost = localStorage.getItem('pending_post_payload');
+      const rawFeatureEditContext = localStorage.getItem(
+        this.featureEditContextStorageKey
+      );
 
       this.planData = rawPlan ? JSON.parse(rawPlan) : null;
       this.postData = rawPost ? JSON.parse(rawPost) : null;
+
+      const isFeaturedFlow =
+        !!this.planData?.boost_plan_id ||
+        !!this.planData?.featured_plan_id ||
+        this.planData?.isfeatured === true ||
+        this.planData?.is_featured === true;
+
+      if (!this.postData && isFeaturedFlow && rawFeatureEditContext) {
+        const featureEditContext = JSON.parse(rawFeatureEditContext);
+
+        if (featureEditContext?.postData) {
+          this.postData = featureEditContext.postData;
+        } else if (featureEditContext?.postId) {
+          const fetchedPost = await this.fetchPostById(Number(featureEditContext.postId));
+          if (fetchedPost) {
+            this.postData = fetchedPost;
+          }
+        }
+      }
+
+      if ((!this.postData || !this.postData?.postid) && isFeaturedFlow) {
+        const postIdFromPlan = Number(
+          this.planData?.postId ||
+          this.planData?.post_id ||
+          this.planData?.selected_post_id ||
+          0
+        );
+
+        if (postIdFromPlan) {
+          const fetchedPost = await this.fetchPostById(postIdFromPlan);
+          if (fetchedPost) {
+            this.postData = fetchedPost;
+          }
+        }
+      }
 
       console.log('PAYMENT PAGE PLAN DATA:', this.planData);
       console.log('PAYMENT PAGE POST DATA:', this.postData);
@@ -62,6 +101,28 @@ export class Payment implements OnInit {
     } catch (error) {
       console.error('Error loading payment data:', error);
       this.errorMessage.set('Unable to load payment details.');
+    }
+  }
+
+  private async fetchPostById(postId: number): Promise<any | null> {
+    try {
+      if (!postId) return null;
+
+      const { data, error } = await this.supabaseService.supabase
+        .from('post')
+        .select('*')
+        .eq('postid', postId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching post by id:', error);
+        return null;
+      }
+
+      return data || null;
+    } catch (error) {
+      console.error('Error fetching post by id:', error);
+      return null;
     }
   }
 
@@ -204,8 +265,28 @@ export class Payment implements OnInit {
   }
 
   private async getAccessToken(): Promise<string | null> {
+    const effectiveSession = await this.supabaseService.getEffectiveAuthUser();
+    if (!effectiveSession.isAuthenticated) {
+      return null;
+    }
+
     const { data } = await supabase.auth.getSession();
     return data.session?.access_token ?? null;
+  }
+
+  private async getEffectiveUserUuid(): Promise<string | null> {
+    const effectiveSession = await this.supabaseService.getEffectiveAuthUser();
+
+    if (!effectiveSession.isAuthenticated) {
+      return null;
+    }
+
+    const resolvedUuid = await this.supabaseService.resolveEffectiveUserUuid();
+    if (resolvedUuid) {
+      return resolvedUuid;
+    }
+
+    return effectiveSession.authUser?.id || effectiveSession.supabase_uid || null;
   }
 
   private parseJsonArray<T = any>(value: any): T[] {
@@ -378,16 +459,16 @@ export class Payment implements OnInit {
   ): Promise<void> {
     const selectedPlan = this.planData || {};
 
-    const user = await this.supabaseService.getCurrentUser();
-    if (!user) {
+    const userUuid = await this.getEffectiveUserUuid();
+    if (!userUuid) {
       throw new Error('Authenticated user not found');
     }
 
     const { data: dbUser, error: dbUserError } = await this.supabaseService.supabase
       .from('users')
       .select('userid')
-      .eq('supabase_uid', user.id)
-      .single();
+      .or(`supabase_uid.eq.${userUuid},auth_user_id.eq.${userUuid},user_id.eq.${userUuid}`)
+      .maybeSingle();
 
     if (dbUserError || !dbUser) {
       throw new Error(dbUserError?.message || 'User mapping not found');
@@ -446,7 +527,7 @@ export class Payment implements OnInit {
           razorpay_payment_id: paymentPayload.razorpay_payment_id || null,
           razorpay_order_id: paymentPayload.razorpay_order_id || null,
           razorpay_signature: paymentPayload.razorpay_signature || null,
-          auth_user_id: user.id
+          auth_user_id: userUuid
         }
       ]);
 
@@ -585,7 +666,6 @@ export class Payment implements OnInit {
         currencycode: pendingPost.currencycode || 'INR'
       };
 
-      // avoid duplicate key on new insert
       delete finalPayload.postid;
       delete finalPayload.id;
 
@@ -639,6 +719,7 @@ export class Payment implements OnInit {
       localStorage.removeItem('pending_post_flow');
       localStorage.removeItem('pending_post_type');
       localStorage.removeItem('pending_post_userid');
+      localStorage.removeItem(this.featureEditContextStorageKey);
 
       this.postDraftService.clearDraft();
       this.paymentSuccess.set(true);
@@ -660,7 +741,7 @@ export class Payment implements OnInit {
     razorpay_signature: string;
   }): Promise<void> {
     const accessToken = await this.getAccessToken();
-    const currentUser = await this.supabaseService.getCurrentUser();
+    const userUuid = await this.getEffectiveUserUuid();
     const selectedPlanId = this.getSelectedPlanId();
     const selectedPlanName = this.getSelectedPlanName();
 
@@ -673,7 +754,7 @@ export class Payment implements OnInit {
       razorpay_payment_id: payload.razorpay_payment_id,
       razorpay_order_id: payload.razorpay_order_id,
       razorpay_signature: payload.razorpay_signature,
-      user_id: this.postData?.userid ?? currentUser?.id ?? null,
+      user_id: this.postData?.userid ?? userUuid ?? null,
       post_payload: this.postData || {},
       plan_payload: this.planData || {},
       ad_type: this.adType
@@ -681,13 +762,18 @@ export class Payment implements OnInit {
 
     console.log('VERIFY PAYMENT PAYLOAD:', verifyPayload);
 
-    const { data, error } = await supabase.functions.invoke('verify-payment', {
+    const invokeOptions: any = {
       headers: {
-        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         'Content-Type': 'application/json'
       },
       body: verifyPayload
-    });
+    };
+
+    if (accessToken) {
+      invokeOptions.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    const { data, error } = await supabase.functions.invoke('verify-payment', invokeOptions);
 
     console.log('VERIFY PAYMENT RESPONSE DATA:', data);
     console.log('VERIFY PAYMENT RESPONSE ERROR:', error);
@@ -740,19 +826,41 @@ export class Payment implements OnInit {
     this.errorMessage.set('');
 
     try {
+      const effectiveSession = await this.supabaseService.getEffectiveAuthUser();
       const accessToken = await this.getAccessToken();
+      const selectedPlanId = this.getSelectedPlanId();
+      const selectedPlanName = this.getSelectedPlanName();
 
-      const { data, error } = await supabase.functions.invoke('create-order', {
+      console.log('PAY NOW ACCESS TOKEN:', accessToken);
+      console.log('PAY NOW PLAN ID:', selectedPlanId);
+      console.log('PAY NOW PLAN NAME:', selectedPlanName);
+      console.log('PAY NOW AMOUNT:', this.amount);
+
+      if (!effectiveSession.isAuthenticated) {
+        throw new Error('Login session expired. Please login again.');
+      }
+
+      const invokeOptions: any = {
         headers: {
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
           'Content-Type': 'application/json'
         },
         body: {
+          plan_id: selectedPlanId,
+          plan_name: selectedPlanName,
           amount: Math.round(this.amount * 100),
           currency: 'INR',
           receipt: `post_${Date.now()}`
         }
-      });
+      };
+
+      if (accessToken) {
+        invokeOptions.headers.Authorization = `Bearer ${accessToken}`;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-order', invokeOptions);
+
+      console.log('CREATE ORDER RESPONSE DATA:', data);
+      console.log('CREATE ORDER RESPONSE ERROR:', error);
 
       if (error) {
         throw new Error(error.message || 'Unable to create order');

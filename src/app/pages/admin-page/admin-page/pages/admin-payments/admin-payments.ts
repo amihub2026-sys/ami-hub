@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../../../services/supabase.service';
@@ -56,7 +56,10 @@ export class AdminPaymentsComponent implements OnInit {
     userid: null as number | null,
   };
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.fetchPayments();
@@ -120,6 +123,7 @@ export class AdminPaymentsComponent implements OnInit {
 
   async fetchPayments(): Promise<void> {
     this.loading = true;
+    this.cdr.detectChanges();
 
     try {
       const { data, error } = await this.supabase
@@ -130,20 +134,25 @@ export class AdminPaymentsComponent implements OnInit {
       if (error) {
         console.error('Fetch payments error:', error);
         alert(error.message || 'Failed to load payments.');
+        this.cdr.detectChanges();
         return;
       }
 
       this.allPayments = (data || []).map((item: any) => this.mapPayment(item));
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Fetch payments exception:', err);
       alert('Something went wrong while loading payments.');
+      this.cdr.detectChanges();
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
   setPaymentStatusFilter(filter: PaymentStatusFilter): void {
     this.paymentStatusFilter = filter;
+    this.cdr.detectChanges();
   }
 
   get filteredPayments(): AdminPaymentItem[] {
@@ -213,6 +222,7 @@ export class AdminPaymentsComponent implements OnInit {
     this.editingId = null;
     this.showForm = true;
     this.resetForm();
+    this.cdr.detectChanges();
   }
 
   openEditForm(item: AdminPaymentItem): void {
@@ -231,6 +241,8 @@ export class AdminPaymentsComponent implements OnInit {
       auth_user_id: item.auth_user_id || '',
       userid: item.userid,
     };
+
+    this.cdr.detectChanges();
   }
 
   closeForm(): void {
@@ -238,6 +250,7 @@ export class AdminPaymentsComponent implements OnInit {
     this.isEditMode = false;
     this.editingId = null;
     this.resetForm();
+    this.cdr.detectChanges();
   }
 
   resetForm(): void {
@@ -252,35 +265,42 @@ export class AdminPaymentsComponent implements OnInit {
       auth_user_id: '',
       userid: null,
     };
+    this.cdr.detectChanges();
   }
 
   async savePayment(): Promise<void> {
     if (!this.formModel.plan_id.trim()) {
       alert('Plan ID is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.plan_name.trim()) {
       alert('Plan Name is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.razorpay_payment_id.trim()) {
       alert('Razorpay Payment ID is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.razorpay_order_id.trim()) {
       alert('Razorpay Order ID is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.status.trim()) {
       alert('Status is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     this.saving = true;
+    this.cdr.detectChanges();
 
     const payload = {
       plan_id: this.formModel.plan_id.trim(),
@@ -304,6 +324,7 @@ export class AdminPaymentsComponent implements OnInit {
         if (error) {
           console.error('Update payment error:', error);
           alert(error.message || 'Failed to update payment.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -321,6 +342,7 @@ export class AdminPaymentsComponent implements OnInit {
         if (error) {
           console.error('Create payment error:', error);
           alert(error.message || 'Failed to create payment.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -332,8 +354,10 @@ export class AdminPaymentsComponent implements OnInit {
     } catch (err) {
       console.error('Save payment exception:', err);
       alert('Something went wrong while saving payment.');
+      this.cdr.detectChanges();
     } finally {
       this.saving = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -350,20 +374,24 @@ export class AdminPaymentsComponent implements OnInit {
       if (error) {
         console.error('Update payment status error:', error);
         alert(error.message || 'Failed to update payment status.');
+        this.cdr.detectChanges();
         return;
       }
 
       item.status = nextStatus;
       item.statusLabel = this.normalizeStatus(nextStatus);
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Update payment status exception:', err);
       alert('Something went wrong while updating payment status.');
+      this.cdr.detectChanges();
     }
   }
 
   async deletePayment(item: AdminPaymentItem): Promise<void> {
     if (!item?.id) {
       alert('Invalid payment record.');
+      this.cdr.detectChanges();
       return;
     }
 
@@ -374,6 +402,7 @@ export class AdminPaymentsComponent implements OnInit {
     if (!confirmed) return;
 
     this.deletingId = item.id;
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabase
@@ -384,16 +413,20 @@ export class AdminPaymentsComponent implements OnInit {
       if (error) {
         console.error('Delete payment error:', error);
         alert(error.message || 'Failed to delete payment.');
+        this.cdr.detectChanges();
         return;
       }
 
       this.allPayments = this.allPayments.filter((row) => row.id !== item.id);
       alert('Payment deleted successfully.');
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Delete payment exception:', err);
       alert('Something went wrong while deleting payment.');
+      this.cdr.detectChanges();
     } finally {
       this.deletingId = null;
+      this.cdr.detectChanges();
     }
   }
 

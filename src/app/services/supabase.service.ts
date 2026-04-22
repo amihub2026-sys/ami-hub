@@ -296,6 +296,153 @@ export class SupabaseService {
     }
   }
 
+  getLocalUserSession() {
+    if (!this.isBrowser()) return null;
+
+    const userToken = localStorage.getItem('userToken');
+    if (userToken !== 'loggedUser') return null;
+
+    return {
+      userid: localStorage.getItem('userId') || '',
+      email: localStorage.getItem('userEmail') || '',
+      name: localStorage.getItem('userName') || '',
+      username: localStorage.getItem('username') || '',
+      usertypeid: localStorage.getItem('userTypeId') || '',
+      supabase_uid: localStorage.getItem('supabase_uid') || ''
+    };
+  }
+
+  async getEffectiveAuthUser() {
+    const authUser = await this.getCurrentUser();
+    const localUser = this.getLocalUserSession();
+
+    if (authUser) {
+      return {
+        isAuthenticated: true,
+        source: 'supabase',
+        authUser,
+        userid: '',
+        email: authUser.email || '',
+        name:
+          authUser.user_metadata?.['full_name'] ||
+          authUser.user_metadata?.['name'] ||
+          '',
+        username: '',
+        usertypeid: '',
+        supabase_uid: authUser.id
+      };
+    }
+
+    if (localUser) {
+      return {
+        isAuthenticated: true,
+        source: 'local',
+        authUser: null,
+        userid: localUser.userid,
+        email: localUser.email,
+        name: localUser.name,
+        username: localUser.username,
+        usertypeid: localUser.usertypeid,
+        supabase_uid: localUser.supabase_uid
+      };
+    }
+
+    return {
+      isAuthenticated: false,
+      source: null,
+      authUser: null,
+      userid: '',
+      email: '',
+      name: '',
+      username: '',
+      usertypeid: '',
+      supabase_uid: ''
+    };
+  }
+
+  async resolveEffectiveUserUuid(): Promise<string> {
+    const authUser = await this.getCurrentUser();
+    if (authUser?.id) {
+      return authUser.id;
+    }
+
+    if (!this.isBrowser()) return '';
+
+    const localSupabaseUid = localStorage.getItem('supabase_uid') || '';
+    if (localSupabaseUid) {
+      return localSupabaseUid;
+    }
+
+    const localUserId = localStorage.getItem('userId') || '';
+    const localEmail = localStorage.getItem('userEmail') || '';
+
+    if (localUserId) {
+      const numericUserId = Number(localUserId);
+
+      if (!isNaN(numericUserId)) {
+        const { data, error } = await this.supabase
+          .from('users')
+          .select('supabase_uid, auth_user_id, user_id, userid')
+          .eq('userid', numericUserId)
+          .maybeSingle();
+
+        if (!error && data) {
+          const uuid =
+            data.supabase_uid ||
+            data.auth_user_id ||
+            data.user_id ||
+            '';
+
+          if (uuid) {
+            localStorage.setItem('supabase_uid', uuid);
+
+            if (data.userid != null) {
+              localStorage.setItem('userId', String(data.userid));
+            }
+
+            return uuid;
+          }
+        }
+      }
+    }
+
+    if (localEmail) {
+      const { data, error } = await this.supabase
+        .from('users')
+        .select('supabase_uid, auth_user_id, user_id, userid')
+        .eq('email', localEmail)
+        .maybeSingle();
+
+      if (!error && data) {
+        const uuid =
+          data.supabase_uid ||
+          data.auth_user_id ||
+          data.user_id ||
+          '';
+
+        if (uuid) {
+          localStorage.setItem('supabase_uid', uuid);
+
+          if (data.userid != null) {
+            localStorage.setItem('userId', String(data.userid));
+          }
+
+          return uuid;
+        }
+      }
+    }
+
+    return '';
+  }
+
+  async getEffectiveNotificationUserUuid(): Promise<string> {
+    return await this.resolveEffectiveUserUuid();
+  }
+
+  async getEffectiveFavoriteUserUuid(): Promise<string> {
+    return await this.resolveEffectiveUserUuid();
+  }
+
   // ---------------- Seller Profiles / Users Table ----------------
   async addServiceStore(data: any): Promise<void> {
     const { error } = await this.supabase
@@ -390,6 +537,7 @@ export class SupabaseService {
       email: userEmail,
       phonenumber: '',
       phone_number: '',
+      username: '',
       profileimageurl: null,
       usertypeid: 1,
       isverified: true,
@@ -446,6 +594,8 @@ export class SupabaseService {
       email: seller.email || user.email || '',
       phonenumber: seller.phone || '',
       phone_number: seller.phone || '',
+      username: seller.username || existingUser?.username || '',
+      password: seller.password || existingUser?.password || '',
       profileimageurl: seller.profileImage || null,
       avatar_url: seller.profileImage || null,
       accounttype: seller.accountType || '',
@@ -456,6 +606,7 @@ export class SupabaseService {
       isverified: seller.verified ?? true,
       isactive: true,
       termsaccepted: seller.termsAccepted ?? false,
+      isonboardingcompleted: true,
       user_id: user.id,
       supabase_uid: user.id,
       updatedon: new Date().toISOString(),
@@ -1008,6 +1159,26 @@ export class SupabaseService {
     return { data, error };
   }
 
+  async getUserByUsername(username: string) {
+    const { data, error } = await this.supabase
+      .from('users')
+      .select('*')
+      .ilike('username', username.trim())
+      .maybeSingle();
+
+    return { data, error };
+  }
+
+  async getAdminByUsername(username: string) {
+    const { data, error } = await this.supabase
+      .from('admins')
+      .select('*')
+      .eq('adminname', username)
+      .maybeSingle();
+
+    return { data, error };
+  }
+
   async updateUserOtpByEmail(email: string, otp: string, expiry: number) {
     const { data, error } = await this.supabase
       .from('users')
@@ -1098,6 +1269,8 @@ export class SupabaseService {
       localStorage.removeItem('userEmail');
       localStorage.removeItem('userName');
       localStorage.removeItem('userTypeId');
+      localStorage.removeItem('username');
+      localStorage.removeItem('supabase_uid');
       localStorage.removeItem('adminToken');
       localStorage.removeItem('googleLoginPending');
     }
@@ -1166,6 +1339,7 @@ export class SupabaseService {
           fullname: fullName || 'Google User',
           email,
           phonenumber: phone,
+          username: '',
           usertypeid: 1,
           isverified: true,
           isactive: true,

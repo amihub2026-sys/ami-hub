@@ -439,12 +439,9 @@ export class PostViewComponent implements OnInit {
         return;
       }
 
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) throw sessionError;
+      const userId = await this.supabaseService.resolveEffectiveUserUuid();
 
-      const user = sessionData?.session?.user;
-
-      if (!user) {
+      if (!userId) {
         alert('Please login first');
         this.router.navigate(['/login']);
         return;
@@ -457,7 +454,7 @@ export class PostViewComponent implements OnInit {
       const { data: existing, error: existingError } = await supabase
         .from('cart_items')
         .select('cart_id, qty')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .eq('product_id', productId)
         .maybeSingle();
 
@@ -474,7 +471,7 @@ export class PostViewComponent implements OnInit {
         const { error: insertError } = await supabase
           .from('cart_items')
           .insert({
-            user_id: user.id,
+            user_id: userId,
             product_id: productId,
             name: post.title || post.name || 'Product',
             price: Number(post.price || 0),
@@ -505,12 +502,9 @@ export class PostViewComponent implements OnInit {
         return;
       }
 
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) throw sessionError;
+      const userId = await this.supabaseService.resolveEffectiveUserUuid();
 
-      const user = sessionData?.session?.user;
-
-      if (!user) {
+      if (! this.supabaseService.resolveEffectiveUserUuid()) {
         alert('Please login first');
         this.router.navigate(['/login']);
         return;
@@ -523,11 +517,15 @@ export class PostViewComponent implements OnInit {
       const { data: existing, error: existingError } = await supabase
         .from('favorite_items')
         .select('favorite_id')
-        .eq('user_id', user.id)
+        .eq('user_id',  this.supabaseService.resolveEffectiveUserUuid())
         .eq('product_id', productId)
         .maybeSingle();
 
-      if (existingError) throw existingError;
+      if (existingError) {
+        console.error('Favorite existing check error:', existingError);
+        alert(existingError.message || 'Failed checking favorites');
+        return;
+      }
 
       if (existing) {
         alert('Already added to favorites!');
@@ -535,27 +533,35 @@ export class PostViewComponent implements OnInit {
         return;
       }
 
+      const payload = {
+        user_id: userId,
+        product_id: productId,
+        name: post.title || post.name || 'Product',
+        price: Number(post.price || 0),
+        location: post.displayAddress || post.location || 'Location not available',
+        image:
+          post.image_url ||
+          (Array.isArray(post.images) && post.images.length > 0 ? post.images[0] : '') ||
+          'assets/no-image.png'
+      };
+
+  
+
       const { error: insertError } = await supabase
         .from('favorite_items')
-        .insert({
-          user_id: user.id,
-          product_id: productId,
-          name: post.title || post.name || 'Product',
-          price: Number(post.price || 0),
-          location: post.displayAddress || post.location || 'Location not available',
-          image:
-            post.image_url ||
-            (Array.isArray(post.images) && post.images.length > 0 ? post.images[0] : '') ||
-            'assets/no-image.png'
-        });
+        .insert(payload);
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Favorite insert error:', insertError);
+        alert(insertError.message || 'Failed to add favorite item');
+        return;
+      }
 
       alert('Added to favorites successfully!');
       this.router.navigate(['/favt']);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Add to favorites error:', error);
-      alert('Failed to add favorite item');
+      alert(error?.message || 'Failed to add favorite item');
     }
   }
 
@@ -626,10 +632,9 @@ export class PostViewComponent implements OnInit {
     this.isReviewSubmitting.set(true);
 
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const user = sessionData?.session?.user;
+      const userId = await this.supabaseService.resolveEffectiveUserUuid();
 
-      if (!user) {
+      if (!userId) {
         alert('Please login first');
         this.router.navigate(['/login']);
         return;
@@ -639,7 +644,7 @@ export class PostViewComponent implements OnInit {
         .from('reviews')
         .insert({
           postid: post.postid,
-          userid: user.id,
+          userid: userId,
           rating: this.selectedRating,
           reviewtext: this.reviewText,
           reviewimages: this.reviewImages,
@@ -651,7 +656,7 @@ export class PostViewComponent implements OnInit {
       try {
         const sellerUserId = String(post.userid || '').trim();
 
-        if (sellerUserId && sellerUserId !== user.id) {
+        if (sellerUserId && sellerUserId !== userId) {
           await this.supabaseService.createNotification({
             userid: sellerUserId,
             title: 'New Review Received',

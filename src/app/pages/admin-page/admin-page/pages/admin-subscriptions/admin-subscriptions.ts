@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../../../services/supabase.service';
@@ -60,7 +60,10 @@ export class AdminSubscriptionsComponent implements OnInit {
     remaining_ads: 1,
   };
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.fetchSubscriptionPlans();
@@ -72,6 +75,7 @@ export class AdminSubscriptionsComponent implements OnInit {
 
   async fetchSubscriptionPlans(): Promise<void> {
     this.loading = true;
+    this.cdr.detectChanges();
 
     try {
       const { data, error } = await this.supabase
@@ -82,17 +86,21 @@ export class AdminSubscriptionsComponent implements OnInit {
       if (error) {
         console.error('Fetch subscription plans error:', error);
         alert(error.message || 'Failed to load subscription plans.');
+        this.cdr.detectChanges();
         return;
       }
 
       this.allSubscriptionPlans = (data || []).map((item: any) =>
         this.mapSubscriptionPlan(item)
       );
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Fetch subscription plans exception:', err);
       alert('Something went wrong while loading subscription plans.');
+      this.cdr.detectChanges();
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -136,6 +144,7 @@ export class AdminSubscriptionsComponent implements OnInit {
 
   setSubscriptionStatusFilter(filter: SubscriptionStatusFilter): void {
     this.subscriptionStatusFilter = filter;
+    this.cdr.detectChanges();
   }
 
   get filteredSubscriptionPlans(): AdminSubscriptionPlanItem[] {
@@ -191,6 +200,7 @@ export class AdminSubscriptionsComponent implements OnInit {
     this.editingPlanId = null;
     this.showForm = true;
     this.resetForm();
+    this.cdr.detectChanges();
   }
 
   openEditForm(plan: AdminSubscriptionPlanItem): void {
@@ -212,6 +222,8 @@ export class AdminSubscriptionsComponent implements OnInit {
       is_active: !!plan.is_active,
       remaining_ads: Number(plan.remaining_ads || 0),
     };
+
+    this.cdr.detectChanges();
   }
 
   closeForm(): void {
@@ -219,6 +231,7 @@ export class AdminSubscriptionsComponent implements OnInit {
     this.isEditMode = false;
     this.editingPlanId = null;
     this.resetForm();
+    this.cdr.detectChanges();
   }
 
   resetForm(): void {
@@ -236,20 +249,24 @@ export class AdminSubscriptionsComponent implements OnInit {
       is_active: true,
       remaining_ads: 1,
     };
+    this.cdr.detectChanges();
   }
 
   async saveSubscription(): Promise<void> {
     if (!this.formModel.planname.trim()) {
       alert('Plan name is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.plan_id.trim()) {
       alert('Plan ID is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     this.saving = true;
+    this.cdr.detectChanges();
 
     const payload = {
       planname: this.formModel.planname.trim(),
@@ -276,6 +293,7 @@ export class AdminSubscriptionsComponent implements OnInit {
         if (error) {
           console.error('Update subscription plan error:', error);
           alert(error.message || 'Failed to update subscription plan.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -296,6 +314,7 @@ export class AdminSubscriptionsComponent implements OnInit {
         if (error) {
           console.error('Create subscription plan error:', error);
           alert(error.message || 'Failed to create subscription plan.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -307,8 +326,10 @@ export class AdminSubscriptionsComponent implements OnInit {
     } catch (err) {
       console.error('Save subscription plan exception:', err);
       alert('Something went wrong while saving subscription plan.');
+      this.cdr.detectChanges();
     } finally {
       this.saving = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -327,14 +348,17 @@ export class AdminSubscriptionsComponent implements OnInit {
       if (error) {
         console.error('Toggle subscription status error:', error);
         alert(error.message || 'Failed to update status.');
+        this.cdr.detectChanges();
         return;
       }
 
       plan.isactive = nextValue;
       plan.is_active = nextValue;
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Toggle subscription status exception:', err);
       alert('Something went wrong while updating status.');
+      this.cdr.detectChanges();
     }
   }
 
@@ -346,6 +370,7 @@ export class AdminSubscriptionsComponent implements OnInit {
     if (!confirmed) return;
 
     this.deletingId = plan.subscriptionplanid;
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabase
@@ -356,6 +381,7 @@ export class AdminSubscriptionsComponent implements OnInit {
       if (error) {
         console.error('Delete subscription plan error:', error);
         alert(error.message || 'Failed to delete subscription plan.');
+        this.cdr.detectChanges();
         return;
       }
 
@@ -364,11 +390,14 @@ export class AdminSubscriptionsComponent implements OnInit {
       );
 
       alert('Subscription plan deleted successfully.');
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Delete subscription plan exception:', err);
       alert('Something went wrong while deleting subscription plan.');
+      this.cdr.detectChanges();
     } finally {
       this.deletingId = null;
+      this.cdr.detectChanges();
     }
   }
 

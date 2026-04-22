@@ -169,6 +169,50 @@ outline:none;
 border-color:#007bff;
 }
 
+/* PASSWORD FIELD */
+
+.password-wrap{
+position:relative;
+width:100%;
+margin-top:12px;
+}
+
+.password-wrap input{
+width:100%;
+max-width:100%;
+padding:12px 72px 12px 12px;
+margin-top:0;
+border-radius:6px;
+border:1px solid #ddd;
+font-size:14px;
+display:block;
+}
+
+.password-wrap input:focus{
+outline:none;
+border-color:#007bff;
+}
+
+.password-toggle{
+position:absolute;
+top:50%;
+right:10px;
+transform:translateY(-50%);
+border:none;
+background:transparent;
+color:#007bff;
+font-size:13px;
+font-weight:600;
+cursor:pointer;
+padding:4px 6px;
+line-height:1;
+}
+
+.password-toggle:disabled{
+opacity:0.6;
+cursor:not-allowed;
+}
+
 /* IMAGE PREVIEW */
 
 .preview{
@@ -305,6 +349,20 @@ font-size:14px;
 margin-top:10px;
 }
 
+.password-wrap{
+margin-top:10px;
+}
+
+.password-wrap input{
+padding:11px 68px 11px 11px;
+font-size:14px;
+}
+
+.password-toggle{
+right:8px;
+font-size:12px;
+}
+
 input[type="file"]{
 font-size:13px;
 padding:8px;
@@ -399,6 +457,16 @@ padding:10px;
 font-size:13px;
 margin-top:10px;
 border-radius:6px;
+}
+
+.password-wrap input{
+padding:10px 62px 10px 10px;
+font-size:13px;
+}
+
+.password-toggle{
+right:7px;
+font-size:11px;
 }
 
 input[type="file"]{

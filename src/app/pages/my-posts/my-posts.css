@@ -60,15 +60,17 @@
   color: #444;
   font-size: 0.9rem;
 }
+
 .post-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-top: 12px;
+  padding: 0 12px;
 }
 
 .edit-btn,
 .delete-btn {
-  flex: 1;
   height: 38px;
   border: none;
   border-radius: 10px;
@@ -85,6 +87,7 @@
   background: #ef4444;
   color: #fff;
 }
+
 .my-posts-page {
   padding: 20px;
 }
@@ -146,7 +149,8 @@
 }
 
 .post-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   padding: 0 12px;
 }
@@ -155,11 +159,19 @@
 .remove-btn {
   border: none;
   outline: none;
-  padding: 10px 14px;
+  padding: 10px 8px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: 0.2s ease;
+  min-height: 40px;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.15;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .edit-btn {
