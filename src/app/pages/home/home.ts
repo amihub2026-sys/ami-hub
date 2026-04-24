@@ -273,7 +273,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   toggleFavourite(item: any, event: Event) {
     event.stopPropagation();
-    console.log('Favourite clicked:', item);
+    
   }
 
   openCategory(category: any) {
@@ -394,7 +394,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   selectTab(tab: string) {
     this.activeTab = tab;
-    this.searchQuery = '';
+    // this.searchQuery = '';
 
     if (tab === 'service-list') {
       this.router.navigate(['/service-list']);
@@ -411,17 +411,21 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  goToPage() {
-    const query = this.searchQuery?.trim() || '';
-    if (query === '') return;
+goToPage() {
+  const query = this.searchQuery?.trim() || '';
 
-    this.router.navigate(['/search'], {
-      queryParams: {
-        q: query,
-        type: this.activeTab
-      }
-    });
-  }
+  this.router.navigate(['/search'], {
+    queryParams: {
+      q: query,
+      type:
+        this.activeTab === 'products'
+          ? 'product'
+          : this.activeTab === 'service-list'
+          ? 'service'
+          : 'all'
+    }
+  });
+}
 
   goToAllProductCategories() {
     this.router.navigate(['/product-categories']);

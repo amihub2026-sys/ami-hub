@@ -73,19 +73,7 @@ export class Service {
 
   // Form submit
   goToCustomFields() {
-    console.log('Ad Details:', {
-      adTitle: this.adTitle,
-      category: this.category,
-      subcategory: this.subcategory,
-      description: this.description,
-      price: this.price,
-      country: this.country,
-      state: this.state,
-      district: this.district,
-      area: this.area,
-      images: this.images,
-      video: this.video
-    });
+
     // Navigate to custom fields or next step
   }
 }

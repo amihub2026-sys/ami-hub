@@ -157,7 +157,7 @@ export class Service implements OnInit {
     if (this.isBrowser()) {
       alert(message);
     } else {
-      console.log(message);
+    
     }
   }
 

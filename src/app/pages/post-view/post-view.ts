@@ -44,8 +44,7 @@ export class PostViewComponent implements OnInit {
       return;
     }
 
-    console.log('Report submitted for post:', post.postid);
-    console.log('Report message:', this.reportText);
+
 
     alert('Report submitted successfully!');
 
@@ -163,7 +162,7 @@ export class PostViewComponent implements OnInit {
 
     try {
       const data = await this.supabaseService.getPostById(this.postId);
-      console.log('Post details response:', data);
+      
 
       const imageList: string[] = Array.isArray(data?.image_urls)
         ? data.image_urls.filter((x: any) => typeof x === 'string' && x)
@@ -493,77 +492,75 @@ export class PostViewComponent implements OnInit {
     }
   }
 
-  async addToFavorites(): Promise<void> {
-    try {
-      const post = this.postData();
+async addToFavorites(): Promise<void> {
+  try {
+    const post = this.postData();
 
-      if (!post) {
-        alert('Product data not available');
-        return;
-      }
-
-      const userId = await this.supabaseService.resolveEffectiveUserUuid();
-
-      if (! this.supabaseService.resolveEffectiveUserUuid()) {
-        alert('Please login first');
-        this.router.navigate(['/login']);
-        return;
-      }
-
-      const productId = String(
-        post.postid || post.id || post.product_id || post.title || post.name || this.postId
-      );
-
-      const { data: existing, error: existingError } = await supabase
-        .from('favorite_items')
-        .select('favorite_id')
-        .eq('user_id',  this.supabaseService.resolveEffectiveUserUuid())
-        .eq('product_id', productId)
-        .maybeSingle();
-
-      if (existingError) {
-        console.error('Favorite existing check error:', existingError);
-        alert(existingError.message || 'Failed checking favorites');
-        return;
-      }
-
-      if (existing) {
-        alert('Already added to favorites!');
-        this.router.navigate(['/favt']);
-        return;
-      }
-
-      const payload = {
-        user_id: userId,
-        product_id: productId,
-        name: post.title || post.name || 'Product',
-        price: Number(post.price || 0),
-        location: post.displayAddress || post.location || 'Location not available',
-        image:
-          post.image_url ||
-          (Array.isArray(post.images) && post.images.length > 0 ? post.images[0] : '') ||
-          'assets/no-image.png'
-      };
-
-  
-
-      const { error: insertError } = await supabase
-        .from('favorite_items')
-        .insert(payload);
-
-      if (insertError) {
-        console.error('Favorite insert error:', insertError);
-        alert(insertError.message || 'Failed to add favorite item');
-        return;
-      }
-
-      alert('Added to favorites successfully!');
-      this.router.navigate(['/favt']);
-    } catch (error: any) {
-      console.error('Add to favorites error:', error);
-      alert(error?.message || 'Failed to add favorite item');
+    if (!post) {
+      alert('Product data not available');
+      return;
     }
+
+    const userId = await this.supabaseService.resolveEffectiveUserUuid();
+
+    if (!userId) {
+      alert('Please login first');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const productId = String(
+      post.postid || post.id || post.product_id || post.title || post.name || this.postId
+    );
+
+    const { data: existing, error: existingError } = await supabase
+      .from('favorite_items')
+      .select('favorite_id')
+      .eq('user_id', userId)
+      .eq('product_id', productId)
+      .maybeSingle();
+
+    if (existingError) {
+      console.error('Favorite existing check error:', existingError);
+      alert(existingError.message || 'Failed checking favorites');
+      return;
+    }
+
+    if (existing) {
+      alert('Already added to favorites!');
+      this.router.navigate(['/favt']);
+      return;
+    }
+
+    const payload = {
+      user_id: userId,
+      product_id: productId,
+      name: post.title || post.name || 'Product',
+      price: Number(post.price || 0),
+      location: post.displayAddress || post.location || 'Location not available',
+      image:
+        post.image_url ||
+        (Array.isArray(post.images) && post.images.length > 0 ? post.images[0] : '') ||
+        'assets/no-image.png'
+    };
+
+    const { error: insertError } = await supabase
+      .from('favorite_items')
+      .insert(payload);
+
+    if (insertError) {
+      console.error('Favorite insert error:', insertError);
+      alert(insertError.message || 'Failed to add favorite item');
+      return;
+    }
+
+    alert('Added to favorites successfully!');
+    this.router.navigate(['/favt']);
+  } catch (error: any) {
+    console.error('Add to favorites error:', error);
+    alert(error?.message || 'Failed to add favorite item');
   }
+}
 
   chatSeller() {
     const post = this.postData();
@@ -664,12 +661,12 @@ export class PostViewComponent implements OnInit {
             type: 'review',
             refid: String(post.postid)
           });
-          console.log('Review notification created successfully');
+          
         } else {
-          console.log('Review notification skipped: seller id missing or same user');
+          
         }
       } catch (notificationError) {
-        console.error('Review notification error:', notificationError);
+        
       }
 
       alert('Review submitted successfully!');

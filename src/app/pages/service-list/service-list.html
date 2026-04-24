@@ -9,8 +9,35 @@
         <input
           type="text"
           [(ngModel)]="searchText"
+          (ngModelChange)="onSearchTextChange()"
           placeholder="Search services..."
         />
+      </div>
+
+ <div class="filter-group">
+  <label>Location</label>
+  <input
+    type="text"
+    [(ngModel)]="locationText"
+    placeholder="Search location..."
+    (input)="onLocationInputChange()"
+  />
+</div>
+      <div class="filter-group">
+        <label>Radius: {{ selectedRadiusKm }} km</label>
+        <input
+          type="range"
+          min="1"
+          max="50"
+          step="1"
+          [(ngModel)]="selectedRadiusKm"
+          (input)="applyFilters()"
+          style="width:100%;"
+        />
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:#6b7280; margin-top:4px;">
+          <span>1 km</span>
+          <span>50 km</span>
+        </div>
       </div>
 
       <div class="filter-group">

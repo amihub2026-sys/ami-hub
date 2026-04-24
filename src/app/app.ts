@@ -8,6 +8,7 @@ import { supabase } from '../supabaseClient';
 import { LocationPickerComponent } from './pages/location-picker/location-picker';
 import { AppLocationResult } from './services/location-search';
 
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -16,7 +17,8 @@ import { AppLocationResult } from './services/location-search';
     FormsModule,
     RouterOutlet,
     RouterLink,
-    LocationPickerComponent
+    LocationPickerComponent,
+    
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
@@ -206,7 +208,7 @@ export class App implements OnInit {
         .eq('isread', false);
 
       if (error) {
-        console.log('Notification count error', error);
+        
         this.notificationCount = 0;
         return;
       }
@@ -214,7 +216,7 @@ export class App implements OnInit {
       this.notificationCount = count || 0;
       this.cdr.detectChanges();
     } catch (e) {
-      console.log('Notification count error', e);
+     
       this.notificationCount = 0;
     }
   }

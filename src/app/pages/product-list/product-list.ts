@@ -37,9 +37,14 @@ export class ProductList implements OnInit {
 
   subcategories = signal<SubcategoryItem[]>([]);
   categoriesData: CategoryItem[] = [];
+  allSubcategories: SubcategoryItem[] = [];
 
   private page = 0;
   private readonly pageSize = 12;
+
+  private selectedLocation: any = null;
+  selectedRadiusKm = 10;
+  locationText = '';
 
   searchText = '';
   minPrice: number | null = null;
@@ -56,7 +61,9 @@ export class ProductList implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    this.loadSelectedLocationAndRadius();
     await this.loadCategories();
+    await this.loadAllSubcategories();
 
     this.route.queryParams.subscribe(async (params) => {
       this.selectedCategoryId = params['category']
@@ -86,7 +93,43 @@ export class ProductList implements OnInit {
       }
 
       await this.loadMorePosts();
+
+      if (this.searchText) {
+        await this.syncSearchWithCategoryAndSubcategory();
+        this.applyFilters();
+      }
     });
+  }
+
+  private loadSelectedLocationAndRadius(): void {
+    if (typeof window === 'undefined') return;
+
+    const savedRadius = localStorage.getItem('selectedRadiusKm');
+    if (savedRadius && !isNaN(Number(savedRadius))) {
+      this.selectedRadiusKm = Number(savedRadius);
+    }
+
+    const savedLocation = localStorage.getItem('amh_selected_location');
+    if (savedLocation) {
+      try {
+        const parsed = JSON.parse(savedLocation);
+        this.selectedLocation = {
+          ...parsed,
+          lat: parsed?.lat != null ? Number(parsed.lat) : null,
+          lon: parsed?.lon != null ? Number(parsed.lon) : null,
+        };
+
+        this.locationText =
+          parsed?.name ||
+          parsed?.address ||
+          parsed?.place_name ||
+          parsed?.city ||
+          '';
+      } catch (error) {
+        console.error('Failed to parse selected location:', error);
+        this.selectedLocation = null;
+      }
+    }
   }
 
   async loadCategories(): Promise<void> {
@@ -104,9 +147,33 @@ export class ProductList implements OnInit {
       }
 
       this.categoriesData = (data || []) as CategoryItem[];
+      
     } catch (error) {
-      console.error('Error loading categories:', error);
+      
       this.categoriesData = [];
+    }
+  }
+
+  async loadAllSubcategories(): Promise<void> {
+    try {
+      const { data, error } = await supabase
+        .from('subcategories')
+        .select(
+          'subcategoryid, categoryid, subcategoryname, iconurl, isactive, sortorder'
+        )
+        .eq('isactive', true)
+        .order('sortorder', { ascending: true });
+
+      if (error) {
+        console.error('Error loading all subcategories:', error);
+        this.allSubcategories = [];
+        return;
+      }
+
+      this.allSubcategories = (data || []) as SubcategoryItem[];
+    } catch (error) {
+      console.error('Error loading all subcategories:', error);
+      this.allSubcategories = [];
     }
   }
 
@@ -133,13 +200,104 @@ export class ProductList implements OnInit {
       }
 
       this.subcategories.set((data || []) as SubcategoryItem[]);
+     
     } catch (error) {
       console.error('Error loading subcategories:', error);
       this.subcategories.set([]);
     }
   }
 
+  async onSearchTextChange(): Promise<void> {
+    await this.syncSearchWithCategoryAndSubcategory();
+    this.applyFilters();
+  }
+
+  async syncSearchWithCategoryAndSubcategory(): Promise<void> {
+    const keyword = this.searchText.trim().toLowerCase();
+
+    if (!keyword) {
+      this.selectedCategoryId = null;
+      this.selectedSubcategoryId = null;
+      this.selectedCategoryName = '';
+      this.subcategories.set([]);
+      return;
+    }
+
+    const matchedCategory = this.categoriesData.find(
+      (c) =>
+        (c.categoryname || '').toString().trim().toLowerCase() === keyword
+    );
+
+    if (matchedCategory) {
+      this.selectedCategoryId = Number(matchedCategory.categoryid);
+      this.selectedSubcategoryId = null;
+      this.selectedCategoryName = matchedCategory.categoryname || '';
+      await this.loadSubcategories(this.selectedCategoryId);
+      return;
+    }
+
+    const matchedSubcategory = this.allSubcategories.find(
+      (s) =>
+        (s.subcategoryname || '').toString().trim().toLowerCase() === keyword
+    );
+
+    if (matchedSubcategory) {
+      this.selectedCategoryId = Number(matchedSubcategory.categoryid);
+      this.selectedSubcategoryId = Number(matchedSubcategory.subcategoryid);
+
+      const selectedCategory = this.categoriesData.find(
+        (c) => Number(c.categoryid) === Number(matchedSubcategory.categoryid)
+      );
+
+      this.selectedCategoryName = selectedCategory?.categoryname || '';
+      await this.loadSubcategories(this.selectedCategoryId);
+      return;
+    }
+
+    const matchedPostByCategory = this.posts().find((post) => {
+      const categoryName = (
+        post?.category ??
+        post?.categoryname ??
+        ''
+      )
+        .toString()
+        .trim()
+        .toLowerCase();
+
+      return categoryName.includes(keyword);
+    });
+
+    if (matchedPostByCategory) {
+      const matchedCategoryFromPost = this.categoriesData.find((c) => {
+        const categoryName = (c.categoryname || '')
+          .toString()
+          .trim()
+          .toLowerCase();
+
+        return categoryName === (
+          matchedPostByCategory?.category ??
+          matchedPostByCategory?.categoryname ??
+          ''
+        )
+          .toString()
+          .trim()
+          .toLowerCase();
+      });
+
+      if (matchedCategoryFromPost) {
+        this.selectedCategoryId = Number(matchedCategoryFromPost.categoryid);
+        this.selectedSubcategoryId = null;
+        this.selectedCategoryName = matchedCategoryFromPost.categoryname || '';
+        await this.loadSubcategories(this.selectedCategoryId);
+      }
+    }
+  }
+
   async onCategoryChange(): Promise<void> {
+    this.selectedCategoryId = this.selectedCategoryId
+      ? Number(this.selectedCategoryId)
+      : null;
+
     this.selectedSubcategoryId = null;
 
     const selectedCategory = this.categoriesData.find(
@@ -147,32 +305,151 @@ export class ProductList implements OnInit {
     );
 
     this.selectedCategoryName = selectedCategory?.categoryname || '';
+    this.searchText = selectedCategory?.categoryname || '';
 
     await this.loadSubcategories(this.selectedCategoryId);
     this.applyFilters();
   }
 
   selectSubcategory(sub: SubcategoryItem): void {
-    this.selectedSubcategoryId = Number(sub?.subcategoryid || 0) || null;
+    this.selectedSubcategoryId = Number(sub.subcategoryid);
+    this.searchText = sub.subcategoryname || '';
     this.applyFilters();
   }
 
   showAllSubcategoryPosts(): void {
     this.selectedSubcategoryId = null;
+
+    const selectedCategory = this.categoriesData.find(
+      (c) => Number(c.categoryid) === Number(this.selectedCategoryId)
+    );
+
+    this.searchText = selectedCategory?.categoryname || '';
     this.applyFilters();
   }
 
+  private hasValidCoordinates(value: any): boolean {
+    return (
+      value &&
+      value.lat != null &&
+      value.lon != null &&
+      !isNaN(Number(value.lat)) &&
+      !isNaN(Number(value.lon))
+    );
+  }
+
+  private toRad(value: number): number {
+    return (value * Math.PI) / 180;
+  }
+
+  private calculateDistanceKm(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ): number {
+    const earthRadiusKm = 6371;
+
+    const dLat = this.toRad(lat2 - lat1);
+    const dLon = this.toRad(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRad(lat1)) *
+        Math.cos(this.toRad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return earthRadiusKm * c;
+  }
+
+  private processPostsWithDistance(posts: any[]): any[] {
+    if (!this.hasValidCoordinates(this.selectedLocation)) {
+      return posts.map((post: any) => ({
+        ...post,
+        distanceKm: null,
+      }));
+    }
+
+    const originLat = Number(this.selectedLocation.lat);
+    const originLon = Number(this.selectedLocation.lon);
+
+    return posts.map((post: any) => {
+      const postLat =
+        post?.latitude != null
+          ? Number(post.latitude)
+          : post?.lat != null
+          ? Number(post.lat)
+          : null;
+
+      const postLon =
+        post?.longitude != null
+          ? Number(post.longitude)
+          : post?.lon != null
+          ? Number(post.lon)
+          : null;
+
+      const hasPostCoords =
+        postLat != null &&
+        postLon != null &&
+        !isNaN(postLat) &&
+        !isNaN(postLon);
+
+      if (!hasPostCoords) {
+        return {
+          ...post,
+          distanceKm: null,
+        };
+      }
+
+      const distanceKm = this.calculateDistanceKm(
+        originLat,
+        originLon,
+        postLat,
+        postLon
+      );
+
+      return {
+        ...post,
+        distanceKm: Number(distanceKm.toFixed(1)),
+      };
+    });
+  }
+
   applyFilters(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedRadiusKm', String(this.selectedRadiusKm));
+    }
+
     let data = [...this.posts()];
 
     const search = this.searchText.trim().toLowerCase();
+    const locationSearch = this.locationText.trim().toLowerCase();
+
+    const selectedCategory = this.categoriesData.find(
+      (c) => Number(c.categoryid) === Number(this.selectedCategoryId)
+    );
+    const selectedCategoryName = (
+      selectedCategory?.categoryname || ''
+    ).toLowerCase();
+
+    const selectedSubcategory = this.subcategories().find(
+      (s) => Number(s.subcategoryid) === Number(this.selectedSubcategoryId)
+    );
+    const selectedSubcategoryName = (
+      selectedSubcategory?.subcategoryname || ''
+    ).toLowerCase();
+
     if (search) {
       data = data.filter((post) => {
         const haystack = [
           post?.title,
           post?.description,
           post?.category,
+          post?.categoryname,
           post?.subcategory,
+          post?.subcategoryname,
           post?.location,
           post?.address,
           post?.area,
@@ -186,18 +463,101 @@ export class ProductList implements OnInit {
       });
     }
 
+    if (locationSearch) {
+      data = data.filter((post) => {
+        const locationHaystack = [
+          post?.location,
+          post?.address,
+          post?.area,
+          post?.city,
+          post?.full_address,
+          post?.place_name,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+
+        return locationHaystack.includes(locationSearch);
+      });
+    }
+
+    if (this.hasValidCoordinates(this.selectedLocation) && this.selectedRadiusKm > 0) {
+      data = data.filter((post) => {
+        const postLat =
+          post?.latitude != null
+            ? Number(post.latitude)
+            : post?.lat != null
+            ? Number(post.lat)
+            : null;
+
+        const postLon =
+          post?.longitude != null
+            ? Number(post.longitude)
+            : post?.lon != null
+            ? Number(post.lon)
+            : null;
+
+        const hasPostCoords =
+          postLat != null &&
+          postLon != null &&
+          !isNaN(postLat) &&
+          !isNaN(postLon);
+
+        if (!hasPostCoords) return false;
+
+        const distanceKm = this.calculateDistanceKm(
+          Number(this.selectedLocation.lat),
+          Number(this.selectedLocation.lon),
+          postLat,
+          postLon
+        );
+
+        return distanceKm <= this.selectedRadiusKm;
+      });
+    }
+
     if (this.selectedCategoryId !== null) {
-      data = data.filter(
-        (post) =>
-          Number(post?.categoryid || 0) === Number(this.selectedCategoryId)
-      );
+      data = data.filter((post) => {
+        const postCategoryId = Number(
+          post?.categoryid ?? post?.category_id ?? 0
+        );
+
+        const postCategoryName = (
+          post?.category ??
+          post?.categoryname ??
+          ''
+        )
+          .toString()
+          .trim()
+          .toLowerCase();
+
+        return (
+          postCategoryId === Number(this.selectedCategoryId) ||
+          postCategoryName === selectedCategoryName
+        );
+      });
     }
 
     if (this.selectedSubcategoryId !== null) {
-      data = data.filter(
-        (post) =>
-          Number(post?.subcategoryid || 0) === Number(this.selectedSubcategoryId)
-      );
+      data = data.filter((post) => {
+        const postSubcategoryId = Number(
+          post?.subcategoryid ?? post?.subcategory_id ?? 0
+        );
+
+        const postSubcategoryName = (
+          post?.subcategory ??
+          post?.subcategoryname ??
+          ''
+        )
+          .toString()
+          .trim()
+          .toLowerCase();
+
+        return (
+          postSubcategoryId === Number(this.selectedSubcategoryId) ||
+          postSubcategoryName === selectedSubcategoryName
+        );
+      });
     }
 
     if (
@@ -243,13 +603,23 @@ export class ProductList implements OnInit {
 
   resetFilters(): void {
     this.searchText = '';
+    this.locationText = this.selectedLocation?.name ||
+      this.selectedLocation?.address ||
+      this.selectedLocation?.place_name ||
+      this.selectedLocation?.city ||
+      '';
     this.selectedCategoryId = null;
     this.selectedSubcategoryId = null;
     this.selectedCategoryName = '';
     this.minPrice = null;
     this.maxPrice = null;
     this.sortBy = 'Newest';
+    this.selectedRadiusKm = 10;
     this.subcategories.set([]);
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedRadiusKm', String(this.selectedRadiusKm));
+    }
 
     this.applyFilters();
   }
@@ -265,7 +635,17 @@ export class ProductList implements OnInit {
         this.pageSize
       );
 
-      console.log('Loaded products batch:', newPosts);
+      newPosts = (newPosts || []).map((post: any) => ({
+        ...post,
+        categoryid: post?.categoryid ?? post?.category_id ?? null,
+        subcategoryid: post?.subcategoryid ?? post?.subcategory_id ?? null,
+        categoryname: post?.categoryname ?? post?.category ?? '',
+        subcategoryname: post?.subcategoryname ?? post?.subcategory ?? '',
+      }));
+
+      newPosts = this.processPostsWithDistance(newPosts);
+
+      
 
       if (!newPosts.length || newPosts.length < this.pageSize) {
         this.hasMore.set(false);

@@ -936,7 +936,7 @@ export class SupabaseService {
       catalog: safeCatalog
     };
 
-    console.log('Add Post Payload Size:', JSON.stringify(payload).length);
+    
     console.time('SUPABASE_POST_INSERT');
 
     const { data, error } = await this.supabase
@@ -1187,6 +1187,58 @@ export class SupabaseService {
         otp_expired: expiry
       })
       .eq('email', email);
+
+    return { data, error };
+  }
+  async createUserWithPhone(phone: string) {
+  const { data, error } = await this.supabase
+    .from('users')
+    .insert([
+      {
+        phonenumber: phone,
+        phone_number: phone,
+        fullname: '',
+        name: '',
+        email: null,
+        username: '',
+        password: null,
+        usertypeid: 1,
+        isverified: false,
+        isactive: true,
+        createdon: new Date().toISOString(),
+        updatedon: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        isonboardingcompleted: false
+      }
+    ])
+    .select()
+    .single();
+
+  return { data, error };
+}
+  async updateUserOtpByPhone(phone: string, otp: string, expiry: number) {
+    const { data, error } = await this.supabase
+      .from('users')
+      .update({
+        otp,
+        otp_expired: expiry,
+        updatedon: new Date().toISOString()
+      })
+      .eq('phonenumber', phone);
+
+    return { data, error };
+  }
+
+  async clearUserOtpByPhone(phone: string) {
+    const { data, error } = await this.supabase
+      .from('users')
+      .update({
+        otp: null,
+        otp_expired: null,
+        isverified: true,
+        updatedon: new Date().toISOString()
+      })
+      .eq('phonenumber', phone);
 
     return { data, error };
   }
