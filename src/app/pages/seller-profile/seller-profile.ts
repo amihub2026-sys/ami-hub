@@ -134,6 +134,8 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
       await this.supabaseService.waitForSession(2500);
 
       const session = await this.supabaseService.getEffectiveAuthUser();
+      
+
 
       if (!session.isAuthenticated) {
         this.authChecked = true;
@@ -161,7 +163,7 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
             email: profileById?.email || session.email || '',
             phone: profileById?.phone_number || profileById?.phonenumber || '',
             username: profileById?.username || session.username || '',
-            password: profileById?.password || '',
+           
             accountType: profileById?.accounttype || '',
             category: profileById?.category || '',
             profileImage: profileById?.profileimageurl || profileById?.avatar_url || null,
@@ -230,7 +232,6 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
           email: profile?.email || user?.email || session.email || '',
           phone: profile?.phone_number || profile?.phonenumber || '',
           username: profile?.username || session.username || '',
-          password: profile?.password || '',
           accountType: profile?.accounttype || '',
           category: profile?.category || '',
           profileImage: profile?.profileimageurl || profile?.avatar_url || null,
@@ -311,13 +312,22 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
 
     try {
       const session = await this.supabaseService.getEffectiveAuthUser();
+      console.log('SAVE STARTED');
+console.log('SESSION:', session);
+     if (!session.isAuthenticated) {
+  this.showMessage('Please login first');
 
-      if (!session.isAuthenticated) {
-        this.showMessage('Please login first');
-        this.router.navigate(['/login']);
-        return;
-      }
+  this.zone.run(() => {
+    this.isLoading = false;
+    this.cdr.detectChanges();
+  });
 
+  this.router.navigate(['/login']);
+  return;
+}
+// ✅ CORRECT PLACE (ADD HERE)
+
+this.seller.password = '';
       if (!session.authUser && session.userid) {
         const payload = {
           fullname: this.seller.name || '',
@@ -326,7 +336,7 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
           phonenumber: this.seller.phone || '',
           phone_number: this.seller.phone || '',
           username: this.seller.username || '',
-          password: this.seller.password || '',
+
           profileimageurl: this.seller.profileImage || null,
           avatar_url: this.seller.profileImage || null,
           accounttype: this.seller.accountType || '',
@@ -352,7 +362,14 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
         }
       } else {
         await this.supabaseService.waitForSession(1500);
-        await this.supabaseService.upsertSellerProfileToUsers(this.seller);
+        console.log('UPSERT STARTED');
+await Promise.race([
+  this.supabaseService.upsertSellerProfileToUsers(this.seller),
+  new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Timeout saving profile')), 5000)
+  )
+]);
+console.log('UPSERT FINISHED');
       }
 
       this.zone.run(() => {
