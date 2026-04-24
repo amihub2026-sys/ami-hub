@@ -30,6 +30,8 @@ interface SubcategoryItem {
 })
 export class SearchResults {
   searchText = '';
+  locationText = '';
+  selectedRadiusKm = 5;
   selectedType: 'all' | 'product' | 'service' = 'all';
 
   selectedCategoryId: number | null = null;
@@ -53,8 +55,6 @@ export class SearchResults {
   ) {}
 
   ngOnInit() {
-    console.log('SEARCH RESULTS TS IS RUNNING');
-
     this.route.queryParams.subscribe(async (params) => {
       this.searchText = (params['q'] || '').trim();
 
@@ -108,7 +108,8 @@ export class SearchResults {
   }
 
   goToServiceList() {
-    this.router.navigate(['/service-list']);
+    this.selectedType = 'service';
+    this.searchNow();
   }
 
   async searchNow() {
@@ -147,8 +148,6 @@ export class SearchResults {
 
       if (this.selectedType === 'product') {
         query = query.eq('category_type', 'product');
-      } else if (this.selectedType === 'service') {
-        query = query.eq('category_type', 'service');
       }
 
       const { data, error } = await query;
@@ -204,8 +203,61 @@ export class SearchResults {
     const matchedCategory = this.findCategoryFromSearch(cleanSearch);
 
     if (matchedCategory) {
-      this.selectedCategoryId = matchedCategory.categoryid;
-      await this.loadSubcategories(this.selectedCategoryId);
+      const detectedId = Number(matchedCategory.categoryid);
+      const exists = this.categories.find(
+        (c) => Number(c.categoryid) === detectedId
+      );
+
+      if (exists) {
+        this.selectedCategoryId = detectedId;
+        await this.loadSubcategories(this.selectedCategoryId);
+
+        setTimeout(() => {
+          this.selectedCategoryId = detectedId;
+          this.cdr.detectChanges();
+        });
+      }
+
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const matchedPost = this.results.find((item: any) => {
+      const text = [
+        item?.title,
+        item?.description,
+        item?.category,
+        item?.displayTitle,
+        item?.displayLocation
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      const normalizedSearch = this.normalizeWord(cleanSearch);
+
+      return (
+        text.includes(cleanSearch) ||
+        text.includes(normalizedSearch) ||
+        this.normalizeWord(text).includes(normalizedSearch)
+      );
+    });
+
+    if (matchedPost?.categoryid) {
+      const detectedId = Number(matchedPost.categoryid);
+      const exists = this.categories.find(
+        (c) => Number(c.categoryid) === detectedId
+      );
+
+      if (exists) {
+        this.selectedCategoryId = detectedId;
+        await this.loadSubcategories(this.selectedCategoryId);
+
+        setTimeout(() => {
+          this.selectedCategoryId = detectedId;
+          this.cdr.detectChanges();
+        });
+      }
     }
 
     this.cdr.detectChanges();
@@ -228,8 +280,6 @@ export class SearchResults {
   }
 
   async loadResults() {
-    console.log('loadResults called');
-
     try {
       let query = supabase
         .from('post')
@@ -283,7 +333,6 @@ export class SearchResults {
       this.filteredResults = [...mapped];
       this.isLoading = false;
 
-      console.log('Results loaded:', mapped.length);
       this.cdr.detectChanges();
     } catch (error) {
       console.error('Error loading results:', error);
@@ -336,6 +385,7 @@ export class SearchResults {
 
   applyFilters() {
     const cleanSearch = (this.searchText || '').trim().toLowerCase();
+    const locationSearch = (this.locationText || '').trim().toLowerCase();
     let data = [...this.results];
 
     if (cleanSearch) {
@@ -344,6 +394,20 @@ export class SearchResults {
         String(item.description || '').toLowerCase().includes(cleanSearch) ||
         String(item.category || '').toLowerCase().includes(cleanSearch)
       );
+    }
+
+    if (locationSearch) {
+      data = data.filter((item) => {
+        const locationHaystack = [
+          item?.location,
+          item?.displayLocation
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+
+        return locationHaystack.includes(locationSearch);
+      });
     }
 
     if (this.selectedCategoryId !== null) {
@@ -376,6 +440,8 @@ export class SearchResults {
 
   async resetFilters() {
     this.searchText = '';
+    this.locationText = '';
+    this.selectedRadiusKm = 5;
     this.selectedCategoryId = null;
     this.selectedSubcategoryId = null;
     this.subcategories = [];

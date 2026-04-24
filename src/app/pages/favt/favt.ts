@@ -43,7 +43,7 @@ export class Favt implements OnInit {
     if (this.isBrowser()) {
       alert(message);
     } else {
-      console.log(message);
+      
     }
   }
 
