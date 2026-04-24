@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../../../services/supabase.service';
 
@@ -25,6 +31,7 @@ interface AdminCategoryItem {
 })
 export class AdminCategoriesComponent implements OnInit {
   private supabaseService = inject(SupabaseService);
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() searchQuery = '';
 
@@ -59,6 +66,7 @@ export class AdminCategoriesComponent implements OnInit {
   async loadCategories(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     try {
       const { data, error } = await this.supabaseService.supabase
@@ -81,6 +89,7 @@ export class AdminCategoriesComponent implements OnInit {
         console.error('Load categories error:', error);
         this.errorMessage = 'Failed to load categories.';
         this.categories = [];
+        this.cdr.detectChanges();
         return;
       }
 
@@ -96,12 +105,16 @@ export class AdminCategoriesComponent implements OnInit {
         rawcreatedon: row.createdon || '',
         category_type: row.category_type || '-',
       }));
+
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Categories page error:', error);
       this.errorMessage = 'Something went wrong while loading categories.';
       this.categories = [];
+      this.cdr.detectChanges();
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -152,6 +165,8 @@ export class AdminCategoriesComponent implements OnInit {
       isactive: true,
       category_type: 'product',
     };
+
+    this.cdr.detectChanges();
   }
 
   editCategory(item: AdminCategoryItem): void {
@@ -170,23 +185,28 @@ export class AdminCategoriesComponent implements OnInit {
       isactive: item.isactive,
       category_type: item.category_type || 'product',
     };
+
+    this.cdr.detectChanges();
   }
 
   cancelForm(): void {
     this.showForm = false;
     this.editingCategoryId = null;
     this.selectedIconFile = null;
+    this.cdr.detectChanges();
   }
 
   onCategoryNameChange(): void {
     if (!this.editingCategoryId) {
       this.form.slug = this.makeSlug(this.form.categoryname);
+      this.cdr.detectChanges();
     }
   }
 
   onIconFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.selectedIconFile = input.files?.[0] || null;
+    this.cdr.detectChanges();
   }
 
   onBannerFileSelected(event: Event): void {
@@ -196,6 +216,7 @@ export class AdminCategoriesComponent implements OnInit {
     if (!file) return;
 
     this.form.bannerurl = URL.createObjectURL(file);
+    this.cdr.detectChanges();
   }
 
   async saveCategory(): Promise<void> {
@@ -206,20 +227,24 @@ export class AdminCategoriesComponent implements OnInit {
 
     if (!this.form.categoryname.trim()) {
       this.errorMessage = 'Category name is required.';
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.form.slug.trim()) {
       this.errorMessage = 'Slug is required.';
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.form.category_type.trim()) {
       this.errorMessage = 'Category type is required.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.isSaving = true;
+    this.cdr.detectChanges();
 
     try {
       let iconurl = this.form.iconurl;
@@ -252,6 +277,7 @@ export class AdminCategoriesComponent implements OnInit {
           console.error('Update category error:', error);
           this.errorMessage = error.message || 'Failed to update category.';
           this.isSaving = false;
+          this.cdr.detectChanges();
           return;
         }
 
@@ -265,6 +291,7 @@ export class AdminCategoriesComponent implements OnInit {
           console.error('Create category error:', error);
           this.errorMessage = error.message || 'Failed to create category.';
           this.isSaving = false;
+          this.cdr.detectChanges();
           return;
         }
 
@@ -272,12 +299,14 @@ export class AdminCategoriesComponent implements OnInit {
       }
 
       this.isSaving = false;
+      this.cdr.detectChanges();
       this.cancelForm();
       await this.loadCategories();
     } catch (error: any) {
       console.error('Save category exception FULL:', error);
       this.errorMessage = error?.message || 'Failed to save category.';
       this.isSaving = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -285,6 +314,7 @@ export class AdminCategoriesComponent implements OnInit {
     const nextValue = !item.isactive;
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabaseService.supabase
@@ -295,15 +325,18 @@ export class AdminCategoriesComponent implements OnInit {
       if (error) {
         console.error('Toggle category status error:', error);
         this.errorMessage = error.message || 'Failed to update category status.';
+        this.cdr.detectChanges();
         return;
       }
 
       item.isactive = nextValue;
       this.successMessage = `Category ${nextValue ? 'enabled' : 'disabled'} successfully.`;
+      this.cdr.detectChanges();
       await this.loadCategories();
     } catch (error) {
       console.error('Toggle category status exception:', error);
       this.errorMessage = 'Failed to update category status.';
+      this.cdr.detectChanges();
     }
   }
 
@@ -311,6 +344,7 @@ export class AdminCategoriesComponent implements OnInit {
     if (!item.isactive) {
       this.errorMessage = 'Category is already inactive.';
       this.successMessage = '';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -322,6 +356,7 @@ export class AdminCategoriesComponent implements OnInit {
 
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabaseService.supabase
@@ -332,15 +367,18 @@ export class AdminCategoriesComponent implements OnInit {
       if (error) {
         console.error('Deactivate category error:', error);
         this.errorMessage = error.message || 'Failed to deactivate category.';
+        this.cdr.detectChanges();
         return;
       }
 
       item.isactive = false;
       this.successMessage = 'Category deactivated successfully.';
+      this.cdr.detectChanges();
       await this.loadCategories();
     } catch (error) {
       console.error('Deactivate category exception:', error);
       this.errorMessage = 'Failed to deactivate category.';
+      this.cdr.detectChanges();
     }
   }
 

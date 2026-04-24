@@ -23,23 +23,82 @@ export class MyPosts implements OnInit {
     await this.loadCurrentUserPosts();
   }
 
+  private isBrowser(): boolean {
+    return typeof window !== 'undefined';
+  }
+
+  private showAlert(message: string): void {
+    if (this.isBrowser()) {
+      alert(message);
+    } else {
+      console.log(message);
+    }
+  }
+
+  private showConfirm(message: string): boolean {
+    if (this.isBrowser()) {
+      return confirm(message);
+    }
+    return false;
+  }
+
+  private mergePosts(...postLists: any[][]): any[] {
+    const map = new Map<any, any>();
+
+    for (const list of postLists) {
+      for (const post of list || []) {
+        const key = post?.postid;
+        if (key != null && !map.has(key)) {
+          map.set(key, post);
+        }
+      }
+    }
+
+    return Array.from(map.values());
+  }
+
   async loadCurrentUserPosts(): Promise<void> {
     this.isLoading.set(true);
 
     try {
-      const user = await this.supabaseService.getCurrentUser();
+      const session = await this.supabaseService.getEffectiveAuthUser();
 
-      if (!user) {
+      if (!session.isAuthenticated) {
         this.posts.set([]);
-        alert('Please login first');
+        this.showAlert('Please login first');
         this.router.navigate(['/login'], {
           state: { redirectTo: 'my-posts' }
         });
         return;
       }
 
-      const data = await this.supabaseService.getPostsByUserId(user.id, 0, 100);
-      this.posts.set(Array.isArray(data) ? data : []);
+      const authUserId = session.authUser?.id || '';
+      const localUserId = session.userid || '';
+      const resolvedUuid = await this.supabaseService.resolveEffectiveUserUuid();
+
+      const results: any[][] = [];
+
+      if (localUserId) {
+        const data = await this.supabaseService.getPostsByUserId(localUserId, 0, 100);
+        results.push(Array.isArray(data) ? data : []);
+      }
+
+      if (resolvedUuid && resolvedUuid !== localUserId) {
+        const data = await this.supabaseService.getPostsByUserId(resolvedUuid, 0, 100);
+        results.push(Array.isArray(data) ? data : []);
+      }
+
+      if (
+        authUserId &&
+        authUserId !== localUserId &&
+        authUserId !== resolvedUuid
+      ) {
+        const data = await this.supabaseService.getPostsByUserId(authUserId, 0, 100);
+        results.push(Array.isArray(data) ? data : []);
+      }
+
+      const mergedPosts = this.mergePosts(...results);
+      this.posts.set(mergedPosts);
     } catch (error) {
       console.error('Error loading my posts:', error);
       this.posts.set([]);
@@ -96,7 +155,7 @@ export class MyPosts implements OnInit {
 
     if (!post?.postid) {
       console.warn('Missing postid for edit:', post);
-      alert('Post id not found');
+      this.showAlert('Post id not found');
       return;
     }
 
@@ -106,7 +165,7 @@ export class MyPosts implements OnInit {
 
     if (!success) {
       console.error('Navigation failed for edit post:', post.postid);
-      alert('Failed to open edit page');
+      this.showAlert('Failed to open edit page');
     }
   }
 
@@ -140,8 +199,6 @@ export class MyPosts implements OnInit {
       latitude: post?.latitude ?? null,
       longitude: post?.longitude ?? null,
       custom_fields: post?.custom_fields ?? null,
-
-      // featured values reset until payment completes
       isfeatured: false,
       is_featured: false,
       featured_plan_id: null,
@@ -156,12 +213,12 @@ export class MyPosts implements OnInit {
 
     if (!post?.postid) {
       console.warn('Missing postid for feature:', post);
-      alert('Post id not found');
+      this.showAlert('Post id not found');
       return;
     }
 
     if (this.isFeatured(post)) {
-      alert('This post is already featured');
+      this.showAlert('This post is already featured');
       return;
     }
 
@@ -169,19 +226,19 @@ export class MyPosts implements OnInit {
     const featurePayload = this.buildFeaturePostPayload(post);
 
     try {
-      // save edited/existing post so payment page can read it
-      localStorage.setItem(
-        'pending_post_payload',
-        JSON.stringify(featurePayload)
-      );
+      if (this.isBrowser()) {
+        localStorage.setItem(
+          'pending_post_payload',
+          JSON.stringify(featurePayload)
+        );
 
-      // mark this as featured/boost flow
-      localStorage.setItem('pending_post_flow', 'featured');
-      localStorage.setItem('pending_post_type', adType);
-      localStorage.setItem(
-        'pending_post_userid',
-        String(featurePayload?.userid ?? '')
-      );
+        localStorage.setItem('pending_post_flow', 'featured');
+        localStorage.setItem('pending_post_type', adType);
+        localStorage.setItem(
+          'pending_post_userid',
+          String(featurePayload?.userid ?? '')
+        );
+      }
 
       console.log('Opening featured plan for post:', post.postid, 'type:', adType);
       console.log('STORED FEATURE POST PAYLOAD:', featurePayload);
@@ -196,11 +253,11 @@ export class MyPosts implements OnInit {
 
       if (!success) {
         console.error('Navigation failed for featured post:', post.postid);
-        alert('Failed to open featured plan');
+        this.showAlert('Failed to open featured plan');
       }
     } catch (error) {
       console.error('Error preparing featured flow:', error);
-      alert('Failed to open featured plan');
+      this.showAlert('Failed to open featured plan');
     }
   }
 
@@ -210,23 +267,20 @@ export class MyPosts implements OnInit {
     event.stopImmediatePropagation?.();
 
     if (!post?.postid) {
-      alert('Post id not found');
+      this.showAlert('Post id not found');
       return;
     }
 
-    const confirmed = confirm('Are you sure you want to remove this post?');
+    const confirmed = this.showConfirm('Are you sure you want to remove this post?');
     if (!confirmed) {
       return;
     }
 
     try {
-      const user = await this.supabaseService.getCurrentUser();
+      const session = await this.supabaseService.getEffectiveAuthUser();
 
-      console.log('Logged in user id:', user?.id);
-      console.log('Clicked post:', post);
-
-      if (!user) {
-        alert('Please login first');
+      if (!session.isAuthenticated) {
+        this.showAlert('Please login first');
         this.router.navigate(['/login']);
         return;
       }
@@ -241,12 +295,12 @@ export class MyPosts implements OnInit {
 
       if (error) {
         console.error('Delete error:', error);
-        alert(error.message || 'Failed to remove post');
+        this.showAlert(error.message || 'Failed to remove post');
         return;
       }
 
       if (!data || data.length === 0) {
-        alert('Delete blocked in Supabase. Fix RLS policy / userid match.');
+        this.showAlert('Delete blocked in Supabase. Fix RLS policy / userid match.');
         return;
       }
 
@@ -254,10 +308,10 @@ export class MyPosts implements OnInit {
         this.posts().filter(item => item.postid !== post.postid)
       );
 
-      alert('Post removed successfully');
+      this.showAlert('Post removed successfully');
     } catch (error) {
       console.error('Error removing post:', error);
-      alert('Failed to remove post');
+      this.showAlert('Failed to remove post');
     }
   }
 

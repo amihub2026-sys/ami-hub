@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../../../services/supabase.service';
@@ -34,6 +34,7 @@ type SubcategoryStatusFilter = 'all' | 'active' | 'inactive';
 })
 export class AdminSubcategories implements OnInit {
   private supabaseService = inject(SupabaseService);
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() searchQuery = '';
 
@@ -79,6 +80,7 @@ export class AdminSubcategories implements OnInit {
 
       if (error) {
         console.error('Load categories error:', error);
+        this.cdr.detectChanges();
         return;
       }
 
@@ -87,14 +89,18 @@ export class AdminSubcategories implements OnInit {
         categoryname: row.categoryname || '',
         isactive: !!row.isactive,
       }));
+
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Load categories exception:', error);
+      this.cdr.detectChanges();
     }
   }
 
   async loadSubcategories(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     try {
       const { data, error } = await this.supabaseService.supabase
@@ -120,6 +126,7 @@ export class AdminSubcategories implements OnInit {
         console.error('Load subcategories error:', error);
         this.errorMessage = error.message || 'Failed to load subcategories.';
         this.allSubcategories = [];
+        this.cdr.detectChanges();
         return;
       }
 
@@ -136,12 +143,16 @@ export class AdminSubcategories implements OnInit {
         createdon: row.createdon || null,
         createdLabel: this.formatDate(row.createdon),
       }));
+
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Subcategories page error:', error);
       this.errorMessage = 'Something went wrong while loading subcategories.';
       this.allSubcategories = [];
+      this.cdr.detectChanges();
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -162,6 +173,8 @@ export class AdminSubcategories implements OnInit {
       sortorder: this.allSubcategories.length + 1,
       isactive: true,
     };
+
+    this.cdr.detectChanges();
   }
 
   editSubcategory(subcategory: AdminSubcategoryItem): void {
@@ -181,6 +194,8 @@ export class AdminSubcategories implements OnInit {
       sortorder: subcategory.sortorder,
       isactive: subcategory.isactive,
     };
+
+    this.cdr.detectChanges();
   }
 
   cancelForm(): void {
@@ -189,11 +204,13 @@ export class AdminSubcategories implements OnInit {
     this.selectedIconFile = null;
     this.selectedImageFile = null;
     this.errorMessage = '';
+    this.cdr.detectChanges();
   }
 
   onSubcategoryNameChange(): void {
     if (!this.editingSubcategoryId) {
       this.form.slug = this.makeSlug(this.form.subcategoryname);
+      this.cdr.detectChanges();
     }
   }
 
@@ -202,10 +219,14 @@ export class AdminSubcategories implements OnInit {
     const file = input.files?.[0] || null;
     this.selectedIconFile = file;
 
-    if (!file) return;
+    if (!file) {
+      this.cdr.detectChanges();
+      return;
+    }
 
     const readerUrl = URL.createObjectURL(file);
     this.form.iconurl = readerUrl;
+    this.cdr.detectChanges();
   }
 
   onImageFileSelected(event: Event): void {
@@ -213,10 +234,14 @@ export class AdminSubcategories implements OnInit {
     const file = input.files?.[0] || null;
     this.selectedImageFile = file;
 
-    if (!file) return;
+    if (!file) {
+      this.cdr.detectChanges();
+      return;
+    }
 
     const readerUrl = URL.createObjectURL(file);
     this.form.image = readerUrl;
+    this.cdr.detectChanges();
   }
 
   async saveSubcategory(): Promise<void> {
@@ -227,20 +252,24 @@ export class AdminSubcategories implements OnInit {
 
     if (!this.form.categoryid) {
       this.errorMessage = 'Category is required.';
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.form.subcategoryname.trim()) {
       this.errorMessage = 'Subcategory name is required.';
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.form.slug.trim()) {
       this.errorMessage = 'Slug is required.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.isSaving = true;
+    this.cdr.detectChanges();
 
     try {
       let iconurl = this.form.iconurl;
@@ -293,6 +322,7 @@ export class AdminSubcategories implements OnInit {
           console.error('Update subcategory error:', error);
           this.errorMessage = error.message || 'Failed to update subcategory.';
           this.isSaving = false;
+          this.cdr.detectChanges();
           return;
         }
 
@@ -317,6 +347,7 @@ export class AdminSubcategories implements OnInit {
           console.error('Create subcategory error:', error);
           this.errorMessage = error.message || 'Failed to create subcategory.';
           this.isSaving = false;
+          this.cdr.detectChanges();
           return;
         }
 
@@ -324,17 +355,20 @@ export class AdminSubcategories implements OnInit {
       }
 
       this.isSaving = false;
+      this.cdr.detectChanges();
       this.cancelForm();
       await this.loadSubcategories();
     } catch (error: any) {
       console.error('Save subcategory exception:', error);
       this.errorMessage = error?.message || 'Failed to save subcategory.';
       this.isSaving = false;
+      this.cdr.detectChanges();
     }
   }
 
   setSubcategoryStatusFilter(filter: SubcategoryStatusFilter): void {
     this.subcategoryStatusFilter = filter;
+    this.cdr.detectChanges();
   }
 
   get filteredSubcategories(): AdminSubcategoryItem[] {
@@ -386,6 +420,7 @@ export class AdminSubcategories implements OnInit {
 
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabaseService.supabase
@@ -397,6 +432,7 @@ export class AdminSubcategories implements OnInit {
         console.error('Toggle subcategory status error:', error);
         this.errorMessage =
           error.message || 'Failed to update subcategory status.';
+        this.cdr.detectChanges();
         return;
       }
 
@@ -405,10 +441,12 @@ export class AdminSubcategories implements OnInit {
         nextValue ? 'activated' : 'deactivated'
       } successfully.`;
 
+      this.cdr.detectChanges();
       await this.loadSubcategories();
     } catch (error) {
       console.error('Toggle subcategory status exception:', error);
       this.errorMessage = 'Failed to update subcategory status.';
+      this.cdr.detectChanges();
     }
   }
 
@@ -421,6 +459,7 @@ export class AdminSubcategories implements OnInit {
 
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabaseService.supabase
@@ -431,14 +470,17 @@ export class AdminSubcategories implements OnInit {
       if (error) {
         console.error('Delete subcategory error:', error);
         this.errorMessage = error.message || 'Failed to delete subcategory.';
+        this.cdr.detectChanges();
         return;
       }
 
       this.successMessage = 'Subcategory deleted successfully.';
+      this.cdr.detectChanges();
       await this.loadSubcategories();
     } catch (error) {
       console.error('Delete subcategory exception:', error);
       this.errorMessage = 'Failed to delete subcategory.';
+      this.cdr.detectChanges();
     }
   }
 

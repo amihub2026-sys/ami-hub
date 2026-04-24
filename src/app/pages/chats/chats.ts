@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { supabase } from '../../../supabaseClient';
+import { SupabaseService } from '../../services/supabase.service';
 
 @Component({
   selector: 'app-chats',
@@ -26,20 +27,25 @@ export class Chats implements OnInit, OnDestroy {
 
   private channel: any = null;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private supabaseService: SupabaseService
+  ) {}
 
   async ngOnInit() {
-    const { data } = await supabase.auth.getSession();
-    this.currentUser = data?.session?.user;
+    const userUuid = await this.supabaseService.resolveEffectiveUserUuid();
 
-    if (!this.currentUser) return;
+    if (!userUuid) return;
+
+    this.currentUser = {
+      id: userUuid
+    };
 
     this.postId = this.route.snapshot.queryParamMap.get('postId');
     this.sellerId = this.route.snapshot.queryParamMap.get('sellerId');
 
     await this.loadConversations();
 
-    // if coming from post view, auto open that chat
     if (this.postId && this.sellerId) {
       const existing = this.conversations().find(
         c => String(c.post_id) === String(this.postId) && String(c.otherUserId) === String(this.sellerId)

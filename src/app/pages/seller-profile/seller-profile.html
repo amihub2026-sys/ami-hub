@@ -54,11 +54,36 @@
     [(ngModel)]="seller.email"
     [disabled]="isLoading">
 
+ <input
+  type="text"
+  placeholder="Phone Number"
+  [(ngModel)]="seller.phone"
+  maxlength="10"
+  pattern="[0-9]*"
+  inputmode="numeric"
+  [disabled]="isLoading">
+
   <input
     type="text"
-    placeholder="Phone Number"
-    [(ngModel)]="seller.phone"
+    placeholder="Username"
+    [(ngModel)]="seller.username"
     [disabled]="isLoading">
+
+  <div class="password-wrap">
+    <input
+      [type]="showPassword ? 'text' : 'password'"
+      placeholder="Password"
+      [(ngModel)]="seller.password"
+      [disabled]="isLoading">
+
+    <button
+      type="button"
+      class="password-toggle"
+      (click)="togglePassword()"
+      [disabled]="isLoading">
+      {{ showPassword ? 'Hide' : 'Show' }}
+    </button>
+  </div>
 
   <select [(ngModel)]="seller.accountType" [disabled]="isLoading">
     <option value="">Select Account Type</option>

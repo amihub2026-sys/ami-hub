@@ -98,6 +98,11 @@ export class App implements OnInit {
     return isPlatformBrowser(this.platformId);
   }
 
+  private hasLocalUserLogin(): boolean {
+    if (!this.isBrowser()) return false;
+    return localStorage.getItem('userToken') === 'loggedUser';
+  }
+
   private async isLoggedIn(): Promise<boolean> {
     if (!this.isBrowser()) return false;
 
@@ -106,16 +111,16 @@ export class App implements OnInit {
 
       if (error) {
         console.error('Session check error:', error);
-        return false;
       }
 
       const user = data.session?.user;
       const isAdmin = localStorage.getItem('adminToken') === 'loggedAdmin';
+      const isLocalUser = localStorage.getItem('userToken') === 'loggedUser';
 
-      return !!user || isAdmin;
+      return !!user || isAdmin || isLocalUser;
     } catch (error) {
       console.error('isLoggedIn error:', error);
-      return false;
+      return this.hasLocalUserLogin();
     }
   }
 
@@ -183,6 +188,11 @@ export class App implements OnInit {
     try {
       const { data } = await supabase.auth.getSession();
       const user = data.session?.user;
+
+      if (!user && !this.hasLocalUserLogin()) {
+        this.notificationCount = 0;
+        return;
+      }
 
       if (!user) {
         this.notificationCount = 0;
@@ -497,10 +507,16 @@ export class App implements OnInit {
 
   async postService(): Promise<void> {
     const user = await this.supabaseService.getCurrentUser();
+    const localLoggedIn = this.hasLocalUserLogin();
 
-    if (!user) {
+    if (!user && !localLoggedIn) {
       alert('Please login first');
       this.router.navigate(['/login']);
+      return;
+    }
+
+    if (!user && localLoggedIn) {
+      this.router.navigate(['/service']);
       return;
     }
 
@@ -588,6 +604,8 @@ export class App implements OnInit {
       localStorage.removeItem('adminToken');
       localStorage.removeItem('userToken');
       localStorage.removeItem('userTypeId');
+      localStorage.removeItem('supabase_uid');
+      localStorage.removeItem('username');
     }
 
     this.closeMenu();

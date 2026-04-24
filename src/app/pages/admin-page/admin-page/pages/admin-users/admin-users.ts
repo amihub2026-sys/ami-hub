@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { SupabaseService } from '../../../../../services/supabase.service';
 
 type UserStatus = 'Active' | 'Blocked' | 'Pending';
@@ -30,6 +36,7 @@ interface AdminUserItem {
 })
 export class AdminUsers implements OnInit {
   private supabaseService = inject(SupabaseService);
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() searchQuery = '';
 
@@ -44,6 +51,7 @@ export class AdminUsers implements OnInit {
   async loadUsers(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     try {
       const { data, error } = await this.supabaseService.supabase
@@ -70,6 +78,7 @@ export class AdminUsers implements OnInit {
         console.error('Load users error:', error);
         this.errorMessage = 'Failed to load users.';
         this.users = [];
+        this.cdr.detectChanges();
         return;
       }
 
@@ -104,12 +113,16 @@ export class AdminUsers implements OnInit {
           createdonRaw: row.createdon || '',
         };
       });
+
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Users page error:', error);
       this.errorMessage = 'Something went wrong while loading users.';
       this.users = [];
+      this.cdr.detectChanges();
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -152,6 +165,7 @@ export class AdminUsers implements OnInit {
 
     user.isactive = nextIsActive;
     user.status = nextIsActive ? 'Active' : 'Blocked';
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabaseService.supabase
@@ -174,6 +188,8 @@ export class AdminUsers implements OnInit {
       user.isactive = previousIsActive;
       user.status = previousStatus;
       this.errorMessage = 'Failed to update user status.';
+    } finally {
+      this.cdr.detectChanges();
     }
   }
 

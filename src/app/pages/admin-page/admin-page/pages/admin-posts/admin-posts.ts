@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { SupabaseService } from '../../../../../services/supabase.service';
 
 interface AdminPostItem {
@@ -28,6 +34,7 @@ interface AdminPostItem {
 })
 export class AdminPosts implements OnInit {
   private supabaseService = inject(SupabaseService);
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() searchQuery = '';
 
@@ -42,6 +49,7 @@ export class AdminPosts implements OnInit {
   async loadPosts(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     try {
       const { data, error } = await this.supabaseService.supabase
@@ -67,6 +75,7 @@ export class AdminPosts implements OnInit {
         console.error('Load posts error:', error);
         this.errorMessage = 'Failed to load posts.';
         this.posts = [];
+        this.cdr.detectChanges();
         return;
       }
 
@@ -86,12 +95,16 @@ export class AdminPosts implements OnInit {
         imageUrl: row.image_url || '',
         rawCreatedOn: row.createdon || '',
       }));
+
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Posts page error:', error);
       this.errorMessage = 'Something went wrong while loading posts.';
       this.posts = [];
+      this.cdr.detectChanges();
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -131,6 +144,7 @@ export class AdminPosts implements OnInit {
   async togglePostStatus(post: AdminPostItem): Promise<void> {
     const previousValue = post.isActive;
     post.isActive = !post.isActive;
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabaseService.supabase
@@ -150,12 +164,15 @@ export class AdminPosts implements OnInit {
       console.error('Toggle post status exception:', error);
       post.isActive = previousValue;
       this.errorMessage = 'Failed to update post status.';
+    } finally {
+      this.cdr.detectChanges();
     }
   }
 
   async toggleFeatured(post: AdminPostItem): Promise<void> {
     const previousValue = post.isFeatured;
     post.isFeatured = !post.isFeatured;
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabaseService.supabase
@@ -174,6 +191,8 @@ export class AdminPosts implements OnInit {
       console.error('Toggle featured exception:', error);
       post.isFeatured = previousValue;
       this.errorMessage = 'Failed to update featured status.';
+    } finally {
+      this.cdr.detectChanges();
     }
   }
 
@@ -183,6 +202,7 @@ export class AdminPosts implements OnInit {
 
     const previousPosts = [...this.posts];
     this.posts = this.posts.filter((p) => p.id !== post.id);
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabaseService.supabase
@@ -199,6 +219,8 @@ export class AdminPosts implements OnInit {
       console.error('Delete post exception:', error);
       this.posts = previousPosts;
       this.errorMessage = 'Failed to delete post.';
+    } finally {
+      this.cdr.detectChanges();
     }
   }
 

@@ -1,6 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  NgZone,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { SupabaseService } from '../../../../../services/supabase.service';
+
 interface DashboardStat {
   title: string;
   value: string;
@@ -27,6 +34,8 @@ interface ActivityItem {
 })
 export class AdminDashboard implements OnInit {
   private supabaseService = inject(SupabaseService);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   isLoading = true;
   errorMessage = '';
@@ -43,8 +52,11 @@ export class AdminDashboard implements OnInit {
   }
 
   async loadDashboard(): Promise<void> {
-    this.isLoading = true;
-    this.errorMessage = '';
+    this.ngZone.run(() => {
+      this.isLoading = true;
+      this.errorMessage = '';
+      this.cdr.detectChanges();
+    });
 
     try {
       await Promise.all([
@@ -56,9 +68,15 @@ export class AdminDashboard implements OnInit {
       ]);
     } catch (error) {
       console.error('Dashboard load error:', error);
-      this.errorMessage = 'Failed to load dashboard data.';
+
+      this.ngZone.run(() => {
+        this.errorMessage = 'Failed to load dashboard data.';
+      });
     } finally {
-      this.isLoading = false;
+      this.ngZone.run(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      });
     }
   }
 
@@ -67,13 +85,15 @@ export class AdminDashboard implements OnInit {
       .from('users')
       .select('*', { count: 'exact', head: true });
 
-    if (error) {
-      console.error('loadUserCount error:', error);
-      this.totalUsers = 0;
-      return;
-    }
-
-    this.totalUsers = count || 0;
+    this.ngZone.run(() => {
+      if (error) {
+        console.error('loadUserCount error:', error);
+        this.totalUsers = 0;
+      } else {
+        this.totalUsers = count || 0;
+      }
+      this.cdr.detectChanges();
+    });
   }
 
   async loadPostCount(): Promise<void> {
@@ -81,13 +101,15 @@ export class AdminDashboard implements OnInit {
       .from('post')
       .select('*', { count: 'exact', head: true });
 
-    if (error) {
-      console.error('loadPostCount error:', error);
-      this.totalPosts = 0;
-      return;
-    }
-
-    this.totalPosts = count || 0;
+    this.ngZone.run(() => {
+      if (error) {
+        console.error('loadPostCount error:', error);
+        this.totalPosts = 0;
+      } else {
+        this.totalPosts = count || 0;
+      }
+      this.cdr.detectChanges();
+    });
   }
 
   async loadSubscriptionCount(): Promise<void> {
@@ -96,29 +118,34 @@ export class AdminDashboard implements OnInit {
       .select('*', { count: 'exact', head: true })
       .eq('isactive', true);
 
-    if (error) {
-      console.error('loadSubscriptionCount error:', error);
-      this.activeSubscriptions = 0;
-      return;
-    }
-
-    this.activeSubscriptions = count || 0;
+    this.ngZone.run(() => {
+      if (error) {
+        console.error('loadSubscriptionCount error:', error);
+        this.activeSubscriptions = 0;
+      } else {
+        this.activeSubscriptions = count || 0;
+      }
+      this.cdr.detectChanges();
+    });
   }
 
   async loadRevenue(): Promise<void> {
     const { data, error } = await this.supabaseService.supabase
-      .from('payments')
-      .select('amount, status');
+      .from('user_subscriptions')
+      .select('amountpaid, paymentstatus, isactive')
+      .eq('isactive', true);
 
-    if (error) {
-      console.error('loadRevenue error:', error);
-      this.totalRevenueAmount = 0;
-      return;
-    }
-
-    this.totalRevenueAmount = (data || [])
-      .filter((item: any) => (item.status || '').toLowerCase() === 'paid')
-      .reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0);
+    this.ngZone.run(() => {
+      if (error) {
+        console.error('loadRevenue error:', error);
+        this.totalRevenueAmount = 0;
+      } else {
+        this.totalRevenueAmount = (data || [])
+          .filter((item: any) => (item.paymentstatus || '').toLowerCase() === 'paid')
+          .reduce((sum: number, item: any) => sum + Number(item.amountpaid || 0), 0);
+      }
+      this.cdr.detectChanges();
+    });
   }
 
   async loadRecentActivities(): Promise<void> {
@@ -160,6 +187,8 @@ export class AdminDashboard implements OnInit {
           createdAt: user.createdon || '',
         });
       }
+    } else {
+      console.error('loadRecentActivities users error:', usersRes.error);
     }
 
     if (!postsRes.error) {
@@ -172,6 +201,8 @@ export class AdminDashboard implements OnInit {
           createdAt: post.createdon || '',
         });
       }
+    } else {
+      console.error('loadRecentActivities posts error:', postsRes.error);
     }
 
     if (!subsRes.error) {
@@ -186,6 +217,8 @@ export class AdminDashboard implements OnInit {
           createdAt: sub.createdon || '',
         });
       }
+    } else {
+      console.error('loadRecentActivities subscriptions error:', subsRes.error);
     }
 
     if (!paymentsRes.error) {
@@ -200,11 +233,20 @@ export class AdminDashboard implements OnInit {
           createdAt: payment.created_at || '',
         });
       }
+    } else {
+      console.error('loadRecentActivities payments error:', paymentsRes.error);
     }
 
-    this.recentActivities = activityItems
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 6);
+    this.ngZone.run(() => {
+      this.recentActivities = activityItems
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+        .slice(0, 6);
+
+      this.cdr.detectChanges();
+    });
   }
 
   get stats(): DashboardStat[] {

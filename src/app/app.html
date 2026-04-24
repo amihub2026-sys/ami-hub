@@ -10,8 +10,8 @@
         </button>
 
         <a class="logo" [routerLink]="['/']">
-  <img src="assets/hub_logo.png" alt="AMI HUB Logo" />
-</a>
+          <img src="assets/hub_logo.png" alt="AMI HUB Logo" />
+        </a>
       </div>
 
       <div class="location-search-bar">
@@ -167,106 +167,137 @@
       </div>
 
       <div class="menu-footer">
-        <button class="logout-btn" (click)="logout(); closeMenu()">Logout</button>
+        <div style="display:flex; flex-direction:column; gap:12px; width:100%;">
+          <a
+            [routerLink]="['/login']"
+            (click)="closeMenu()"
+            style="
+              width:100%;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              min-height:46px;
+              border-radius:14px;
+              text-decoration:none;
+              font-weight:600;
+              font-size:16px;
+              border:1px solid rgba(58,119,255,0.25);
+              background:#eef4ff;
+              color:#2563eb;
+            "
+          >
+            Login
+          </a>
+
+          <button
+            class="logout-btn"
+            style="width:100%; min-height:46px; margin:0;"
+            (click)="logout(); closeMenu()"
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="floating-ad" *ngIf="showAd && !shouldHideGlobalAds">
-  <button class="close-ad" (click)="showAd = false">×</button>
+    <button class="close-ad" (click)="showAd = false">×</button>
 
-  <div class="ad-content">
-    <h4>Boost Your Post 🚀</h4>
-    <p>Get more views & reach more buyers instantly!</p>
-    <button class="ad-btn">Promote Now</button>
+    <div class="ad-content">
+      <h4>Boost Your Post 🚀</h4>
+      <p>Get more views & reach more buyers instantly!</p>
+      <button class="ad-btn">Promote Now</button>
+    </div>
   </div>
-</div>
 
-<div class="top-ad" *ngIf="showTopAd && !shouldHideGlobalAds">
-  <button class="close-ad" (click)="showTopAd = false">×</button>
+  <div class="top-ad" *ngIf="showTopAd && !shouldHideGlobalAds">
+    <button class="close-ad" (click)="showTopAd = false">×</button>
 
-  <div class="top-ad-content">
-    <h4>🔥 Special Offer</h4>
-    <p>Upgrade your listing and appear on top!</p>
-    <button class="top-ad-btn">Upgrade</button>
+    <div class="top-ad-content">
+      <h4>🔥 Special Offer</h4>
+      <p>Upgrade your listing and appear on top!</p>
+      <button class="top-ad-btn">Upgrade</button>
+    </div>
   </div>
-</div>
 
   <router-outlet></router-outlet>
-<!-- SERVICES MODAL -->
-<div class="services-modal" *ngIf="activeService">
-  <div class="services-backdrop" (click)="closeService()"></div>
 
-  <div class="services-card">
-    <button class="close-btn" (click)="closeService()">×</button>
+  <!-- SERVICES MODAL -->
+  <div class="services-modal" *ngIf="activeService">
+    <div class="services-backdrop" (click)="closeService()"></div>
 
-    <!-- SIMPLE WEBSITE -->
-    <div *ngIf="activeService === 'website'">
-      <h2>🌐 Simple Website</h2>
-      <p>Create a professional website for your business.</p>
+    <div class="services-card">
+      <button class="close-btn" (click)="closeService()">×</button>
 
-      <ul>
-        <li>✔ Business website design</li>
-        <li>✔ Mobile responsive</li>
-        <li>✔ Fast & secure hosting</li>
-        <li>✔ Domain setup included</li>
-      </ul>
+      <!-- SIMPLE WEBSITE -->
+      <div *ngIf="activeService === 'website'">
+        <h2>🌐 Simple Website</h2>
+        <p>Create a professional website for your business.</p>
 
-      <div class="contact-box">
-        📞 Call: +91 919042111424<br>
-        📧 Email: amihub2026@gmail.com
+        <ul>
+          <li>✔ Business website design</li>
+          <li>✔ Mobile responsive</li>
+          <li>✔ Fast & secure hosting</li>
+          <li>✔ Domain setup included</li>
+        </ul>
+
+        <div class="contact-box">
+          📞 Call: +91 919042111424<br>
+          📧 Email: amihub2026@gmail.com
+        </div>
       </div>
-    </div>
 
-    <!-- WHATSAPP ORDERING -->
-    <div *ngIf="activeService === 'whatsapp'">
-      <h2>💬 WhatsApp Ordering</h2>
-      <p>Let customers order directly through WhatsApp.</p>
+      <!-- WHATSAPP ORDERING -->
+      <div *ngIf="activeService === 'whatsapp'">
+        <h2>💬 WhatsApp Ordering</h2>
+        <p>Let customers order directly through WhatsApp.</p>
 
-      <ul>
-        <li>✔ One-click WhatsApp ordering</li>
-        <li>✔ Auto message setup</li>
-        <li>✔ Product catalog integration</li>
-        <li>✔ Easy customer communication</li>
-      </ul>
+        <ul>
+          <li>✔ One-click WhatsApp ordering</li>
+          <li>✔ Auto message setup</li>
+          <li>✔ Product catalog integration</li>
+          <li>✔ Easy customer communication</li>
+        </ul>
 
-      <div class="contact-box">
-        📞 Call: +91 919042111424<br>
-        📧 Email: amihub2026@gmail.com
+        <div class="contact-box">
+          📞 Call: +91 919042111424<br>
+          📧 Email: amihub2026@gmail.com
+        </div>
       </div>
-    </div>
 
-    <!-- GOOGLE LISTING -->
-    <div *ngIf="activeService === 'google'">
-      <h2>📍 Google Listing Setup</h2>
-      <p>Show your business on Google Maps & search.</p>
+      <!-- GOOGLE LISTING -->
+      <div *ngIf="activeService === 'google'">
+        <h2>📍 Google Listing Setup</h2>
+        <p>Show your business on Google Maps & search.</p>
 
-      <ul>
-        <li>✔ Google My Business setup</li>
-        <li>✔ Map visibility</li>
-        <li>✔ Reviews & rating setup</li>
-        <li>✔ SEO optimization</li>
-      </ul>
+        <ul>
+          <li>✔ Google My Business setup</li>
+          <li>✔ Map visibility</li>
+          <li>✔ Reviews & rating setup</li>
+          <li>✔ SEO optimization</li>
+        </ul>
 
-      <div class="contact-box">
-        📞 Call: +91 919042111424<br>
-        📧 Email: amihub2026@gmail.com
+        <div class="contact-box">
+          📞 Call: +91 919042111424<br>
+          📧 Email: amihub2026@gmail.com
+        </div>
       </div>
-    </div>
 
+    </div>
   </div>
-</div>
+
   <footer class="footer">
     <div class="footer-glow"></div>
 
     <div class="footer-container">
       <div class="footer-brand">
-   <div class="footer-brand-top">
-  <div class="footer-logo-wrap">
-    <img src="assets/hub_logo.png" alt="AMI HUB Logo" class="footer-logo" />
-  </div>
-  <span class="footer-badge">Trusted Marketplace</span>
-</div>
+        <div class="footer-brand-top">
+          <div class="footer-logo-wrap">
+            <img src="assets/hub_logo.png" alt="AMI HUB Logo" class="footer-logo" />
+          </div>
+          <span class="footer-badge">Trusted Marketplace</span>
+        </div>
 
         <p>
           Buy, sell and discover products or trusted services near you with a secure,
@@ -294,26 +325,28 @@
         <a routerLink="/privacy-policy">Privacy Policy</a>
         <a routerLink="/refund-policy">Refund Policy</a>
       </div>
-<div class="footer-column footer-services">
-  <h3 class="services-title">Other Services</h3>
 
-  <div class="services-list">
-    <div class="service-pill" (click)="openService('website')">
-      <i class="fas fa-globe"></i>
-      <span>Simple Website</span>
-    </div>
+      <div class="footer-column footer-services">
+        <h3 class="services-title">Other Services</h3>
 
-    <div class="service-pill" (click)="openService('whatsapp')">
-      <i class="fab fa-whatsapp"></i>
-      <span>WhatsApp Ordering</span>
-    </div>
+        <div class="services-list">
+          <div class="service-pill" (click)="openService('website')">
+            <i class="fas fa-globe"></i>
+            <span>Simple Website</span>
+          </div>
 
-    <div class="service-pill" (click)="openService('google')">
-      <i class="fas fa-map-marked-alt"></i>
-      <span>Google Listing Setup</span>
-    </div>
-  </div>
-</div>
+          <div class="service-pill" (click)="openService('whatsapp')">
+            <i class="fab fa-whatsapp"></i>
+            <span>WhatsApp Ordering</span>
+          </div>
+
+          <div class="service-pill" (click)="openService('google')">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>Google Listing Setup</span>
+          </div>
+        </div>
+      </div>
+
       <div class="footer-column">
         <h3>Contact Us</h3>
 

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../../../services/supabase.service';
@@ -67,7 +67,10 @@ export class AdminUserSubscriptionsComponent implements OnInit {
     auth_user_id: '',
   };
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.fetchUserSubscriptions();
@@ -155,6 +158,7 @@ export class AdminUserSubscriptionsComponent implements OnInit {
 
   async fetchUserSubscriptions(): Promise<void> {
     this.loading = true;
+    this.cdr.detectChanges();
 
     try {
       const { data, error } = await this.supabase
@@ -165,22 +169,27 @@ export class AdminUserSubscriptionsComponent implements OnInit {
       if (error) {
         console.error('Fetch user subscriptions error:', error);
         alert(error.message || 'Failed to load user subscriptions.');
+        this.cdr.detectChanges();
         return;
       }
 
       this.allUserSubscriptions = (data || []).map((item: any) =>
         this.mapUserSubscription(item)
       );
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Fetch user subscriptions exception:', err);
       alert('Something went wrong while loading user subscriptions.');
+      this.cdr.detectChanges();
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
   setUserSubscriptionStatusFilter(filter: UserSubscriptionStatusFilter): void {
     this.userSubscriptionStatusFilter = filter;
+    this.cdr.detectChanges();
   }
 
   get filteredUserSubscriptions(): AdminUserSubscriptionItem[] {
@@ -241,6 +250,7 @@ export class AdminUserSubscriptionsComponent implements OnInit {
     this.editingId = null;
     this.showForm = true;
     this.resetForm();
+    this.cdr.detectChanges();
   }
 
   openEditForm(item: AdminUserSubscriptionItem): void {
@@ -264,6 +274,8 @@ export class AdminUserSubscriptionsComponent implements OnInit {
       razorpay_signature: item.razorpay_signature || '',
       auth_user_id: item.auth_user_id || '',
     };
+
+    this.cdr.detectChanges();
   }
 
   closeForm(): void {
@@ -271,6 +283,7 @@ export class AdminUserSubscriptionsComponent implements OnInit {
     this.isEditMode = false;
     this.editingId = null;
     this.resetForm();
+    this.cdr.detectChanges();
   }
 
   resetForm(): void {
@@ -290,30 +303,36 @@ export class AdminUserSubscriptionsComponent implements OnInit {
       razorpay_signature: '',
       auth_user_id: '',
     };
+    this.cdr.detectChanges();
   }
 
   async saveUserSubscription(): Promise<void> {
     if (!this.formModel.userid) {
       alert('User ID is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.subscriptionplanid) {
       alert('Subscription Plan ID is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.startdate) {
       alert('Start date is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.formModel.enddate) {
       alert('End date is required.');
+      this.cdr.detectChanges();
       return;
     }
 
     this.saving = true;
+    this.cdr.detectChanges();
 
     const payload = {
       userid: this.formModel.userid,
@@ -342,6 +361,7 @@ export class AdminUserSubscriptionsComponent implements OnInit {
         if (error) {
           console.error('Update user subscription error:', error);
           alert(error.message || 'Failed to update user subscription.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -359,6 +379,7 @@ export class AdminUserSubscriptionsComponent implements OnInit {
         if (error) {
           console.error('Create user subscription error:', error);
           alert(error.message || 'Failed to create user subscription.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -370,8 +391,10 @@ export class AdminUserSubscriptionsComponent implements OnInit {
     } catch (err) {
       console.error('Save user subscription exception:', err);
       alert('Something went wrong while saving user subscription.');
+      this.cdr.detectChanges();
     } finally {
       this.saving = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -389,6 +412,7 @@ export class AdminUserSubscriptionsComponent implements OnInit {
       if (error) {
         console.error('Toggle user subscription status error:', error);
         alert(error.message || 'Failed to update status.');
+        this.cdr.detectChanges();
         return;
       }
 
@@ -397,9 +421,11 @@ export class AdminUserSubscriptionsComponent implements OnInit {
         isactive: item.isactive,
         enddate: item.enddate,
       });
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Toggle user subscription status exception:', err);
       alert('Something went wrong while updating status.');
+      this.cdr.detectChanges();
     }
   }
 
@@ -411,6 +437,7 @@ export class AdminUserSubscriptionsComponent implements OnInit {
     if (!confirmed) return;
 
     this.deletingId = item.usersubscriptionid;
+    this.cdr.detectChanges();
 
     try {
       const { error } = await this.supabase
@@ -421,6 +448,7 @@ export class AdminUserSubscriptionsComponent implements OnInit {
       if (error) {
         console.error('Delete user subscription error:', error);
         alert(error.message || 'Failed to delete user subscription.');
+        this.cdr.detectChanges();
         return;
       }
 
@@ -429,11 +457,14 @@ export class AdminUserSubscriptionsComponent implements OnInit {
       );
 
       alert('User subscription deleted successfully.');
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Delete user subscription exception:', err);
       alert('Something went wrong while deleting user subscription.');
+      this.cdr.detectChanges();
     } finally {
       this.deletingId = null;
+      this.cdr.detectChanges();
     }
   }
 
