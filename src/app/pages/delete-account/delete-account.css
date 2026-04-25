@@ -1,0 +1,115 @@
+.delete-account-page {
+  min-height: 100vh;
+  padding: 120px 20px 60px;
+  background: linear-gradient(135deg, #eef4ff, #ffffff);
+  font-family: Arial, sans-serif;
+}
+
+.delete-card {
+  max-width: 900px;
+  margin: auto;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 22px;
+  box-shadow: 0 15px 45px rgba(15, 23, 42, 0.12);
+  border: 1px solid #e5e7eb;
+}
+
+.delete-card h1 {
+  font-size: 34px;
+  color: #0f172a;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.intro {
+  font-size: 17px;
+  line-height: 1.8;
+  color: #475569;
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.section {
+  margin-bottom: 28px;
+  padding: 22px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border-left: 5px solid #2563eb;
+}
+
+.section h2,
+.contact-box h2 {
+  font-size: 22px;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.section p,
+.section li,
+.contact-box p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #475569;
+}
+
+.section ul {
+  padding-left: 22px;
+  margin: 0;
+}
+
+.section li {
+  margin-bottom: 8px;
+}
+
+.warning {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.danger {
+  border-left-color: #dc2626;
+  background: #fef2f2;
+}
+
+.contact-box {
+  margin-top: 30px;
+  padding: 25px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0f172a, #1e3a8a);
+  color: #ffffff;
+}
+
+.contact-box h2,
+.contact-box p {
+  color: #ffffff;
+}
+
+@media (max-width: 600px) {
+  .delete-account-page {
+    padding: 90px 14px 40px;
+  }
+
+  .delete-card {
+    padding: 24px 18px;
+    border-radius: 18px;
+  }
+
+  .delete-card h1 {
+    font-size: 26px;
+  }
+
+  .section {
+    padding: 18px;
+  }
+
+  .section h2 {
+    font-size: 19px;
+  }
+
+  .section p,
+  .section li,
+  .contact-box p {
+    font-size: 15px;
+  }
+}

@@ -32,7 +32,7 @@ import { Chats } from './pages/chats/chats';
 import { Cart } from './pages/cart/cart';
 import { Favt } from './pages/favt/favt';
 import { Payment } from './pages/payment/payment';
-
+import { DeleteAccount } from './pages/delete-account/delete-account';
 function adminGuard() {
   return () => {
     const token = localStorage.getItem('adminToken');
@@ -90,6 +90,7 @@ export const routes: Routes = [
   { path: 'terms', component: Terms },
   { path: 'privacy-policy', component: PrivacyPolicy },
   { path: 'refund-policy', component: RefundPolicy },
+  { path: 'delete-account', component: DeleteAccount },
   { path: 'help', component: Help },
   { path: 'payment', component: Payment },
   { path: 'notification', component: Notification },
