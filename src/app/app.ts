@@ -67,7 +67,7 @@ export class App implements OnInit {
   currentUrl: string = '';
 
   constructor(
-    private router: Router,
+    public router: Router,
     private supabaseService: SupabaseService,
     private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
