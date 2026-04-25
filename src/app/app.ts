@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, RouterLink, Router, NavigationEnd, NavigationStart } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { SupabaseService } from './services/supabase.service';
 import { supabase } from '../supabaseClient';
@@ -65,7 +65,7 @@ export class App implements OnInit {
   radiusOptions: number[] = [2, 5, 10, 15, 25, 50];
 
   currentUrl: string = '';
-
+isRouteLoading = false;
   constructor(
     public router: Router,
     private supabaseService: SupabaseService,
@@ -84,13 +84,23 @@ export class App implements OnInit {
   async ngOnInit(): Promise<void> {
     this.currentUrl = this.router.url;
 
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
-        this.currentUrl = event.urlAfterRedirects || event.url || this.router.url;
-        this.cdr.detectChanges();
-      });
+this.router.events.subscribe((event: any) => {
 
+  if (event.constructor.name === 'NavigationStart') {
+    this.isRouteLoading = true;
+    this.cdr.detectChanges();
+  }
+
+  if (event instanceof NavigationEnd) {
+    this.currentUrl = event.urlAfterRedirects || event.url || this.router.url;
+
+    setTimeout(() => {
+      this.isRouteLoading = false;
+      this.cdr.detectChanges();
+    }, 300);
+  }
+
+});
     await this.loadSavedLocation();
     await this.loadNotificationCount();
     this.cdr.detectChanges();

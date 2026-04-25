@@ -6,10 +6,10 @@
 .desktop-menu {
   display: none;
 }
-.wide {
+/* .wide {
   width: 100%;
   background: #ffffff;
-}
+} */
 
 /* =========================
    NAVBAR
@@ -3365,4 +3365,23 @@ router-outlet {
 .links-container a:hover,
 .links-container .menu-item:hover {
   color: #3A77FF;
+}
+/* =========================
+   FINAL FOOTER JUMP / FLICKER FIX
+   ADD THIS AT VERY END
+========================= */
+.wide {
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+router-outlet {
+  flex: 1 0 auto !important;
+  display: block !important;
+}
+
+.footer {
+  margin-top: auto !important;
+  flex-shrink: 0 !important;
 }
