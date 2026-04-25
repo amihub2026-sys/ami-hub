@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
-
+import { SnackbarService } from '../../services/snackbar.service';
 @Component({
   selector: 'app-my-posts',
   standalone: true,
@@ -14,10 +14,11 @@ export class MyPosts implements OnInit {
   posts = signal<any[]>([]);
   isLoading = signal(true);
 
-  constructor(
-    private router: Router,
-    private supabaseService: SupabaseService
-  ) {}
+ constructor(
+  private router: Router,
+  private supabaseService: SupabaseService,
+  private snackbar: SnackbarService   // 🔥 ADD THIS
+) {}
 
   async ngOnInit(): Promise<void> {
     await this.loadCurrentUserPosts();
@@ -27,6 +28,7 @@ export class MyPosts implements OnInit {
     return typeof window !== 'undefined';
   }
 
+<<<<<<< HEAD
   private showAlert(message: string): void {
     if (this.isBrowser()) {
       alert(message);
@@ -34,6 +36,11 @@ export class MyPosts implements OnInit {
       
     }
   }
+=======
+private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
+  this.snackbar.show(message, type);
+}
+>>>>>>> snackbar
 
   private showConfirm(message: string): boolean {
     if (this.isBrowser()) {
@@ -65,7 +72,7 @@ export class MyPosts implements OnInit {
 
       if (!session.isAuthenticated) {
         this.posts.set([]);
-        this.showAlert('Please login first');
+        this.showAlert('Please login first', 'error');
         this.router.navigate(['/login'], {
           state: { redirectTo: 'my-posts' }
         });
@@ -240,7 +247,11 @@ export class MyPosts implements OnInit {
         );
       }
 
+<<<<<<< HEAD
       
+=======
+    
+>>>>>>> snackbar
 
       const success = await this.router.navigate(['/featured-plan'], {
         state: {
@@ -307,7 +318,7 @@ export class MyPosts implements OnInit {
         this.posts().filter(item => item.postid !== post.postid)
       );
 
-      this.showAlert('Post removed successfully');
+      this.showAlert('Post removed successfully', 'success');
     } catch (error) {
       console.error('Error removing post:', error);
       this.showAlert('Failed to remove post');

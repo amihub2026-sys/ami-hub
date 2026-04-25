@@ -61,9 +61,7 @@ export class FeaturedPlan {
       };
     }
 
-    console.log('FEATURED PLAN POST ID:', this.postId);
-    console.log('FEATURED PLAN AD TYPE:', this.adType);
-    console.log('FEATURED PLAN POST DETAILS:', this.postDetails);
+  
   }
 
   private getStoredPendingPost(): any {
@@ -106,7 +104,7 @@ export class FeaturedPlan {
       localStorage.setItem('pending_post_userid', String(payload.userid));
     }
 
-    console.log('STORED PENDING POST PAYLOAD:', payload);
+    
   }
 
   choosePlan(planType: 'basic' | 'standard' | 'premium') {
@@ -189,7 +187,7 @@ export class FeaturedPlan {
           JSON.stringify(selectedPlan)
         );
 
-        console.log('SELECTED PLAN PAYLOAD:', selectedPlan);
+       
       }
 
       this.router.navigate(['/payment'], {

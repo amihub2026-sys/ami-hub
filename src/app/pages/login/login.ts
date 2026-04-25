@@ -1,8 +1,9 @@
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { SupabaseService } from '../../services/supabase.service';
+import { SnackbarService } from '../../services/snackbar.service';
 
 @Component({
   selector: 'app-login',
@@ -36,13 +37,14 @@ export class Login implements OnInit {
   showRightAd = true;
   showLeftAd = true;
 
-  constructor(
-    private router: Router,
-    private supabaseService: SupabaseService,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) {
-    this.isBrowser = isPlatformBrowser(this.platformId);
-  }
+constructor(
+  private router: Router,
+  private supabaseService: SupabaseService,
+  private snackbar: SnackbarService,
+  @Inject(PLATFORM_ID) private platformId: Object
+) {
+  this.isBrowser = isPlatformBrowser(this.platformId);
+}
 
   closeAd(type: 'left' | 'right') {
     if (type === 'left') {
@@ -52,13 +54,9 @@ export class Login implements OnInit {
     }
   }
 
-  private showAlert(message: string) {
-    if (this.isBrowser) {
-      alert(message);
-    } else {
-      console.log(message);
-    }
-  }
+private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') {
+  this.snackbar.show(message, type);
+}
 
   async ngOnInit() {
     const nav = this.router.getCurrentNavigation();
@@ -77,6 +75,7 @@ export class Login implements OnInit {
 
     const { data: sessionData } = await this.supabaseService.supabase.auth.getSession();
 
+
     if (!sessionData.session) {
       localStorage.removeItem('googleLoginPending');
       localStorage.removeItem('redirectToAfterLogin');
@@ -92,8 +91,13 @@ export class Login implements OnInit {
       return;
     }
 
-    this.storeUserSession(data);
-    await this.redirectAfterLogin(data);
+  this.storeUserSession(data);
+
+this.showAlert('Login Successful', 'success');
+
+setTimeout(async () => {
+  await this.redirectAfterLogin(data);
+}, 1200);
   }
 
   selectUserLogin(method: 'emailOtp' | 'username' | 'admin') {
@@ -192,68 +196,39 @@ export class Login implements OnInit {
     return { data, error };
   }
 
-  async loginWithEmailPassword() {
-    const identifier = this.email.trim();
-    const enteredPassword = this.password.trim();
+async loginWithEmailPassword() {
+  const identifier = this.email.trim();
+  const enteredPassword = this.password.trim();
 
-    if (!identifier || !enteredPassword) {
-      this.showAlert('Enter email/username and password');
-      return;
-    }
-
-    const { data, error } = await this.getUserForPasswordLogin(identifier);
-
-    if (error || !data) {
-      this.showAlert('User not found');
-      return;
-    }
-
-    if (!data.isactive) {
-      this.showAlert('User account is inactive');
-      return;
-    }
-
-    if (!data.password || data.password !== enteredPassword) {
-      this.showAlert('Invalid password');
-      return;
-    }
-
-    const resolvedEmail = (data.email || '').trim();
-
-    if (!resolvedEmail) {
-      this.showAlert('Email not found for this user');
-      return;
-    }
-
-    const { error: authError } =
-      await this.supabaseService.supabase.auth.signInWithPassword({
-        email: resolvedEmail,
-        password: enteredPassword
-      });
-
-    if (authError) {
-      console.warn('Supabase auth login failed, continuing with local session:', authError);
-    }
-
-    const { data: sessionData } =
-      await this.supabaseService.supabase.auth.getSession();
-
-    console.log('SESSION AFTER LOGIN:', sessionData.session);
-
-    this.storeUserSession({
-      ...data,
-      supabase_uid:
-        sessionData.session?.user?.id ||
-        data?.supabase_uid ||
-        data?.auth_user_id ||
-        data?.user_id ||
-        ''
-    });
-
-    this.showAlert('Login Successful');
-    await this.redirectAfterLogin(data);
+  if (!identifier || !enteredPassword) {
+    this.showAlert('Enter email/username and password');
+    return;
   }
 
+  const { data, error } = await this.getUserForPasswordLogin(identifier);
+
+  if (error || !data) {
+    this.showAlert('User not found');
+    return;
+  }
+
+  if (!data.isactive) {
+    this.showAlert('User account is inactive');
+    return;
+  }
+
+  if ((data.password || '').trim() !== enteredPassword) {
+    this.showAlert('Invalid password');
+    return;
+  }
+
+  this.storeUserSession(data);
+this.showAlert('Login Successful', 'success');
+
+setTimeout(async () => {
+  await this.redirectAfterLogin(data);
+}, 1200);
+}
   async loginAdmin() {
     if (!this.adminUsername || !this.adminPassword) {
       this.showAlert('Enter admin username and password');
@@ -262,7 +237,7 @@ export class Login implements OnInit {
 
     const { data, error } = await this.supabaseService.getAdminByUsername(this.adminUsername.trim());
 
-    console.log('Admin lookup result:', data, error);
+    
 
     if (error || !data) {
       this.showAlert('Admin not found');
@@ -286,8 +261,11 @@ export class Login implements OnInit {
       localStorage.setItem('adminUsername', data.adminname || this.adminUsername);
     }
 
-    this.showAlert('Admin Login Successful');
-    await this.router.navigate(['/admin-page']);
+    this.showAlert('Admin Login Successful', 'success');
+
+setTimeout(async () => {
+  await this.router.navigate(['/admin-page']);
+}, 1200);
   }
 
   async sendOtp() {
@@ -308,7 +286,7 @@ export class Login implements OnInit {
 
     await this.supabaseService.updateUserOtpByEmail(this.email.trim(), generatedOtp, expiry);
 
-    console.log('Generated OTP (for testing):', generatedOtp);
+   
     this.showAlert('OTP sent! Check console for testing');
 
     this.otpSent = true;
@@ -343,21 +321,39 @@ export class Login implements OnInit {
     this.showPasswordSet = true;
   }
 
-  async setPassword() {
-    if (!this.newPassword) {
-      this.showAlert('Enter new password');
-      return;
-    }
-
-    await this.supabaseService.updateUserPasswordByEmail(this.email.trim(), this.newPassword);
-
-    this.showAlert('Password set! You can now login using email/password.');
-    this.password = this.newPassword;
-    this.showPasswordSet = false;
-    this.userLoginMethod = 'username';
-    this.showNewPassword = false;
-    this.showPassword = false;
+async setPassword() {
+  if (!this.newPassword) {
+    this.showAlert('Enter new password');
+    return;
   }
+
+  const email = this.email.trim();
+  const password = this.newPassword.trim();
+
+  const { error: signUpError } =
+    await this.supabaseService.supabase.auth.signUp({
+      email,
+      password
+    });
+
+  if (
+    signUpError &&
+    !signUpError.message.toLowerCase().includes('already registered')
+  ) {
+    this.showAlert(signUpError.message);
+    return;
+  }
+
+  await this.supabaseService.updateUserPasswordByEmail(email, password);
+
+  this.showAlert('Password set! You can now login using email/password.');
+
+  this.password = this.newPassword;
+  this.showPasswordSet = false;
+  this.userLoginMethod = 'username';
+  this.showNewPassword = false;
+  this.showPassword = false;
+}
 
   startTimer() {
     this.countdown = 30;

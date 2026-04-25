@@ -4,7 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { supabase } from '../../../supabaseClient';
 import { SupabaseService } from '../../services/supabase.service';
 import { PostDraftService } from '../../services/post-draft.service';
-
+import { SnackbarService } from '../../services/snackbar.service';
 declare global {
   interface Window {
     Razorpay: any;
@@ -23,7 +23,7 @@ export class Payment implements OnInit {
   private platformId = inject(PLATFORM_ID);
   private supabaseService = inject(SupabaseService);
   private postDraftService = inject(PostDraftService);
-
+private snackbar = inject(SnackbarService);
   private isBrowser = isPlatformBrowser(this.platformId);
 
   isPaying = signal(false);
@@ -92,9 +92,7 @@ export class Payment implements OnInit {
         }
       }
 
-      console.log('PAYMENT PAGE PLAN DATA:', this.planData);
-      console.log('PAYMENT PAGE POST DATA:', this.postData);
-
+ 
       if (!this.postData) {
         this.errorMessage.set('Post details not found. Please fill the form again.');
       }
@@ -316,7 +314,7 @@ export class Payment implements OnInit {
 
       if (typeof response.text === 'function') {
         const rawText = await response.text();
-        console.log('VERIFY PAYMENT RAW ERROR RESPONSE:', rawText);
+    
 
         if (!rawText) {
           return error?.message || 'Payment verification failed';
@@ -669,7 +667,7 @@ export class Payment implements OnInit {
       delete finalPayload.postid;
       delete finalPayload.id;
 
-      console.log('FINAL NEW POST PAYLOAD AFTER PAYMENT:', finalPayload);
+      
 
       const { error } = await supabase
         .from('post')
@@ -722,15 +720,17 @@ export class Payment implements OnInit {
       localStorage.removeItem(this.featureEditContextStorageKey);
 
       this.postDraftService.clearDraft();
-      this.paymentSuccess.set(true);
-      this.paymentFailed.set(false);
-      this.errorMessage.set('');
+  this.paymentSuccess.set(true);
+this.paymentFailed.set(false);
+this.errorMessage.set('');
+
+this.snackbar.show('Payment successful & post saved!', 'success');
     } catch (error: any) {
       console.error('Final savePostAfterPayment error:', error);
       this.paymentFailed.set(true);
-      this.errorMessage.set(
-        error?.message || 'Payment succeeded but post saving failed.'
-      );
+     const msg = error?.message || 'Payment succeeded but post saving failed.';
+this.errorMessage.set(msg);
+this.snackbar.show(msg, 'error');
       throw error;
     }
   }
@@ -760,7 +760,7 @@ export class Payment implements OnInit {
       ad_type: this.adType
     };
 
-    console.log('VERIFY PAYMENT PAYLOAD:', verifyPayload);
+   
 
     const invokeOptions: any = {
       headers: {
@@ -775,8 +775,7 @@ export class Payment implements OnInit {
 
     const { data, error } = await supabase.functions.invoke('verify-payment', invokeOptions);
 
-    console.log('VERIFY PAYMENT RESPONSE DATA:', data);
-    console.log('VERIFY PAYMENT RESPONSE ERROR:', error);
+    
 
     if (error) {
       const detailedMessage = await this.readEdgeFunctionError(error);
@@ -807,17 +806,24 @@ export class Payment implements OnInit {
     if (!this.isBrowser) return;
 
     if (!this.postData) {
-      this.errorMessage.set('Post data missing. Please go back and submit again.');
+    const msg = 'Post data missing. Please go back and submit again.';
+this.errorMessage.set(msg);
+this.snackbar.show(msg, 'error');
+
       return;
     }
 
     if (!this.amount || this.amount <= 0) {
-      this.errorMessage.set('Invalid payment amount.');
+     const msg = 'Invalid payment amount.';
+this.errorMessage.set(msg);
+this.snackbar.show(msg, 'error');
       return;
     }
 
     if (!window.Razorpay) {
-      this.errorMessage.set('Razorpay SDK not loaded. Please refresh and try again.');
+     const msg = 'Razorpay SDK not loaded. Please refresh and try again.';
+this.errorMessage.set(msg);
+this.snackbar.show(msg, 'error');
       return;
     }
 
@@ -831,10 +837,7 @@ export class Payment implements OnInit {
       const selectedPlanId = this.getSelectedPlanId();
       const selectedPlanName = this.getSelectedPlanName();
 
-      console.log('PAY NOW ACCESS TOKEN:', accessToken);
-      console.log('PAY NOW PLAN ID:', selectedPlanId);
-      console.log('PAY NOW PLAN NAME:', selectedPlanName);
-      console.log('PAY NOW AMOUNT:', this.amount);
+  
 
       if (!effectiveSession.isAuthenticated) {
         throw new Error('Login session expired. Please login again.');
@@ -859,8 +862,7 @@ export class Payment implements OnInit {
 
       const { data, error } = await supabase.functions.invoke('create-order', invokeOptions);
 
-      console.log('CREATE ORDER RESPONSE DATA:', data);
-      console.log('CREATE ORDER RESPONSE ERROR:', error);
+  
 
       if (error) {
         throw new Error(error.message || 'Unable to create order');
@@ -921,9 +923,9 @@ export class Payment implements OnInit {
           } catch (error: any) {
             console.error('Verification/Post save failed:', error);
             this.paymentFailed.set(true);
-            this.errorMessage.set(
-              error?.message || 'Payment succeeded but post saving failed.'
-            );
+            const msg = error?.message || 'Payment succeeded but post saving failed.';
+this.errorMessage.set(msg);
+this.snackbar.show(msg, 'error');
           } finally {
             this.isPaying.set(false);
           }
@@ -935,9 +937,9 @@ export class Payment implements OnInit {
       razorpayInstance.on('payment.failed', (failureResponse: any) => {
         console.error('Razorpay payment failed:', failureResponse);
         this.paymentFailed.set(true);
-        this.errorMessage.set(
-          failureResponse?.error?.description || 'Payment failed. Please try again.'
-        );
+      const msg = failureResponse?.error?.description || 'Payment failed. Please try again.';
+this.errorMessage.set(msg);
+this.snackbar.show(msg, 'error');
         this.isPaying.set(false);
       });
 
@@ -945,7 +947,9 @@ export class Payment implements OnInit {
     } catch (error: any) {
       console.error('Pay now error:', error);
       this.paymentFailed.set(true);
-      this.errorMessage.set(error?.message || 'Unable to start payment.');
+    const msg = error?.message || 'Unable to start payment.';
+this.errorMessage.set(msg);
+this.snackbar.show(msg, 'error');
       this.isPaying.set(false);
     }
   }

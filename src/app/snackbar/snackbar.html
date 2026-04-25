@@ -3,6 +3,16 @@
   [class.show]="visible"
   [class.success]="type === 'success'"
   [class.error]="type === 'error'"
+  [class.info]="type === 'info'"
 >
-  {{ message }}
+  <span class="snackbar-message">{{ message }}</span>
+
+  <button
+    type="button"
+    class="snackbar-close"
+    aria-label="Close notification"
+    (click)="hide()"
+  >
+    ×
+  </button>
 </div>

@@ -7,19 +7,20 @@ import { SupabaseService } from './services/supabase.service';
 import { supabase } from '../supabaseClient';
 import { LocationPickerComponent } from './pages/location-picker/location-picker';
 import { AppLocationResult } from './services/location-search';
-
+import { SnackbarService } from './services/snackbar.service';
+import { SnackbarComponent } from './snackbar/snackbar';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterOutlet,
-    RouterLink,
-    LocationPickerComponent,
-    
-  ],
+imports: [
+  CommonModule,
+  FormsModule,
+  RouterOutlet,
+  RouterLink,
+  LocationPickerComponent,
+  SnackbarComponent   // ✅ ADD THIS
+],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
@@ -66,12 +67,13 @@ export class App implements OnInit {
 
   currentUrl: string = '';
 isRouteLoading = false;
-  constructor(
-    public router: Router,
-    private supabaseService: SupabaseService,
-    private cdr: ChangeDetectorRef,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+ constructor(
+  public router: Router,
+  private supabaseService: SupabaseService,
+  private cdr: ChangeDetectorRef,
+  private snackbar: SnackbarService,   // ✅ ADD THIS
+  @Inject(PLATFORM_ID) private platformId: Object
+) {}
 
   openService(service: string) {
     this.activeService = service;
@@ -528,7 +530,7 @@ if (event instanceof NavigationEnd) {
     const localLoggedIn = this.hasLocalUserLogin();
 
     if (!user && !localLoggedIn) {
-      alert('Please login first');
+     this.snackbar.show('Please login first', 'error');
       this.router.navigate(['/login']);
       return;
     }
