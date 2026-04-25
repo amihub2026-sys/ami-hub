@@ -28,19 +28,9 @@ export class MyPosts implements OnInit {
     return typeof window !== 'undefined';
   }
 
-<<<<<<< HEAD
-  private showAlert(message: string): void {
-    if (this.isBrowser()) {
-      alert(message);
-    } else {
-      
-    }
-  }
-=======
 private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
   this.snackbar.show(message, type);
 }
->>>>>>> snackbar
 
   private showConfirm(message: string): boolean {
     if (this.isBrowser()) {
@@ -247,11 +237,7 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'):
         );
       }
 
-<<<<<<< HEAD
-      
-=======
     
->>>>>>> snackbar
 
       const success = await this.router.navigate(['/featured-plan'], {
         state: {
@@ -318,7 +304,7 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'):
         this.posts().filter(item => item.postid !== post.postid)
       );
 
-      this.showAlert('Post removed successfully', 'success');
+      this.snackbar.show('Post removed successfully', 'success');
     } catch (error) {
       console.error('Error removing post:', error);
       this.showAlert('Failed to remove post');
