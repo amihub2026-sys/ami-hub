@@ -91,14 +91,20 @@ this.router.events.subscribe((event: any) => {
     this.cdr.detectChanges();
   }
 
-  if (event instanceof NavigationEnd) {
-    this.currentUrl = event.urlAfterRedirects || event.url || this.router.url;
+if (event instanceof NavigationEnd) {
+  this.currentUrl = event.urlAfterRedirects || event.url || this.router.url;
 
-    setTimeout(() => {
-      this.isRouteLoading = false;
-      this.cdr.detectChanges();
-    }, 300);
-  }
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, 0);
+
+  setTimeout(() => {
+    this.isRouteLoading = false;
+    this.cdr.detectChanges();
+  }, 300);
+}
 
 });
     await this.loadSavedLocation();

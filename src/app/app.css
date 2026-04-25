@@ -352,7 +352,7 @@
   position: relative;
   background: linear-gradient(135deg, #0b2f52 0%, #11497c 55%, #1560a8 100%);
   color: #ffffff;
-  margin-top: 60px;
+  
   padding-top: 56px;
   overflow: hidden;
 }
@@ -2194,14 +2194,14 @@ i.fa-user {
   }
 
   /* Prevent content from hiding behind bottom floating ad */
-  router-outlet,
-  .page,
-  .home-page,
-  .main-content,
-  .content-wrapper {
-    display: block;
-    padding-bottom: 130px !important;
-  }
+router-outlet,
+.page,
+.home-page,
+.main-content,
+.content-wrapper {
+  display: block;
+  padding-bottom: 0 !important;
+}
 
   /* Footer spacing */
   .footer-container {
@@ -3469,4 +3469,62 @@ router-outlet {
     height: 64px !important;
     min-height: 64px !important;
   }
+}
+/* FOOTER BOTTOM FIX */
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+.wide {
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.main-content {
+  flex: 1 0 auto !important;
+  min-height: calc(100vh - 72px) !important;
+}
+
+.footer {
+  margin-top: auto !important;
+  flex-shrink: 0 !important;
+}
+/* ✅ FINAL ROUTER PAGE + FOOTER FIX - ADD AT VERY END */
+
+.wide {
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.main-content {
+  flex: 1 0 auto !important;
+  width: 100% !important;
+  min-height: calc(100vh - 84px) !important;
+  padding-bottom: 0 !important;
+}
+
+.footer {
+  margin-top: auto !important;
+  flex-shrink: 0 !important;
+}
+
+/* Remove old padding effect from earlier CSS */
+/* FINAL FIX */
+.wide {
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.main-content {
+  flex: 1 !important;
+  min-height: 0 !important;
+}
+
+.footer {
+  margin-top: auto !important;
 }
