@@ -3366,3 +3366,107 @@ router-outlet {
 .links-container .menu-item:hover {
   color: #3A77FF;
 }
+/* =========================
+   FINAL NAVBAR STABLE FIX
+   ADD AT VERY END ONLY
+========================= */
+
+.topbar {
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 99999 !important;
+  background: #ffffff !important;
+}
+
+.topbar .nav-container {
+  height: 84px !important;
+  min-height: 84px !important;
+  max-height: 84px !important;
+  overflow: visible !important;
+}
+
+.topbar .logo img {
+  height: 68px !important;
+  width: auto !important;
+  max-width: 210px !important;
+  object-fit: contain !important;
+}
+
+/* stop page content hiding/jumping under navbar */
+.wide {
+  min-height: 100vh !important;
+  background: #ffffff !important;
+  overflow-x: hidden !important;
+}
+
+/* mobile */
+@media (max-width: 768px) {
+  .topbar .nav-container {
+    height: 68px !important;
+    min-height: 68px !important;
+    max-height: 68px !important;
+  }
+
+  .topbar .logo img {
+    height: 40px !important;
+    max-width: 108px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar .nav-container {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+  }
+
+  .topbar .logo img {
+    height: 36px !important;
+    max-width: 100px !important;
+  }
+}
+/* NAVBAR ALWAYS VISIBLE WHILE SCROLLING */
+.topbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 99999 !important;
+  background: #ffffff !important;
+}
+
+/* Give page space because fixed navbar floats */
+.wide {
+  padding-top: 84px !important;
+}
+
+/* Desktop nav height */
+.topbar .nav-container {
+  height: 84px !important;
+  min-height: 84px !important;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .wide {
+    padding-top: 68px !important;
+  }
+
+  .topbar .nav-container {
+    height: 68px !important;
+    min-height: 68px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .wide {
+    padding-top: 64px !important;
+  }
+
+  .topbar .nav-container {
+    height: 64px !important;
+    min-height: 64px !important;
+  }
+}
