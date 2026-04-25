@@ -52,14 +52,14 @@
           <i class="fas fa-comments"></i>
         </a>
 
-        <a (click)="goToNotifications()" class="nav-icon-btn bell-animate" aria-label="Notification">
+        <a (click)="goToNotifications(); closeMenu()" class="nav-icon-btn bell-animate" aria-label="Notification">
           <i class="fas fa-bell"></i>
           <span *ngIf="notificationCount > 0" class="badge">
             {{ notificationCount }}
           </span>
         </a>
 
-        <a (click)="goToProfile()" class="profile" aria-label="Profile">
+        <a (click)="goToProfile(); closeMenu()" class="profile" aria-label="Profile">
           <i class="fas fa-user-circle"></i>
         </a>
       </div>
@@ -146,7 +146,7 @@
           💬 Chats
         </a>
 
-        <div class="menu-item notification-item" (click)="goToNotifications()">
+        <div class="menu-item notification-item" (click)="goToNotifications(); closeMenu()">
           <i class="fas fa-bell"></i>
           <span>Notifications</span>
           <span *ngIf="notificationCount > 0" class="notification-badge">
@@ -161,9 +161,10 @@
 
         <!-- <a [routerLink]="['/news']" (click)="closeMenu()">📰 News</a> -->
 
-        <a (click)="goToProfile(); closeMenu()">
-          Profile
-        </a>
+      <div class="menu-item" (click)="goToProfile(); closeMenu()">
+  <i class="fas fa-user-circle"></i>
+  <span>Profile</span>
+</div>
       </div>
 
       <div class="menu-footer">
