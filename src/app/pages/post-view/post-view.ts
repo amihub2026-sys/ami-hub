@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SupabaseService } from '../../services/supabase.service';
 import { supabase } from '../../../supabaseClient';
-
+import { SnackbarService } from '../../services/snackbar.service';
 @Component({
   selector: 'app-post-view',
   standalone: true,
@@ -14,6 +14,10 @@ import { supabase } from '../../../supabaseClient';
   styleUrls: ['./post-view.css']
 })
 export class PostViewComponent implements OnInit {
+  
+private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') {
+  this.snackbar.show(message, type);
+}
   toggleReviewForm() {
     const next = !this.showReviewForm();
     this.showReviewForm.set(next);
@@ -33,7 +37,7 @@ export class PostViewComponent implements OnInit {
 
   submitReport() {
     if (!this.reportText.trim()) {
-      alert('Please enter report message');
+      this.showAlert('Please enter report message', 'error');
       return;
     }
 
@@ -46,7 +50,7 @@ export class PostViewComponent implements OnInit {
 
 
 
-    alert('Report submitted successfully!');
+    this.showAlert('Report submitted successfully!', 'success');
 
     this.reportText = '';
     this.showReportForm.set(false);
@@ -76,12 +80,13 @@ export class PostViewComponent implements OnInit {
   showReportForm = signal(false);
   reportText = '';
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private supabaseService: SupabaseService,
-    private sanitizer: DomSanitizer
-  ) {}
+ constructor(
+  private route: ActivatedRoute,
+  private router: Router,
+  private supabaseService: SupabaseService,
+  private sanitizer: DomSanitizer,
+  private snackbar: SnackbarService
+) {}
 
   async ngOnInit(): Promise<void> {
     this.postId = this.route.snapshot.paramMap.get('id') || '';
@@ -426,7 +431,7 @@ export class PostViewComponent implements OnInit {
     }
 
     navigator.clipboard.writeText(shareUrl);
-    alert('Product link copied successfully!');
+    this.showAlert('Link copied successfully!', 'success');
   }
 
   async addToCart(): Promise<void> {
@@ -434,7 +439,7 @@ export class PostViewComponent implements OnInit {
       const post = this.postData();
 
       if (!post) {
-        alert('Product data not available');
+      this.showAlert('Product data not available', 'error');
         return;
       }
 
@@ -484,7 +489,7 @@ export class PostViewComponent implements OnInit {
         if (insertError) throw insertError;
       }
 
-      alert('Added to cart successfully!');
+      this.showAlert('Added to cart successfully!', 'success');
       this.router.navigate(['/cart']);
     } catch (error) {
       console.error('Add to cart error:', error);
@@ -496,15 +501,15 @@ async addToFavorites(): Promise<void> {
   try {
     const post = this.postData();
 
-    if (!post) {
-      alert('Product data not available');
-      return;
-    }
+   if (!post) {
+  this.showAlert('Product data not available', 'error');
+  return;
+}
 
     const userId = await this.supabaseService.resolveEffectiveUserUuid();
 
     if (!userId) {
-      alert('Please login first');
+      this.showAlert('Please login first', 'error');
       this.router.navigate(['/login']);
       return;
     }
@@ -527,7 +532,7 @@ async addToFavorites(): Promise<void> {
     }
 
     if (existing) {
-      alert('Already added to favorites!');
+      this.showAlert('Already added to favorites!', 'info');
       this.router.navigate(['/favt']);
       return;
     }
@@ -550,12 +555,16 @@ async addToFavorites(): Promise<void> {
 
     if (insertError) {
       console.error('Favorite insert error:', insertError);
-      alert(insertError.message || 'Failed to add favorite item');
+      this.showAlert('Failed to add favorite item', 'error');
       return;
     }
 
-    alert('Added to favorites successfully!');
-    this.router.navigate(['/favt']);
+this.snackbar.show('Added to favorites successfully!', 'success');
+
+setTimeout(() => {
+  this.router.navigate(['/favt']);
+}, 1200);
+
   } catch (error: any) {
     console.error('Add to favorites error:', error);
     alert(error?.message || 'Failed to add favorite item');
@@ -632,7 +641,7 @@ async addToFavorites(): Promise<void> {
       const userId = await this.supabaseService.resolveEffectiveUserUuid();
 
       if (!userId) {
-        alert('Please login first');
+       this.showAlert('Please login first', 'error');
         this.router.navigate(['/login']);
         return;
       }

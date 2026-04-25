@@ -1,9 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { supabase } from '../../../supabaseClient';
 import { SupabaseService } from '../../services/supabase.service';
-
+import { SnackbarService } from '../../services/snackbar.service';
 interface FavoriteItem {
   favorite_id: number;
   product_id: string | null;
@@ -21,32 +21,31 @@ interface FavoriteItem {
   styleUrls: ['./favt.css']
 })
 export class Favt implements OnInit {
+
   favoriteItems: FavoriteItem[] = [];
   loading = false;
   errorMessage = '';
 
-  constructor(
-    private router: Router,
-    private cdr: ChangeDetectorRef,
-    private supabaseService: SupabaseService
-  ) {}
+constructor(
+  private router: Router,
+  private cdr: ChangeDetectorRef,
+  private supabaseService: SupabaseService,
+  private snackbar: SnackbarService
+) {}
 
-  async ngOnInit(): Promise<void> {
-    await this.loadFavoriteItems();
-  }
+ async ngOnInit(): Promise<void> {
+  await this.loadFavoriteItems();
+
+
+}
 
   private isBrowser(): boolean {
     return typeof window !== 'undefined';
   }
 
-  private showAlert(message: string): void {
-    if (this.isBrowser()) {
-      alert(message);
-    } else {
-      
-    }
-  }
-
+private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
+  this.snackbar.show(message, type);
+}
   private mapFavorite(item: any): FavoriteItem {
     return {
       favorite_id: Number(item.favorite_id),
@@ -94,16 +93,17 @@ export class Favt implements OnInit {
     this.errorMessage = '';
     this.favoriteItems = [];
     this.cdr.detectChanges();
+   
 
     try {
       const session = await this.supabaseService.getEffectiveAuthUser();
 
-      if (!session.isAuthenticated) {
-        this.favoriteItems = [];
-        this.errorMessage = 'Please login to view your favorites.';
-        return;
-      }
-
+  if (!session.isAuthenticated) {
+  this.favoriteItems = [];
+  this.errorMessage = 'Please login to view your favorites.';
+  this.showAlert('Please login to view your favorites', 'error');
+  return;
+}
       const authUserId = session.authUser?.id || '';
       let resolvedUuid = await this.supabaseService.getEffectiveFavoriteUserUuid();
 
@@ -111,12 +111,12 @@ export class Favt implements OnInit {
         resolvedUuid = authUserId;
       }
 
-      if (!resolvedUuid) {
-        this.favoriteItems = [];
-        this.errorMessage = 'User not found.';
-        return;
-      }
-
+   if (!resolvedUuid) {
+  this.favoriteItems = [];
+  this.errorMessage = 'User not found.';
+  this.showAlert('User not found', 'error');
+  return;
+}
       const results: any[][] = [];
 
       if (authUserId) {
@@ -132,8 +132,10 @@ export class Favt implements OnInit {
       this.favoriteItems = this.mergeFavorites(...results);
     } catch (error: any) {
       console.error('Error loading favorites:', error);
-      this.errorMessage = error?.message || 'Failed to load favorites.';
-      this.favoriteItems = [];
+      const msg = error?.message || 'Failed to load favorites.';
+this.errorMessage = msg;
+this.favoriteItems = [];
+this.showAlert(msg, 'error');
     } finally {
       this.loading = false;
       this.cdr.detectChanges();
@@ -160,13 +162,16 @@ export class Favt implements OnInit {
         throw error;
       }
 
-      this.favoriteItems = this.favoriteItems.filter(
-        favorite => favorite.favorite_id !== item.favorite_id
-      );
-      this.cdr.detectChanges();
+    this.favoriteItems = this.favoriteItems.filter(
+  favorite => favorite.favorite_id !== item.favorite_id
+);
+
+this.cdr.detectChanges();
+
+this.showAlert('Favorite removed successfully', 'success');
     } catch (error) {
       console.error('Error removing favorite item:', error);
-      this.showAlert('Failed to remove favorite item');
+      this.showAlert('Failed to remove favorite item', 'error');
     }
   }
 }

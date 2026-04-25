@@ -11,7 +11,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
-
+import { SnackbarService } from '../../services/snackbar.service';
 @Component({
   selector: 'app-seller-profile',
   standalone: true,
@@ -51,12 +51,13 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
   private authSubscription: { unsubscribe: () => void } | null = null;
   private destroyed = false;
 
-  constructor(
-    private router: Router,
-    private supabaseService: SupabaseService,
-    private zone: NgZone,
-    private cdr: ChangeDetectorRef
-  ) {}
+constructor(
+  private router: Router,
+  private supabaseService: SupabaseService,
+  private zone: NgZone,
+  private cdr: ChangeDetectorRef,
+  private snackbar: SnackbarService   // ✅ ADD THIS
+) {}
 
   get submitButtonText(): string {
     return this.isEditMode ? 'Edit Profile' : 'Create Profile';
@@ -295,7 +296,7 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
 
   async submitProfile() {
     if (!this.seller.termsAccepted) {
-      this.showMessage('Accept Terms');
+     this.showMessage('Accept Terms', 'info');
       return;
     }
     // ✅ ADD THIS ONLY
@@ -313,7 +314,7 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
       const session = await this.supabaseService.getEffectiveAuthUser();
 
       if (!session.isAuthenticated) {
-        this.showMessage('Please login first');
+       this.showMessage('Please login first', 'error');
         this.router.navigate(['/login']);
         return;
       }
@@ -362,7 +363,7 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
         this.cdr.detectChanges();
       });
 
-      this.showMessage('Profile saved successfully');
+      this.showMessage('Profile saved successfully', 'success');
 
       if (this.redirectTo === 'post-service') {
         await this.router.navigate(['/service']);
@@ -381,7 +382,7 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
         this.cdr.detectChanges();
       });
 
-      this.showMessage('Failed to save profile');
+      this.showMessage('Failed to save profile', 'error');
     }
   }
 
@@ -407,11 +408,7 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
     await new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private showMessage(message: string) {
-    if (this.isBrowser()) {
-      alert(message);
-    } else {
-      console.log(message);
-    }
-  }
+ private showMessage(message: string, type: 'success' | 'error' | 'info' = 'info') {
+  this.snackbar.show(message, type);
+}
 }

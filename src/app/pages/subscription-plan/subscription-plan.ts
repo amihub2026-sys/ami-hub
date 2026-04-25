@@ -9,7 +9,7 @@ import {
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { supabase } from '../../../supabaseClient';
-
+import { SnackbarService } from '../../services/snackbar.service';
 interface SubscriptionPlanItem {
   subscriptionplanid: number;
   planname: string;
@@ -41,12 +41,13 @@ export class SubscriptionPlan implements OnInit {
 
   plans: SubscriptionPlanItem[] = [];
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private cd: ChangeDetectorRef,
-    private ngZone: NgZone
-  ) {}
+constructor(
+  private router: Router,
+  private route: ActivatedRoute,
+  private cd: ChangeDetectorRef,
+  private ngZone: NgZone,
+  private snackbar: SnackbarService   // 🔥 ADD THIS
+) {}
 
   async ngOnInit(): Promise<void> {
     const flow = this.route.snapshot.queryParamMap.get('flow');
@@ -213,15 +214,15 @@ export class SubscriptionPlan implements OnInit {
     if (this.isSaving) return;
 
     if (!this.isBrowser) {
-      alert('Please try again in browser.');
+     this.snackbar.show('Please try again in browser.', 'error');
       return;
     }
 
     const pendingPostPayload = localStorage.getItem('pending_post_payload');
-    console.log('pending_post_payload on plan click:', pendingPostPayload);
+    
 
     if (!pendingPostPayload) {
-      alert('Session expired. Please fill the form again.');
+    this.snackbar.show('Session expired. Please fill the form again.', 'error');
       this.router.navigate(['/service']);
       return;
     }
@@ -254,7 +255,7 @@ export class SubscriptionPlan implements OnInit {
         flow_type: this.flowType
       };
 
-      console.log('SELECTED PLAN PAYLOAD:', planPayload);
+      
 
       localStorage.setItem(
         'selected_plan_payload',
@@ -277,7 +278,7 @@ export class SubscriptionPlan implements OnInit {
         this.cd.detectChanges();
       });
 
-      alert('Something went wrong. Please try again.');
+     this.snackbar.show('Something went wrong. Please try again.', 'error');
     }
   }
 }

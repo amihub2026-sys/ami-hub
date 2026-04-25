@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { SnackbarService } from '../../services/snackbar.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -139,27 +140,24 @@ export class Service implements OnInit {
     { title: '', price: null, image: null }
   ];
 
-  constructor(
-    private router: Router,
-    private supabaseService: SupabaseService,
-    private postDraftService: PostDraftService,
-    private locationSearchService: LocationSearchService,
-    private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
-  ) {}
+constructor(
+  private router: Router,
+  private supabaseService: SupabaseService,
+  private postDraftService: PostDraftService,
+  private locationSearchService: LocationSearchService,
+  private route: ActivatedRoute,
+  private cdr: ChangeDetectorRef,
+  private ngZone: NgZone,
+  private snackbar: SnackbarService   // ✅ ADD THIS
+) {}
 
   private isBrowser(): boolean {
     return typeof window !== 'undefined';
   }
 
-  private showAlert(message: string): void {
-    if (this.isBrowser()) {
-      alert(message);
-    } else {
-    
-    }
-  }
+private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
+  this.snackbar.show(message, type);
+}
 
   async ngOnInit(): Promise<void> {
     this.ngZone.run(() => {
@@ -700,12 +698,12 @@ export class Service implements OnInit {
       return;
     }
 
-    this.showAlert('Location confirmed');
+  this.showAlert('Location confirmed', 'success');
   }
 
   private validateForm(): boolean {
     if (!this.mainAd.title.trim()) {
-      this.showAlert('Enter title');
+    this.showAlert('Enter title', 'error');
       return false;
     }
 
@@ -773,7 +771,7 @@ if (this.mainAd.whatsappnumber && !/^\d{10}$/.test(this.mainAd.whatsappnumber)) 
       const session = await this.supabaseService.getEffectiveAuthUser();
 
       if (!session.isAuthenticated) {
-        this.showAlert('Please login first');
+       this.showAlert('Please login first', 'error');
         this.router.navigate(['/login']);
         return;
       }
@@ -857,11 +855,11 @@ if (this.mainAd.whatsappnumber && !/^\d{10}$/.test(this.mainAd.whatsappnumber)) 
 
         if (error) {
           console.error('Error updating post:', error);
-          this.showAlert('Error updating post');
+         this.showAlert('Error updating post', 'error');
           return;
         }
 
-        this.showAlert('Post updated successfully');
+       this.showAlert('Post updated successfully', 'success');
         this.router.navigate(['/my-posts']);
         return;
       }

@@ -7,8 +7,8 @@ import { SupabaseService } from './services/supabase.service';
 import { supabase } from '../supabaseClient';
 import { LocationPickerComponent } from './pages/location-picker/location-picker';
 import { AppLocationResult } from './services/location-search';
-
-
+import { SnackbarComponent } from './snackbar/snackbar';
+import { SnackbarService } from './services/snackbar.service';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -18,7 +18,7 @@ import { AppLocationResult } from './services/location-search';
     RouterOutlet,
     RouterLink,
     LocationPickerComponent,
-    
+     SnackbarComponent   // 🔥 ADD THIS
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
@@ -66,12 +66,13 @@ export class App implements OnInit {
 
   currentUrl: string = '';
 
-  constructor(
-    private router: Router,
-    private supabaseService: SupabaseService,
-    private cdr: ChangeDetectorRef,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+constructor(
+  private router: Router,
+  private supabaseService: SupabaseService,
+  private cdr: ChangeDetectorRef,
+  private snackbar: SnackbarService,
+  @Inject(PLATFORM_ID) private platformId: Object
+) {}
 
   openService(service: string) {
     this.activeService = service;
@@ -512,24 +513,27 @@ export class App implements OnInit {
     const localLoggedIn = this.hasLocalUserLogin();
 
     if (!user && !localLoggedIn) {
-      alert('Please login first');
+     this.snackbar.show('Please login first', 'error');
       this.router.navigate(['/login']);
       return;
     }
 
     if (!user && localLoggedIn) {
+      
       this.router.navigate(['/service']);
       return;
     }
 
     const result = await this.supabaseService.checkSellerProfileCompleted();
 
-    if (!result.completed) {
-      this.router.navigate(['/seller-profile'], {
-        state: { next: 'post-service' }
-      });
-      return;
-    }
+if (!result.completed) {
+  this.snackbar.show('Complete your profile first', 'info');
+
+  this.router.navigate(['/seller-profile'], {
+    state: { next: 'post-service' }
+  });
+  return;
+}
 
     this.router.navigate(['/service']);
   }
