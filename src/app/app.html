@@ -222,7 +222,9 @@
     </div>
   </div> -->
 
+<main class="main-content">
   <router-outlet></router-outlet>
+</main>
 
   <!-- SERVICES MODAL -->
   <div class="services-modal" *ngIf="activeService">
@@ -290,7 +292,10 @@
 <footer class="footer" *ngIf="
   !currentUrl.includes('login') &&
   !currentUrl.includes('admin') &&
-  !currentUrl.includes('service')
+  !currentUrl.includes('service')&&
+  !currentUrl.includes('products')&&
+   !currentUrl.includes('details')
+  
 ">
       <div class="footer-glow"></div>
 
