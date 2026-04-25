@@ -159,7 +159,7 @@
           <span>{{ locationLabel }}</span>
         </div>
 
-        <a [routerLink]="['/news']" (click)="closeMenu()">📰 News</a>
+        <!-- <a [routerLink]="['/news']" (click)="closeMenu()">📰 News</a> -->
 
         <a (click)="goToProfile(); closeMenu()">
           Profile
@@ -243,7 +243,7 @@
         </ul>
 
         <div class="contact-box">
-          📞 Call: +91 919042111424<br>
+          📞 Call: +91 9042111424<br>
           📧 Email: amihub2026@gmail.com
         </div>
       </div>
@@ -261,7 +261,7 @@
         </ul>
 
         <div class="contact-box">
-          📞 Call: +91 919042111424<br>
+          📞 Call: +91 9042111424<br>
           📧 Email: amihub2026@gmail.com
         </div>
       </div>
@@ -279,16 +279,19 @@
         </ul>
 
         <div class="contact-box">
-          📞 Call: +91 919042111424<br>
+          📞 Call: +91 9042111424<br>
           📧 Email: amihub2026@gmail.com
         </div>
       </div>
 
     </div>
   </div>
-
-  <footer class="footer">
-    <div class="footer-glow"></div>
+<footer class="footer" *ngIf="
+  !currentUrl.includes('login') &&
+  !currentUrl.includes('admin') &&
+  !currentUrl.includes('service')
+">
+      <div class="footer-glow"></div>
 
     <div class="footer-container">
       <div class="footer-brand">
@@ -360,7 +363,7 @@
         <p>
           <a href="tel:+919042111424">
             <i class="fas fa-phone"></i>
-            +91 919042111424
+            +91 9042111424
           </a>
         </p>
 

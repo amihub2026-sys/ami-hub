@@ -31,7 +31,7 @@ export class MyPosts implements OnInit {
     if (this.isBrowser()) {
       alert(message);
     } else {
-      console.log(message);
+      
     }
   }
 
@@ -159,7 +159,7 @@ export class MyPosts implements OnInit {
       return;
     }
 
-    console.log('Opening edit page for post:', post.postid);
+    
 
     const success = await this.router.navigate(['/edit-post', String(post.postid)]);
 
@@ -240,8 +240,7 @@ export class MyPosts implements OnInit {
         );
       }
 
-      console.log('Opening featured plan for post:', post.postid, 'type:', adType);
-      console.log('STORED FEATURE POST PAYLOAD:', featurePayload);
+      
 
       const success = await this.router.navigate(['/featured-plan'], {
         state: {
@@ -291,7 +290,7 @@ export class MyPosts implements OnInit {
         .eq('postid', Number(post.postid))
         .select('postid, userid');
 
-      console.log('Delete response:', { data, error });
+      
 
       if (error) {
         console.error('Delete error:', error);

@@ -134,6 +134,8 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
       await this.supabaseService.waitForSession(2500);
 
       const session = await this.supabaseService.getEffectiveAuthUser();
+      
+
 
       if (!session.isAuthenticated) {
         this.authChecked = true;
@@ -158,10 +160,11 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
           this.seller = {
             ...this.seller,
             name: profileById?.name || profileById?.fullname || session.name || '',
+            password: profileById?.password || '',
             email: profileById?.email || session.email || '',
             phone: profileById?.phone_number || profileById?.phonenumber || '',
             username: profileById?.username || session.username || '',
-            password: profileById?.password || '',
+           
             accountType: profileById?.accounttype || '',
             category: profileById?.category || '',
             profileImage: profileById?.profileimageurl || profileById?.avatar_url || null,
@@ -222,6 +225,7 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
           ...this.seller,
           name:
             profile?.name ||
+            
             profile?.fullname ||
             user?.user_metadata?.['full_name'] ||
             user?.user_metadata?.['name'] ||
@@ -312,11 +316,19 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
     try {
       const session = await this.supabaseService.getEffectiveAuthUser();
 
-      if (!session.isAuthenticated) {
-        this.showMessage('Please login first');
-        this.router.navigate(['/login']);
-        return;
-      }
+     if (!session.isAuthenticated) {
+  this.showMessage('Please login first');
+
+  this.zone.run(() => {
+    this.isLoading = false;
+    this.cdr.detectChanges();
+  });
+
+  this.router.navigate(['/login']);
+  return;
+}
+// ✅ CORRECT PLACE (ADD HERE)
+
 
       if (!session.authUser && session.userid) {
         const payload = {
@@ -352,7 +364,14 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
         }
       } else {
         await this.supabaseService.waitForSession(1500);
-        await this.supabaseService.upsertSellerProfileToUsers(this.seller);
+       
+await Promise.race([
+  this.supabaseService.upsertSellerProfileToUsers(this.seller),
+  new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Timeout saving profile')), 5000)
+  )
+]);
+
       }
 
       this.zone.run(() => {
@@ -411,7 +430,7 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
     if (this.isBrowser()) {
       alert(message);
     } else {
-      console.log(message);
+      
     }
   }
 }
