@@ -104,27 +104,41 @@
   </div>
 
    <!-- RIGHT SIDE -->
-  <div class="side-wrapper right" *ngIf="showRightAd">
-    <div class="side-ad">
-      <span class="ad-close" (click)="closeAd('right')">×</span>
+<div class="side-wrapper right" *ngIf="showRightAd">
+  <div class="side-ad">
+    
+    <span class="ad-close" (click)="closeAd('right')">×</span>
+
+    <!-- 🔥 ADD THIS -->
+    <div class="side-poster right-poster"></div>
+
+    <!-- 🔥 WRAP CONTENT -->
+    <div class="ad-content">
       <h4>🔥 Grow Your Business</h4>
       <p>Get your website, promote services, and reach more customers.</p>
       <button>Get Started</button>
     </div>
 
-    <div class="side-poster right-poster"></div>
   </div>
+</div>
 
   <!-- LEFT SIDE -->
-  <div class="side-wrapper left" *ngIf="showLeftAd">
-    <div class="side-ad green-ad">
-      <span class="ad-close" (click)="closeAd('left')">×</span>
+ <div class="side-wrapper left" *ngIf="showLeftAd">
+  <div class="side-ad green-ad">
+
+    <span class="ad-close" (click)="closeAd('left')">×</span>
+
+    <!-- 🔥 ADD THIS -->
+    <div class="side-poster left-poster"></div>
+
+    <!-- 🔥 WRAP CONTENT -->
+    <div class="ad-content">
       <h4>🚀 Boost Your Post</h4>
       <p>Get more views and reach more buyers instantly!</p>
       <button>Promote Now</button>
     </div>
 
-    <div class="side-poster left-poster"></div>
   </div>
+</div>
   
 </div>
