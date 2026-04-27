@@ -30,6 +30,7 @@ interface SubcategoryItem {
   styleUrl: './service-list.css',
 })
 export class ServiceList implements OnInit {
+  isFilterOpen = false;
   posts = signal<any[]>([]);
   filteredPosts = signal<any[]>([]);
   isLoading = signal(false);
@@ -785,4 +786,7 @@ export class ServiceList implements OnInit {
   trackByPostId(index: number, post: any): number {
     return post.postid;
   }
+  toggleFilter(): void {
+  this.isFilterOpen = !this.isFilterOpen;
+}
 }
