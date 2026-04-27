@@ -6,10 +6,10 @@
 .desktop-menu {
   display: none;
 }
-.wide {
+/* .wide {
   width: 100%;
   background: #ffffff;
-}
+} */
 
 /* =========================
    NAVBAR
@@ -353,7 +353,7 @@
   position: relative;
   background: linear-gradient(135deg, #0b2f52 0%, #11497c 55%, #1560a8 100%);
   color: #ffffff;
-  margin-top: 60px;
+  
   padding-top: 56px;
   overflow: hidden;
 }
@@ -2195,14 +2195,14 @@ i.fa-user {
   }
 
   /* Prevent content from hiding behind bottom floating ad */
-  router-outlet,
-  .page,
-  .home-page,
-  .main-content,
-  .content-wrapper {
-    display: block;
-    padding-bottom: 130px !important;
-  }
+router-outlet,
+.page,
+.home-page,
+.main-content,
+.content-wrapper {
+  display: block;
+  padding-bottom: 0 !important;
+}
 
   /* Footer spacing */
   .footer-container {

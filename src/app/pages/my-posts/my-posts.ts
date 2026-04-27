@@ -304,7 +304,7 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'):
         this.posts().filter(item => item.postid !== post.postid)
       );
 
-      this.showAlert('Post removed successfully', 'success');
+      this.snackbar.show('Post removed successfully', 'success');
     } catch (error) {
       console.error('Error removing post:', error);
       this.showAlert('Failed to remove post');

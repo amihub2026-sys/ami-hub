@@ -52,14 +52,14 @@
           <i class="fas fa-comments"></i>
         </a>
 
-        <a (click)="goToNotifications()" class="nav-icon-btn bell-animate" aria-label="Notification">
+        <a (click)="goToNotifications(); closeMenu()" class="nav-icon-btn bell-animate" aria-label="Notification">
           <i class="fas fa-bell"></i>
           <span *ngIf="notificationCount > 0" class="badge">
             {{ notificationCount }}
           </span>
         </a>
 
-        <a (click)="goToProfile()" class="profile" aria-label="Profile">
+        <a (click)="goToProfile(); closeMenu()" class="profile" aria-label="Profile">
           <i class="fas fa-user-circle"></i>
         </a>
       </div>
@@ -146,7 +146,7 @@
           💬 Chats
         </a>
 
-        <div class="menu-item notification-item" (click)="goToNotifications()">
+        <div class="menu-item notification-item" (click)="goToNotifications(); closeMenu()">
           <i class="fas fa-bell"></i>
           <span>Notifications</span>
           <span *ngIf="notificationCount > 0" class="notification-badge">
@@ -159,11 +159,12 @@
           <span>{{ locationLabel }}</span>
         </div>
 
-        <a [routerLink]="['/news']" (click)="closeMenu()">📰 News</a>
+        <!-- <a [routerLink]="['/news']" (click)="closeMenu()">📰 News</a> -->
 
-        <a (click)="goToProfile(); closeMenu()">
-          Profile
-        </a>
+      <div class="menu-item" (click)="goToProfile(); closeMenu()">
+  <i class="fas fa-user-circle"></i>
+  <span>Profile</span>
+</div>
       </div>
       <div style="margin-top: 16px; display:flex; flex-direction:column; gap:12px;">
   
@@ -222,6 +223,7 @@
     </div>
   </div> -->
 
+<main class="main-content">
   <router-outlet></router-outlet>
   <app-snackbar></app-snackbar>
 
@@ -245,7 +247,7 @@
         </ul>
 
         <div class="contact-box">
-          📞 Call: +91 919042111424<br>
+          📞 Call: +91 9042111424<br>
           📧 Email: amihub2026@gmail.com
         </div>
       </div>
@@ -263,7 +265,7 @@
         </ul>
 
         <div class="contact-box">
-          📞 Call: +91 919042111424<br>
+          📞 Call: +91 9042111424<br>
           📧 Email: amihub2026@gmail.com
         </div>
       </div>
@@ -281,16 +283,22 @@
         </ul>
 
         <div class="contact-box">
-          📞 Call: +91 919042111424<br>
+          📞 Call: +91 9042111424<br>
           📧 Email: amihub2026@gmail.com
         </div>
       </div>
 
     </div>
   </div>
-
-  <footer class="footer">
-    <div class="footer-glow"></div>
+<footer class="footer" *ngIf="
+  !currentUrl.includes('login') &&
+  !currentUrl.includes('admin') &&
+  !currentUrl.includes('service')&&
+  !currentUrl.includes('products')&&
+   !currentUrl.includes('details')
+  
+">
+      <div class="footer-glow"></div>
 
     <div class="footer-container">
       <div class="footer-brand">
@@ -326,6 +334,7 @@
         <a routerLink="/terms">Terms & Conditions</a>
         <a routerLink="/privacy-policy">Privacy Policy</a>
         <a routerLink="/refund-policy">Refund Policy</a>
+        <a routerLink="/delete-account">Delete Account</a>
       </div>
 
       <div class="footer-column footer-services">
@@ -362,7 +371,7 @@
         <p>
           <a href="tel:+919042111424">
             <i class="fas fa-phone"></i>
-            +91 919042111424
+            +91 9042111424
           </a>
         </p>
 
@@ -401,4 +410,4 @@
   </footer>
  
 
-</div>
+

@@ -1,25 +1,26 @@
 import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, RouterLink, Router, NavigationEnd, NavigationStart } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { SupabaseService } from './services/supabase.service';
 import { supabase } from '../supabaseClient';
 import { LocationPickerComponent } from './pages/location-picker/location-picker';
 import { AppLocationResult } from './services/location-search';
-import { SnackbarComponent } from './snackbar/snackbar';
 import { SnackbarService } from './services/snackbar.service';
+import { SnackbarComponent } from './snackbar/snackbar';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterOutlet,
-    RouterLink,
-    LocationPickerComponent,
-     SnackbarComponent   // 🔥 ADD THIS
-  ],
+imports: [
+  CommonModule,
+  FormsModule,
+  RouterOutlet,
+  RouterLink,
+  LocationPickerComponent,
+  SnackbarComponent   // ✅ ADD THIS
+],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
@@ -65,12 +66,12 @@ export class App implements OnInit {
   radiusOptions: number[] = [2, 5, 10, 15, 25, 50];
 
   currentUrl: string = '';
-
-constructor(
-  private router: Router,
+isRouteLoading = false;
+ constructor(
+  public router: Router,
   private supabaseService: SupabaseService,
   private cdr: ChangeDetectorRef,
-  private snackbar: SnackbarService,
+  private snackbar: SnackbarService,   // ✅ ADD THIS
   @Inject(PLATFORM_ID) private platformId: Object
 ) {}
 
@@ -85,13 +86,29 @@ constructor(
   async ngOnInit(): Promise<void> {
     this.currentUrl = this.router.url;
 
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
-        this.currentUrl = event.urlAfterRedirects || event.url || this.router.url;
-        this.cdr.detectChanges();
-      });
+this.router.events.subscribe((event: any) => {
 
+  if (event.constructor.name === 'NavigationStart') {
+    this.isRouteLoading = true;
+    this.cdr.detectChanges();
+  }
+
+if (event instanceof NavigationEnd) {
+  this.currentUrl = event.urlAfterRedirects || event.url || this.router.url;
+
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, 0);
+
+  setTimeout(() => {
+    this.isRouteLoading = false;
+    this.cdr.detectChanges();
+  }, 300);
+}
+
+});
     await this.loadSavedLocation();
     await this.loadNotificationCount();
     this.cdr.detectChanges();
@@ -519,21 +536,18 @@ constructor(
     }
 
     if (!user && localLoggedIn) {
-      
       this.router.navigate(['/service']);
       return;
     }
 
     const result = await this.supabaseService.checkSellerProfileCompleted();
 
-if (!result.completed) {
-  this.snackbar.show('Complete your profile first', 'info');
-
-  this.router.navigate(['/seller-profile'], {
-    state: { next: 'post-service' }
-  });
-  return;
-}
+    if (!result.completed) {
+      this.router.navigate(['/seller-profile'], {
+        state: { next: 'post-service' }
+      });
+      return;
+    }
 
     this.router.navigate(['/service']);
   }

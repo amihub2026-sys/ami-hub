@@ -4,9 +4,8 @@
 
 .privacy-page {
   background: linear-gradient(180deg, #f7f9fc 0%, #f2f6fb 100%);
-  min-height: 100vh;
+  min-height: calc(100vh - 100px - 400px); /* 🔥 FINAL FIX */
   padding: 40px 20px 60px;
-  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 .privacy-container {
