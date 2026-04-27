@@ -81,7 +81,7 @@ export class CustomFields {
       return;
     }
 
-    console.log('Ad Data:',this.formData);
+    
 
     this.adPosted = true;
   }
@@ -91,7 +91,7 @@ export class CustomFields {
   }
 
   viewAd(){
-    console.log("View Ad Clicked");
+    
   }
 
 }

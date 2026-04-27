@@ -19,7 +19,7 @@ export class Contact {
   };
 
   submitForm() {
-    console.log('Contact Form Data:', this.formData);
+    
     alert('Your message has been submitted successfully!');
 
     this.formData = {

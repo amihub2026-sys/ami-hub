@@ -99,7 +99,7 @@ export class ServiceCustom implements OnInit {
       customFields: this.formData
     };
 
-    console.log("Final Data:", finalData);
+    
 
     // Show overlay
     this.adPosted = true;
