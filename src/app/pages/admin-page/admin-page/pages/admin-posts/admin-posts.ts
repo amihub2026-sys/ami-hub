@@ -41,6 +41,8 @@ export class AdminPosts implements OnInit {
   isLoading = true;
   errorMessage = '';
   posts: AdminPostItem[] = [];
+  currentPage = 1;
+itemsPerPage = 10;
 
   async ngOnInit(): Promise<void> {
     await this.loadPosts();
@@ -235,7 +237,19 @@ export class AdminPosts implements OnInit {
   trackByPost(index: number, post: AdminPostItem): number {
     return post.id;
   }
+get totalPages(): number {
+  return Math.ceil(this.filteredPosts.length / this.itemsPerPage) || 1;
+}
 
+get paginatedPosts(): AdminPostItem[] {
+  const start = (this.currentPage - 1) * this.itemsPerPage;
+  return this.filteredPosts.slice(start, start + this.itemsPerPage);
+}
+
+goToPage(page: number): void {
+  if (page < 1 || page > this.totalPages) return;
+  this.currentPage = page;
+}
   private formatDate(value: string | null | undefined): string {
     if (!value) return '-';
 

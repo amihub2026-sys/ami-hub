@@ -400,3 +400,32 @@ tbody tr:hover {
     font-size: 28px;
   }
 }
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 18px 0 4px;
+}
+
+.pagination button {
+  border: none;
+  border-radius: 12px;
+  background: #0d3b66;
+  color: #fff;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-size: 14px;
+  font-weight: 800;
+  color: #334155;
+}
