@@ -48,9 +48,8 @@
 }
 
 .snackbar.info {
-  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  background: linear-gradient(135deg, #fdba74, #fb923c);
 }
-
 /* ICON */
 .snackbar::before {
   content: '';
