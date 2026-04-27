@@ -87,8 +87,8 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let post of filteredPosts; trackBy: trackByPost">
-            <td class="id-cell">#{{ post.id }}</td>
+<tr *ngFor="let post of paginatedPosts; trackBy: trackByPost">
+              <td class="id-cell">#{{ post.id }}</td>
 
             <td>
               <div class="post-cell">
@@ -168,7 +168,19 @@
           </tr>
         </tbody>
       </table>
+   
     </div>
+       <div class="pagination" *ngIf="filteredPosts.length > itemsPerPage">
+  <button type="button" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+    Prev
+  </button>
+
+  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+
+  <button type="button" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+    Next
+  </button>
+</div>
 
     <ng-template #loadingBlock>
       <div class="loading-wrap">
