@@ -30,6 +30,7 @@ interface SubcategoryItem {
   styleUrl: './product-list.css',
 })
 export class ProductList implements OnInit {
+  isFilterOpen = false;
   posts = signal<any[]>([]);
   displayedPosts = signal<any[]>([]);
   isLoading = signal(false);
@@ -700,4 +701,8 @@ export class ProductList implements OnInit {
   trackByPostId(index: number, post: any): number {
     return post.postid;
   }
+  /* ADD THIS */
+toggleFilter() {
+  this.isFilterOpen = !this.isFilterOpen;
+}
 }
