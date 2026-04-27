@@ -21,9 +21,9 @@ body {
 
 .results-page {
   width: 100%;
-  max-width: 1220px;
+  max-width: 100%;
   margin: 30px auto;
-  padding: 0 20px 40px;
+  padding: 0 8px 20px;
 }
 
 .top-search-bar {
@@ -367,8 +367,8 @@ body {
 
 @media (max-width: 640px) {
   .results-page {
-    margin: 16px auto;
-    padding: 0 12px 24px;
+    margin: 10px auto;
+    padding: 0 6px 16px;
   }
 
   .top-search-bar {
@@ -519,5 +519,31 @@ body {
   .type-badge {
     font-size: 11px;
     padding: 4px 9px;
+  }
+}
+@media (max-width: 640px) {
+  .top-search-bar {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+@media (max-width: 640px) {
+  .results-page {
+    margin: 0 !important;
+  }
+}
+@media (max-width: 640px) {
+  .top-search-bar input {
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 14px !important;
+    font-size: 14px !important;
+    border-radius: 999px !important;
+  }
+
+  .top-search-bar > button {
+    height: 44px !important;
+    min-height: 44px !important;
+    border-radius: 14px !important;
   }
 }

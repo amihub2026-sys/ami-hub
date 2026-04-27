@@ -1,7 +1,13 @@
 <div class="page-layout">
+<div
+  class="filter-backdrop"
+  *ngIf="isFilterOpen"
+  (click)="toggleFilter()">
+</div>
 
-  <aside class="left-panel">
+<aside class="left-panel" [class.active]="isFilterOpen">
     <div class="filter-card">
+      <button class="filter-close" type="button" (click)="toggleFilter()">×</button>
       <h3>Filter Services</h3>
 
       <div class="filter-group">
@@ -69,13 +75,16 @@
       </div>
 
       <div class="filter-actions">
-        <button type="button" (click)="applyFilters()">Apply</button>
-        <button type="button" class="reset" (click)="resetFilters()">Reset</button>
+     <button type="button" (click)="applyFilters(); toggleFilter()">Apply</button>
+  <button type="button" class="reset" (click)="resetFilters(); toggleFilter()">Reset</button>
       </div>
     </div>
   </aside>
 
   <section class="right-panel">
+    <button class="filter-toggle" type="button" (click)="toggleFilter()">
+  ⚙ Filters
+</button>
     <h2 class="title">
       {{ selectedCategoryName || 'Latest Services' }}
     </h2>
