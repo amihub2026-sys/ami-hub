@@ -113,12 +113,12 @@
       </div>
     </div>
   </div>
-
+<div class="menu-overlay" *ngIf="menuOpen" (click)="closeMenu()"></div>
   <div class="side-menu" [class.active]="menuOpen">
     <div class="menu-content">
       <div class="menu-header">
-        <div class="logo">AMI<span>HUB</span></div>
-        <button class="close-icon" type="button" (click)="closeMenu()">X</button>
+        <!-- <div class="logo">AMI<span>HUB</span></div> -->
+        <button class="close-icon" type="button" (click)="closeMenu()"></button>
       </div>
 
       <div class="links-container">
