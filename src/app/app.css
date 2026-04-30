@@ -18,9 +18,17 @@
   width: 100%;
   background: #ffffff;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+
   position: sticky;
   top: 0;
-  z-index: 10000;
+
+  z-index: 999999;
+
+  isolation: isolate;
+
+  backdrop-filter: blur(12px);
+
+  border-bottom: 1px solid rgba(0,0,0,0.04);
 }
 
 .nav-container {
@@ -3382,4 +3390,9 @@ router-outlet {
     margin-top: 8px !important;
   }
 
+}
+.main-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 20px;
 }
