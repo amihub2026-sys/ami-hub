@@ -264,18 +264,140 @@ constructor(
     }
   }
 
-  uploadProfileImage(event: Event) {
-    this.readFile(event, 'profileImage');
+ async uploadProfileImage(event: Event) {
+
+  const input =
+    event.target as HTMLInputElement;
+
+  if (!input.files || input.files.length === 0) {
+    return;
   }
 
-  uploadKYC(event: Event) {
-    this.readFile(event, 'kycImage');
+  const file = input.files[0];
+
+  const formData = new FormData();
+
+  formData.append('file', file);
+
+  formData.append('folder', 'profiles');
+
+  const { data, error } =
+    await this.supabaseService.supabase.functions.invoke(
+      'upload-r2',
+      {
+        body: formData
+      }
+    );
+
+  if (error) {
+
+    console.error('Profile upload error:', error);
+
+    this.showMessage(
+      'Image upload failed',
+      'error'
+    );
+
+    return;
+
   }
 
-  uploadQR(event: Event) {
-    this.readFile(event, 'qrCodeImage');
+  this.seller.profileImage =
+    data?.url || null;
+
+  this.cdr.detectChanges();
+
+}
+
+ async uploadKYC(event: Event) {
+
+  const input =
+    event.target as HTMLInputElement;
+
+  if (!input.files || input.files.length === 0) {
+    return;
   }
 
+  const file = input.files[0];
+
+  const formData = new FormData();
+
+  formData.append('file', file);
+
+  formData.append('folder', 'kyc');
+
+  const { data, error } =
+    await this.supabaseService.supabase.functions.invoke(
+      'upload-r2',
+      {
+        body: formData
+      }
+    );
+
+  if (error) {
+
+    console.error('KYC upload error:', error);
+
+    this.showMessage(
+      'KYC upload failed',
+      'error'
+    );
+
+    return;
+
+  }
+
+  this.seller.kycImage =
+    data?.url || null;
+
+  this.cdr.detectChanges();
+
+}
+
+ async uploadQR(event: Event) {
+
+  const input =
+    event.target as HTMLInputElement;
+
+  if (!input.files || input.files.length === 0) {
+    return;
+  }
+
+  const file = input.files[0];
+
+  const formData = new FormData();
+
+  formData.append('file', file);
+
+  formData.append('folder', 'qrcode');
+
+  const { data, error } =
+    await this.supabaseService.supabase.functions.invoke(
+      'upload-r2',
+      {
+        body: formData
+      }
+    );
+
+  if (error) {
+
+    console.error('QR upload error:', error);
+
+    this.showMessage(
+      'QR upload failed',
+      'error'
+    );
+
+    return;
+
+  }
+
+  this.seller.qrCodeImage =
+    data?.url || null;
+
+  this.cdr.detectChanges();
+
+}
   readFile(event: Event, key: string) {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
