@@ -614,7 +614,60 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'):
     this.existingVideoUrls.splice(i, 1);
     this.existingVideoUrls = [...this.existingVideoUrls];
   }
+private async uploadToR2(
+  file: File,
+  folder: string
+): Promise<string | null> {
 
+  const formData = new FormData();
+
+  formData.append('file', file);
+
+  formData.append('folder', folder);
+
+  const { data, error } =
+    await this.supabaseService.supabase.functions.invoke(
+      'upload-r2',
+      {
+        body: formData,
+      }
+    );
+
+  if (error) {
+
+    console.error('R2 Upload Error:', error);
+
+    return null;
+
+  }
+
+  return data?.url || null;
+
+}
+
+private async uploadMultipleToR2(
+  files: File[],
+  folder: string
+): Promise<string[]> {
+
+  const uploadedUrls: string[] = [];
+
+  for (const file of files) {
+
+    const uploaded =
+      await this.uploadToR2(file, folder);
+
+    if (uploaded) {
+
+      uploadedUrls.push(uploaded);
+
+    }
+
+  }
+
+  return uploadedUrls;
+
+}
   onMapLocationSelected(location: AppLocationResult): void {
     this.selectedMapLocation = location;
 
@@ -863,7 +916,47 @@ if (this.mainAd.whatsappnumber && !/^\d{10}$/.test(this.mainAd.whatsappnumber)) 
         this.router.navigate(['/my-posts']);
         return;
       }
+let mainImageUrl = '';
 
+let otherImageUrls: string[] = [];
+
+let videoUrls: string[] = [];
+
+if (this.mainAd.mainPhoto) {
+
+  const uploaded =
+    await this.uploadToR2(
+      this.mainAd.mainPhoto,
+      'products'
+    );
+
+  if (uploaded) {
+
+    mainImageUrl = uploaded;
+
+  }
+
+}
+
+if (this.mainAd.otherImages.length > 0) {
+
+  otherImageUrls =
+    await this.uploadMultipleToR2(
+      this.mainAd.otherImages,
+      'products'
+    );
+
+}
+
+if (this.mainAd.videos.length > 0) {
+
+  videoUrls =
+    await this.uploadMultipleToR2(
+      this.mainAd.videos,
+      'videos'
+    );
+
+}
       const rawPayload: any = {
         userid: String(effectiveUserId),
         categoryid: selectedCategory?.categoryid ?? null,
@@ -898,10 +991,10 @@ if (this.mainAd.whatsappnumber && !/^\d{10}$/.test(this.mainAd.whatsappnumber)) 
           '',
         whatsappnumber: this.mainAd.whatsappnumber || '',
 
-        image_url: '',
-        image_urls: [],
-        video_url: '',
-        video_urls: [],
+      image_url: mainImageUrl,
+image_urls: otherImageUrls,
+video_url: videoUrls[0] || '',
+video_urls: videoUrls,
 
         category: this.mainAd.category || '',
         subcategory: this.mainAd.subcategory || '',
