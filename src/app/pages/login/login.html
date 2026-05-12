@@ -1,16 +1,14 @@
-
-
 <div class="login-bg">
   <div class="login-card">
     <h1 class="logo">AMI HUB</h1>
     <p class="tagline">Buy • Sell • Discover – All in One Hub.</p>
 
     <div class="user-login-options">
-      <!-- <button
-        (click)="selectUserLogin('emailOtp')"
-        [class.active]="userLoginMethod === 'emailOtp'">
-        Email OTP
-      </button> -->
+      <button
+        (click)="selectUserLogin('mobileOtp')"
+        [class.active]="userLoginMethod === 'mobileOtp'">
+        Mobile OTP
+      </button>
 
       <button
         (click)="selectUserLogin('username')"
@@ -25,36 +23,30 @@
       </button>
     </div>
 
-    <div *ngIf="userLoginMethod === 'emailOtp'">
+    <div *ngIf="userLoginMethod === 'mobileOtp'">
       <div class="input-group">
-        <input type="email" placeholder="Email" [(ngModel)]="email">
+        <input
+          type="tel"
+          placeholder="Enter Mobile Number"
+          maxlength="10"
+          [(ngModel)]="mobile">
       </div>
 
-      <button class="otp-btn" (click)="sendOtp()" [disabled]="otpSent">
-        Send OTP
+      <button class="otp-btn" (click)="sendMobileOtp()" [disabled]="otpSent">
+        {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
       </button>
 
       <div *ngIf="otpSent" class="otp-section">
         <div class="input-group">
-          <input type="text" placeholder="Enter OTP" [(ngModel)]="otp">
-        </div>
-
-        <button class="submit-btn" (click)="verifyOtp()">Verify OTP</button>
-      </div>
-
-      <div *ngIf="showPasswordSet">
-        <div class="input-group password-group">
           <input
-            [type]="showNewPassword ? 'text' : 'password'"
-            placeholder="Create Password"
-            [(ngModel)]="newPassword">
-          <span class="eye-icon" (click)="toggleNewPassword()">
-            {{ showNewPassword ? '🙈' : '👁️' }}
-          </span>
+            type="text"
+            placeholder="Enter OTP"
+            maxlength="6"
+            [(ngModel)]="otp">
         </div>
 
-        <button class="submit-btn" (click)="setPassword()">
-          Set Password & Login
+        <button class="submit-btn" (click)="verifyMobileOtp()">
+          Verify OTP
         </button>
       </div>
     </div>
@@ -103,42 +95,29 @@
     </button>
   </div>
 
-   <!-- RIGHT SIDE -->
-<div class="side-wrapper right" *ngIf="showRightAd">
-  <div class="side-ad">
-    
-    <span class="ad-close" (click)="closeAd('right')">×</span>
+  <div class="side-wrapper right" *ngIf="showRightAd">
+    <div class="side-ad">
+      <span class="ad-close" (click)="closeAd('right')">×</span>
+      <div class="side-poster right-poster"></div>
 
-    <!-- 🔥 ADD THIS -->
-    <div class="side-poster right-poster"></div>
-
-    <!-- 🔥 WRAP CONTENT -->
-    <div class="ad-content">
-      <h4>🔥 Grow Your Business</h4>
-      <p>Get your website, promote services, and reach more customers.</p>
-      <button>Get Started</button>
+      <div class="ad-content">
+        <h4>🔥 Grow Your Business</h4>
+        <p>Get your website, promote services, and reach more customers.</p>
+        <button>Get Started</button>
+      </div>
     </div>
-
   </div>
-</div>
 
-  <!-- LEFT SIDE -->
- <div class="side-wrapper left" *ngIf="showLeftAd">
-  <div class="side-ad green-ad">
+  <div class="side-wrapper left" *ngIf="showLeftAd">
+    <div class="side-ad green-ad">
+      <span class="ad-close" (click)="closeAd('left')">×</span>
+      <div class="side-poster left-poster"></div>
 
-    <span class="ad-close" (click)="closeAd('left')">×</span>
-
-    <!-- 🔥 ADD THIS -->
-    <div class="side-poster left-poster"></div>
-
-    <!-- 🔥 WRAP CONTENT -->
-    <div class="ad-content">
-      <h4>🚀 Boost Your Post</h4>
-      <p>Get more views and reach more buyers instantly!</p>
-      <button>Promote Now</button>
+      <div class="ad-content">
+        <h4>🚀 Boost Your Post</h4>
+        <p>Get more views and reach more buyers instantly!</p>
+        <button>Promote Now</button>
+      </div>
     </div>
-
   </div>
-</div>
-  
 </div>

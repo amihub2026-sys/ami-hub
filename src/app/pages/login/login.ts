@@ -1,5 +1,4 @@
-import { Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Inject, OnInit, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { SupabaseService } from '../../services/supabase.service';
@@ -13,8 +12,9 @@ import { SnackbarService } from '../../services/snackbar.service';
   styleUrls: ['./login.css']
 })
 export class Login implements OnInit {
-  userLoginMethod: 'emailOtp' | 'username' | 'admin' = 'username';
+  userLoginMethod: 'emailOtp' | 'mobileOtp' | 'username' | 'admin' = 'mobileOtp';
 
+  mobile = '';
   email = '';
   password = '';
   newPassword = '';
@@ -34,29 +34,19 @@ export class Login implements OnInit {
 
   private isBrowser = false;
   private redirectTo = '/';
+
   showRightAd = true;
   showLeftAd = true;
 
-constructor(
+  constructor(
   private router: Router,
   private supabaseService: SupabaseService,
   private snackbar: SnackbarService,
+  private cdr: ChangeDetectorRef,
   @Inject(PLATFORM_ID) private platformId: Object
 ) {
-  this.isBrowser = isPlatformBrowser(this.platformId);
-}
-
-  closeAd(type: 'left' | 'right') {
-    if (type === 'left') {
-      this.showLeftAd = false;
-    } else {
-      this.showRightAd = false;
-    }
+    this.isBrowser = isPlatformBrowser(this.platformId);
   }
-
-private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') {
-  this.snackbar.show(message, type);
-}
 
   async ngOnInit() {
     const nav = this.router.getCurrentNavigation();
@@ -67,14 +57,11 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') 
     const googleLoginPending = localStorage.getItem('googleLoginPending');
     const savedRedirectTo = localStorage.getItem('redirectToAfterLogin');
 
-    if (savedRedirectTo) {
-      this.redirectTo = savedRedirectTo;
-    }
-
+    if (savedRedirectTo) this.redirectTo = savedRedirectTo;
     if (googleLoginPending !== 'true') return;
 
-    const { data: sessionData } = await this.supabaseService.supabase.auth.getSession();
-
+    const { data: sessionData } =
+      await this.supabaseService.supabase.auth.getSession();
 
     if (!sessionData.session) {
       localStorage.removeItem('googleLoginPending');
@@ -82,7 +69,8 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') 
       return;
     }
 
-    const { data, error } = await this.supabaseService.syncGoogleUserToPublicUsers();
+    const { data, error } =
+      await this.supabaseService.syncGoogleUserToPublicUsers();
 
     localStorage.removeItem('googleLoginPending');
 
@@ -91,21 +79,21 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') 
       return;
     }
 
-  this.storeUserSession(data);
+    this.storeUserSession(data);
+    this.showAlert('Login Successful', 'success');
 
-this.showAlert('Login Successful', 'success');
-
-setTimeout(async () => {
-  await this.redirectAfterLogin(data);
-}, 1200);
+    setTimeout(async () => {
+      await this.redirectAfterLogin(data);
+    }, 1200);
   }
 
-  selectUserLogin(method: 'emailOtp' | 'username' | 'admin') {
+  selectUserLogin(method: 'emailOtp' | 'mobileOtp' | 'username' | 'admin') {
     this.userLoginMethod = method;
     this.resetFields();
   }
 
   resetFields() {
+    this.mobile = '';
     this.email = '';
     this.password = '';
     this.newPassword = '';
@@ -118,6 +106,18 @@ setTimeout(async () => {
     this.showNewPassword = false;
     this.showAdminPassword = false;
     clearInterval(this.timer);
+  }
+
+  closeAd(type: 'left' | 'right') {
+    if (type === 'left') {
+      this.showLeftAd = false;
+    } else {
+      this.showRightAd = false;
+    }
+  }
+
+  private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') {
+    this.snackbar.show(message, type);
   }
 
   togglePassword() {
@@ -188,56 +188,156 @@ setTimeout(async () => {
     }
 
     if (this.isEmail(cleaned)) {
-      const { data, error } = await this.supabaseService.getUserByEmail(cleaned);
+      const { data, error } =
+        await this.supabaseService.getUserByEmail(cleaned);
       return { data, error };
     }
 
-    const { data, error } = await this.supabaseService.getUserByUsername(cleaned);
+    const { data, error } =
+      await this.supabaseService.getUserByUsername(cleaned);
+
     return { data, error };
   }
 
-async loginWithEmailPassword() {
-  const identifier = this.email.trim();
-  const enteredPassword = this.password.trim();
+  async loginWithEmailPassword() {
+    const identifier = this.email.trim();
+    const enteredPassword = this.password.trim();
 
-  if (!identifier || !enteredPassword) {
-    this.showAlert('Enter email/username and password');
+    if (!identifier || !enteredPassword) {
+      this.showAlert('Enter email/username and password');
+      return;
+    }
+
+    const { data, error } = await this.getUserForPasswordLogin(identifier);
+
+    if (error || !data) {
+      this.showAlert('User not found');
+      return;
+    }
+
+    if (!data.isactive) {
+      this.showAlert('User account is inactive');
+      return;
+    }
+
+    if ((data.password || '').trim() !== enteredPassword) {
+      this.showAlert('Invalid password');
+      return;
+    }
+
+    this.storeUserSession(data);
+    this.showAlert('Login Successful', 'success');
+
+    setTimeout(async () => {
+      await this.redirectAfterLogin(data);
+    }, 1200);
+  }
+
+  async sendMobileOtp() {
+  const phone = this.mobile.trim();
+
+  if (!/^[6-9]\d{9}$/.test(phone)) {
+    this.showAlert('Enter valid 10 digit mobile number', 'error');
     return;
   }
 
-  const { data, error } = await this.getUserForPasswordLogin(identifier);
+  console.log('SENDING OTP TO:', phone);
 
-  if (error || !data) {
-    this.showAlert('User not found');
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  const res = await fetch(
+    'https://jhojcdhnsfqmroyfotyp.supabase.co/functions/v1/send-sms-hook',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        phone: `91${phone}`,
+        otp: otp
+      })
+    }
+  );
+
+  const result = await res.json();
+  console.log('OTP RESPONSE:', result);
+
+  if (!res.ok) {
+    this.showAlert(result.error || 'OTP sending failed', 'error');
     return;
   }
 
-  if (!data.isactive) {
-    this.showAlert('User account is inactive');
-    return;
-  }
+  localStorage.setItem('login_otp', otp);
+  localStorage.setItem('login_mobile', phone);
 
-  if ((data.password || '').trim() !== enteredPassword) {
-    this.showAlert('Invalid password');
-    return;
-  }
-
-  this.storeUserSession(data);
-this.showAlert('Login Successful', 'success');
-
-setTimeout(async () => {
-  await this.redirectAfterLogin(data);
-}, 1200);
+  this.otpSent = true;
+  this.cdr.detectChanges();
+  this.showAlert('OTP sent successfully', 'success');
 }
+  async verifyMobileOtp() {
+  const phone = this.mobile.trim();
+  const otpCode = this.otp.trim();
+
+  const savedOtp = localStorage.getItem('login_otp');
+  const savedMobile = localStorage.getItem('login_mobile');
+
+  if (!otpCode) {
+    this.showAlert('Enter OTP', 'error');
+    return;
+  }
+
+  if (savedMobile !== phone || savedOtp !== otpCode) {
+    this.showAlert('Invalid OTP', 'error');
+    return;
+  }
+
+  localStorage.removeItem('login_otp');
+  localStorage.removeItem('login_mobile');
+
+  const { data: existingUser, error } = await this.supabaseService.supabase
+    .from('users')
+    .select('*')
+    .eq('phonenumber', phone)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    this.showAlert('User check failed', 'error');
+    return;
+  }
+
+  if (existingUser) {
+    this.storeUserSession(existingUser);
+    localStorage.setItem('userToken', 'loggedUser');
+    localStorage.setItem('mobile', phone);
+
+    this.showAlert('Login successful', 'success');
+
+    setTimeout(async () => {
+      await this.redirectAfterLogin(existingUser);
+    }, 1000);
+
+    return;
+  }
+
+  localStorage.setItem('userToken', 'loggedUser');
+  localStorage.setItem('mobile', phone);
+
+  this.showAlert('Please complete profile setup', 'success');
+
+  setTimeout(async () => {
+    await this.router.navigate(['/account-setup']);
+  }, 1000);
+}
+
   async loginAdmin() {
     if (!this.adminUsername || !this.adminPassword) {
       this.showAlert('Enter admin username and password');
       return;
     }
 
-    const { data, error } = await this.supabaseService.getAdminByUsername(this.adminUsername.trim());
-
-    
+    const { data, error } =
+      await this.supabaseService.getAdminByUsername(this.adminUsername.trim());
 
     if (error || !data) {
       this.showAlert('Admin not found');
@@ -263,9 +363,9 @@ setTimeout(async () => {
 
     this.showAlert('Admin Login Successful', 'success');
 
-setTimeout(async () => {
-  await this.router.navigate(['/admin-page']);
-}, 1200);
+    setTimeout(async () => {
+      await this.router.navigate(['/admin-page']);
+    }, 1200);
   }
 
   async sendOtp() {
@@ -274,21 +374,26 @@ setTimeout(async () => {
       return;
     }
 
-    const { data, error } = await this.supabaseService.getUserByEmail(this.email.trim());
+    const { data, error } =
+      await this.supabaseService.getUserByEmail(this.email.trim());
 
     if (error || !data) {
       this.showAlert('Email not found');
       return;
     }
 
-    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const generatedOtp =
+      Math.floor(100000 + Math.random() * 900000).toString();
+
     const expiry = Date.now() + 5 * 60 * 1000;
 
-    await this.supabaseService.updateUserOtpByEmail(this.email.trim(), generatedOtp, expiry);
+    await this.supabaseService.updateUserOtpByEmail(
+      this.email.trim(),
+      generatedOtp,
+      expiry
+    );
 
-   
     this.showAlert('OTP sent! Check console for testing');
-
     this.otpSent = true;
     this.startTimer();
   }
@@ -299,7 +404,8 @@ setTimeout(async () => {
       return;
     }
 
-    const { data, error } = await this.supabaseService.getUserByEmail(this.email.trim());
+    const { data, error } =
+      await this.supabaseService.getUserByEmail(this.email.trim());
 
     if (error || !data) {
       this.showAlert('Email not found');
@@ -321,39 +427,39 @@ setTimeout(async () => {
     this.showPasswordSet = true;
   }
 
-async setPassword() {
-  if (!this.newPassword) {
-    this.showAlert('Enter new password');
-    return;
+  async setPassword() {
+    if (!this.newPassword) {
+      this.showAlert('Enter new password');
+      return;
+    }
+
+    const email = this.email.trim();
+    const password = this.newPassword.trim();
+
+    const { error: signUpError } =
+      await this.supabaseService.supabase.auth.signUp({
+        email,
+        password
+      });
+
+    if (
+      signUpError &&
+      !signUpError.message.toLowerCase().includes('already registered')
+    ) {
+      this.showAlert(signUpError.message);
+      return;
+    }
+
+    await this.supabaseService.updateUserPasswordByEmail(email, password);
+
+    this.showAlert('Password set! You can now login using email/password.');
+
+    this.password = this.newPassword;
+    this.showPasswordSet = false;
+    this.userLoginMethod = 'username';
+    this.showNewPassword = false;
+    this.showPassword = false;
   }
-
-  const email = this.email.trim();
-  const password = this.newPassword.trim();
-
-  const { error: signUpError } =
-    await this.supabaseService.supabase.auth.signUp({
-      email,
-      password
-    });
-
-  if (
-    signUpError &&
-    !signUpError.message.toLowerCase().includes('already registered')
-  ) {
-    this.showAlert(signUpError.message);
-    return;
-  }
-
-  await this.supabaseService.updateUserPasswordByEmail(email, password);
-
-  this.showAlert('Password set! You can now login using email/password.');
-
-  this.password = this.newPassword;
-  this.showPasswordSet = false;
-  this.userLoginMethod = 'username';
-  this.showNewPassword = false;
-  this.showPassword = false;
-}
 
   startTimer() {
     this.countdown = 30;
@@ -374,13 +480,15 @@ async setPassword() {
         localStorage.setItem('redirectToAfterLogin', this.redirectTo);
       }
 
-      const { error } = await this.supabaseService.signInWithOAuth('google');
+      const { error } =
+        await this.supabaseService.signInWithOAuth('google');
 
       if (error) {
         if (this.isBrowser) {
           localStorage.removeItem('googleLoginPending');
           localStorage.removeItem('redirectToAfterLogin');
         }
+
         this.showAlert(error.message);
       }
     } catch (err: any) {
@@ -388,6 +496,7 @@ async setPassword() {
         localStorage.removeItem('googleLoginPending');
         localStorage.removeItem('redirectToAfterLogin');
       }
+
       this.showAlert(err.message || 'Google login failed');
     }
   }
