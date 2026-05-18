@@ -571,12 +571,32 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'):
     this.serviceBlocks.splice(i, 1);
   }
 
-  onMainPhotoChange(e: Event) {
-    const input = e.target as HTMLInputElement;
-    this.mainAd.mainPhoto =
-      input.files && input.files.length ? input.files[0] : null;
-  }
+ mainPhotoPreview: string | null = null;
 
+onMainPhotoChange(e: Event) {
+
+  const input = e.target as HTMLInputElement;
+
+  this.mainAd.mainPhoto =
+    input.files && input.files.length
+      ? input.files[0]
+      : null;
+
+  if (this.mainAd.mainPhoto) {
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+
+      this.mainPhotoPreview =
+        reader.result as string;
+
+    };
+
+    reader.readAsDataURL(this.mainAd.mainPhoto);
+
+  }
+}
   onOtherImagesChange(e: Event) {
     const input = e.target as HTMLInputElement;
     this.mainAd.otherImages = input.files ? Array.from(input.files) : [];

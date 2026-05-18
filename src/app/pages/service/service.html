@@ -206,11 +206,63 @@
       </h2>
 
       <div class="form-grid">
-        <div class="form-group">
-          <label>Main Photo</label>
-          <input type="file" accept="image/*" (change)="onMainPhotoChange($event)" />
-          <small *ngIf="mainAd.mainPhoto">{{ mainAd.mainPhoto.name }}</small>
+       <div class="form-group">
 
+  <label>Main Photo</label>
+
+  <div class="upload-box">
+
+    <div class="preview-box">
+
+      <img
+        *ngIf="mainPhotoPreview"
+        [src]="mainPhotoPreview"
+        alt="Preview"
+      />
+
+      <span *ngIf="!mainPhotoPreview">
+        Upload Photo
+      </span>
+
+    </div>
+
+    <div class="upload-actions">
+
+      <label class="upload-btn">
+
+        Choose Image
+
+        <input
+          type="file"
+          accept="image/*"
+          hidden
+          (change)="onMainPhotoChange($event)"
+        />
+
+      </label>
+
+      <label class="camera-btn">
+
+        📸 Open Camera
+
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
+          hidden
+          (change)="onMainPhotoChange($event)"
+        />
+
+      </label>
+
+      <small>JPG, PNG supported</small>
+
+    </div>
+
+  </div>
+
+</div>
+          <div *ngIf="isEditMode && existingMainImageUrl" style="margin-top: 10px;">
           <div *ngIf="isEditMode && existingMainImageUrl" style="margin-top: 10px;">
             <img
               [src]="existingMainImageUrl"
