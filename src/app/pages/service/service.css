@@ -499,3 +499,104 @@ small {
     opacity: 1;
   }
 }
+.upload-box{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+    margin-top:10px;
+}
+
+.preview-box{
+
+    width:150px;
+
+    height:150px;
+
+    border:2px dashed #d5d5d5;
+
+    border-radius:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    overflow:hidden;
+
+    background:#fafafa;
+}
+
+.preview-box img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+}
+
+.upload-actions{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+}
+
+.upload-btn{
+
+    background:#9c255f;
+
+    color:#fff;
+
+    padding:14px 22px;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    font-weight:700;
+
+    text-align:center;
+}
+
+.camera-btn{
+
+    background:#14b8a6;
+
+    color:#fff;
+
+    padding:14px 22px;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    font-weight:700;
+
+    text-align:center;
+}
+
+@media(max-width:768px){
+
+    .upload-box{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+    }
+
+    .upload-btn,
+    .camera-btn{
+
+        width:100%;
+    }
+}
