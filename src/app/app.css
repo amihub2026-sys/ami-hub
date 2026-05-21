@@ -1461,12 +1461,16 @@
     font-size: 11px;
   }
 
+  @media (max-width:768px){
+
   .profile i,
-  .profile-icon {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
+  .profile-icon{
+    font-size:20px !important;
+    width:20px !important;
+    height:20px !important;
   }
+
+}
 
   .menu-icon-btn span {
     width: 10px;
@@ -2041,6 +2045,7 @@ i.fa-bell {
 .icon-user,
 .profile-icon,
 i.fa-user {
+
   color: #7b1fa2 !important;
 }
 /* =========================
@@ -3498,6 +3503,57 @@ body app-root {
 
   .footer {
     margin-bottom: 0 !important;
+  }
+
+}/* =========================
+   FINAL MOBILE ICON HIDE
+========================= */
+
+@media only screen and (max-width:768px){
+
+  a.mobile-my-posts-btn,
+  a.fav-animate,
+  a.chat-animate,
+  a.bell-animate{
+
+    display:none !important;
+    visibility:hidden !important;
+    width:0 !important;
+    height:0 !important;
+    opacity:0 !important;
+    overflow:hidden !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+
+}/* FINAL MOBILE PROFILE FIX */
+
+@media only screen and (max-width:768px){
+
+  .profile{
+    width:54px !important;
+    height:54px !important;
+
+    min-width:54px !important;
+    min-height:54px !important;
+
+    border-radius:14px !important;
+  }
+
+  .profile i.fas.fa-user-circle{
+
+    font-size:24px !important;
+
+    width:auto !important;
+    height:auto !important;
+
+    line-height:1 !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    color:#7b1fa2 !important;
   }
 
 }
