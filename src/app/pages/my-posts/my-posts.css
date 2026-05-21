@@ -59,33 +59,130 @@
 .status {
   color: #444;
   font-size: 0.9rem;
+}/* BUTTON WRAPPER */
+
+/* BUTTON WRAPPER */
+
+.post-actions{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  gap:8px;
+  margin-top:18px;
+
+  flex-wrap:nowrap;
 }
 
-.post-actions {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 12px;
-  padding: 0 12px;
-}
+/* BUTTON COMMON */
 
 .edit-btn,
-.delete-btn {
-  height: 38px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
+.feature-btn,
+.delete-btn{
+  position:relative;
+
+  min-width:82px;
+  height:42px;
+
+  padding:0 14px;
+
+  border:none;
+  border-radius:14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+  white-space:nowrap;
+
+  font-size:13px;
+  font-weight:700;
+  line-height:1;
+
+  color:#fff;
+  cursor:pointer;
+
+  overflow:hidden;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    filter 0.3s ease;
+}
+/* BUTTON TEXT */
+
+.edit-btn span,
+.feature-btn span,
+.delete-btn span{
+  position:relative;
+  z-index:2;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  width:100%;
 }
 
-.edit-btn {
-  background: #2563eb;
-  color: #fff;
+/* SHINE EFFECT */
+
+.edit-btn::before,
+.feature-btn::before,
+.delete-btn::before{
+  content:"";
+
+  position:absolute;
+  top:0;
+  left:-120%;
+
+  width:100%;
+  height:100%;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent,
+      rgba(255,255,255,0.35),
+      transparent
+    );
+
+  transition:0.8s;
 }
 
-.delete-btn {
-  background: #ef4444;
-  color: #fff;
+.edit-btn:hover::before,
+.feature-btn:hover::before,
+.delete-btn:hover::before{
+  left:120%;
+}
+
+/* EDIT */
+
+.edit-btn{
+  background:linear-gradient(135deg,#3b82f6,#2563eb);
+  box-shadow:0 10px 24px rgba(37,99,235,0.28);
+}
+
+/* FEATURE */
+
+.feature-btn{
+  background:linear-gradient(135deg,#8b5cf6,#6366f1);
+  box-shadow:0 10px 24px rgba(99,102,241,0.28);
+}
+
+/* DELETE */
+
+.delete-btn{
+  background:linear-gradient(135deg,#ef4444,#dc2626);
+  box-shadow:0 10px 24px rgba(239,68,68,0.28);
+}
+
+/* HOVER */
+
+.edit-btn:hover,
+.feature-btn:hover,
+.delete-btn:hover{
+  transform:translateY(-4px) scale(1.04);
 }
 
 .my-posts-page {
@@ -148,46 +245,3 @@
   color: #0a8f3d;
 }
 
-.post-actions {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  padding: 0 12px;
-}
-
-.edit-btn,
-.remove-btn {
-  border: none;
-  outline: none;
-  padding: 10px 8px;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: 0.2s ease;
-  min-height: 40px;
-  white-space: normal;
-  word-break: break-word;
-  line-height: 1.15;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.edit-btn {
-  background: #0d6efd;
-  color: #fff;
-}
-
-.edit-btn:hover {
-  background: #0b5ed7;
-}
-
-.remove-btn {
-  background: #dc3545;
-  color: #fff;
-}
-
-.remove-btn:hover {
-  background: #bb2d3b;
-}

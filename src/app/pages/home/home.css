@@ -855,7 +855,8 @@ DOTS SPACE FIX
 .location-text {
   font-size: 14px;
   line-height: 1.5;
-  color: #64748b;
+  color: #cddfff;
+  background-color: #0072ff;
   margin: 0 0 14px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
