@@ -279,7 +279,7 @@
 
         <div class="form-group">
           <label>Other Images</label>
-          <input type="file" accept="image/*" multiple (change)="onOtherImagesChange($event)" />
+          <input type="file" accept="image/* " multiple (change)="onOtherImagesChange($event)" />
           <small *ngIf="mainAd.otherImages.length">
             {{ mainAd.otherImages.length }} image(s) selected
           </small>

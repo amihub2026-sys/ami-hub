@@ -36,24 +36,26 @@
             class="edit-btn"
             (click)="editPost(post, $event)"
           >
-            Edit
+                <span>Edit</span>
           </button>
+
+        <button
+  type="button"
+  class="feature-btn"
+  (click)="featurePost(post, $event)"
+  [disabled]="isFeatured(post)"
+>
+  <span>
+    {{ isFeatured(post) ? 'Featured' : 'Feature Ad' }}
+  </span>
+</button>
 
           <button
             type="button"
-            class="edit-btn"
-            (click)="featurePost(post, $event)"
-            [disabled]="isFeatured(post)"
-          >
-            {{ isFeatured(post) ? 'Featured' : 'Feature Ad' }}
-          </button>
-
-          <button
-            type="button"
-            class="remove-btn"
+            class="delete-btn"
             (click)="removePost(post, $event)"
           >
-            Remove
+               <span>Remove</span>
           </button>
         </div>
       </div>
