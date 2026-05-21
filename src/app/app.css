@@ -647,10 +647,7 @@
 }
 
 @media (max-width: 480px) {
-  .side-menu {
-    width: 100%;
-    max-width: 100%;
-  }
+  
 
   .profile {
     width: 38px;
@@ -1840,6 +1837,43 @@
   .top-ad,
   .floating-ad {
     padding: 12px !important;
+  }
+
+}
+/* =========================
+   MOBILE SIDE MENU FIX
+========================= */
+
+@media (max-width: 768px) {
+
+  .side-menu {
+
+    width: 300px !important;
+
+    max-width: 85% !important;
+
+    height: 100vh;
+
+    border-top-right-radius: 24px;
+    border-bottom-right-radius: 24px;
+
+    overflow-y: auto;
+
+    box-shadow:
+      10px 0 35px rgba(0,0,0,0.18);
+
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .side-menu {
+
+    width: 280px !important;
+
+    max-width: 82% !important;
+
   }
 
 }
