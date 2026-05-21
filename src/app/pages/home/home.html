@@ -17,9 +17,21 @@
           class="slides"
           [style.transform]="'translateX(-' + (currentSlide * 100) + '%)'"
         >
-          <img src="assets/slee1.png" alt="Slide 1">
-          <img src="assets/slee2.png" alt="Slide 2">
-          <img src="assets/slee3.png" alt="Slide 3">
+
+        <picture>
+  <source media="(max-width: 768px)" srcset="assets/busines4.png">
+  <img src="assets/slee1.png" alt="Slide 1">
+</picture>
+
+<picture>
+  <source media="(max-width: 768px)" srcset="assets/busines2.png">
+  <img src="assets/slee2.png" alt="Slide 2">
+</picture>
+
+<picture>
+  <source media="(max-width: 768px)" srcset="assets/busines3.png">
+  <img src="assets/slee3.png" alt="Slide 3">
+</picture>
         </div>
 
         <button class="prev" (click)="prevSlide()">❮</button>
