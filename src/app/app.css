@@ -1265,6 +1265,7 @@
   }
 
   .footer {
+    margin-bottom: auto;
     margin-top: 40px;
     padding-top: 38px;
   }
@@ -2132,6 +2133,7 @@ i.fa-user {
     padding: var(--card-space-small-mobile) !important;
   }
 }
+
 /* =========================
    PREMIUM MOBILE SPACING FIX
    ADD AT VERY END ONLY
@@ -2314,6 +2316,7 @@ router-outlet,
   .footer-container {
     gap: 14px !important;
     padding: 0 14px 20px !important;
+    margin-bottom: auto;
   }
 
   .footer-brand,
@@ -2422,6 +2425,7 @@ router-outlet,
   .footer-container {
     gap: 12px !important;
     padding: 0 12px 18px !important;
+    margin-bottom: auto;
   }
 
   .footer-brand,
@@ -3405,6 +3409,61 @@ router-outlet {
   .bell-animate,
   .myposts-animate{
     display: none !important;
+  }
+
+}
+/* =========================
+   REMOVE FOOTER BOTTOM SPACE
+========================= */
+
+html,
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+}
+
+/* FULL APP HEIGHT FIX */
+body app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  flex: 1;
+  min-height: auto !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* FOOTER */
+.footer {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* REMOVE EXTRA GAP */
+.footer-bottom {
+  margin-bottom: 0 !important;
+}
+
+/* MOBILE FIX */
+@media (max-width: 768px) {
+
+  body {
+    background: #16352f;
+  }
+
+  .main-content {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .footer {
+    margin-bottom: 0 !important;
   }
 
 }
