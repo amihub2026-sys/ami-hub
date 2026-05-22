@@ -32,8 +32,11 @@
           [(ngModel)]="mobile">
       </div>
 
-      <button class="otp-btn" (click)="sendMobileOtp()" [disabled]="otpSent">
-        {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
+<button
+  type="button"
+  class="otp-btn"
+  (click)="sendMobileOtp()"
+  [disabled]="otpSent">        {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
       </button>
 
       <div *ngIf="otpSent" class="otp-section">
@@ -45,8 +48,10 @@
             [(ngModel)]="otp">
         </div>
 
-        <button class="submit-btn" (click)="verifyMobileOtp()">
-          Verify OTP
+<button
+  type="button"
+  class="submit-btn"
+  (click)="verifyMobileOtp()">          Verify OTP
         </button>
       </div>
     </div>
@@ -66,8 +71,12 @@
         </span>
       </div>
 
-      <button class="submit-btn" (click)="loginWithEmailPassword()">Login</button>
-    </div>
+<button
+  type="button"
+  class="submit-btn"
+  (click)="loginWithEmailPassword()">
+  Login
+</button>    </div>
 
     <div *ngIf="userLoginMethod === 'admin'">
       <div class="input-group">
@@ -84,8 +93,12 @@
         </span>
       </div>
 
-      <button class="submit-btn" (click)="loginAdmin()">Admin Login</button>
-    </div>
+<button
+  type="button"
+  class="submit-btn"
+  (click)="loginAdmin()">
+  Admin Login
+</button>    </div>
 
     <div class="divider" *ngIf="userLoginMethod !== 'admin'">OR</div>
 

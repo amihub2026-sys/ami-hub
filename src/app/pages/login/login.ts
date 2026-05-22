@@ -268,6 +268,7 @@ export class Login implements OnInit {
   }
 
   localStorage.setItem('login_otp', otp);
+  console.log('NEW OTP STORED:', otp);
   localStorage.setItem('login_mobile', phone);
 
   this.otpSent = true;
@@ -286,48 +287,106 @@ export class Login implements OnInit {
     return;
   }
 
-  if (savedMobile !== phone || savedOtp !== otpCode) {
-    this.showAlert('Invalid OTP', 'error');
-    return;
-  }
+  console.log('ENTERED OTP:', otpCode);
+console.log('SAVED OTP:', savedOtp);
 
-  localStorage.removeItem('login_otp');
-  localStorage.removeItem('login_mobile');
+console.log('ENTERED PHONE:', phone);
+console.log('SAVED PHONE:', savedMobile);
 
-  const { data: existingUser, error } = await this.supabaseService.supabase
+if (
+  savedMobile?.trim() !== phone.trim() ||
+  savedOtp?.trim() !== otpCode.trim()
+) {
+  console.log('OTP CHECK FAILED');
+
+  console.log('savedMobile:', savedMobile);
+  console.log('phone:', phone);
+
+  console.log('savedOtp:', savedOtp);
+  console.log('otpCode:', otpCode);
+
+  this.showAlert('Invalid OTP', 'error');
+  return;
+}
+
+const { data: users, error: userError } =
+  await this.supabaseService.supabase
     .from('users')
     .select('*')
-    .eq('phonenumber', phone)
-    .maybeSingle();
+    .eq('phonenumber', phone);
 
-  if (error) {
-    console.error(error);
-    this.showAlert('User check failed', 'error');
-    return;
-  }
+console.log('USERS:', users);
+console.log('USER ERROR:', userError);
+
+const existingUser =
+  users && users.length > 0
+    ? users[0]
+    : null;
 
   if (existingUser) {
-    this.storeUserSession(existingUser);
-    localStorage.setItem('userToken', 'loggedUser');
-    localStorage.setItem('mobile', phone);
 
-    this.showAlert('Login successful', 'success');
+localStorage.removeItem('login_otp');
+  localStorage.removeItem('login_mobile');
 
-    setTimeout(async () => {
-      await this.redirectAfterLogin(existingUser);
-    }, 1000);
-
-    return;
-  }
+  this.storeUserSession(existingUser);
 
   localStorage.setItem('userToken', 'loggedUser');
   localStorage.setItem('mobile', phone);
 
-  this.showAlert('Please complete profile setup', 'success');
+  this.showAlert('Login successful', 'success');
 
   setTimeout(async () => {
-    await this.router.navigate(['/account-setup']);
+    await this.redirectAfterLogin(existingUser);
   }, 1000);
+
+  return;
+}
+
+/* CREATE NEW USER */
+
+const { data: newUser, error: insertError } =
+  await this.supabaseService.supabase
+    .from('users')
+    .insert([
+ {
+  phonenumber: phone,
+  fullname: 'New User',
+  username: `user_${phone}`,
+  isactive: true,
+  isverified: true,
+  isonboardingcompleted: false,
+  createdon: new Date().toISOString()
+}
+])
+    .select()
+    .single();
+
+if (insertError) {
+
+  console.log('INSERT ERROR FULL:', insertError);
+
+  alert(JSON.stringify(insertError));
+
+  console.error(insertError);
+
+  this.showAlert(insertError.message || 'User creation failed', 'error');
+
+  return;
+}
+
+localStorage.removeItem('login_otp');
+localStorage.removeItem('login_mobile');
+
+this.storeUserSession(newUser);
+
+localStorage.setItem('userToken', 'loggedUser');
+localStorage.setItem('mobile', phone);
+
+this.showAlert('Please complete profile setup', 'success');
+
+setTimeout(async () => {
+  await this.router.navigate(['/profile-setup']);
+}, 1000);
 }
 
   async loginAdmin() {
