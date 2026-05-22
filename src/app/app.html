@@ -4,10 +4,16 @@
 
       <div style="display:flex; align-items:center; gap:12px;">
         <button class="menu-icon-btn" (click)="toggleMenu()">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+
+  <span></span>
+  <span></span>
+  <span></span>
+
+  <span *ngIf="chatCount > 0" class="menu-badge">
+    {{ chatCount }}
+  </span>
+
+</button>
 
         <a class="logo" [routerLink]="['/']">
           <img src="assets/hub_logo.png" alt="AMI HUB Logo" />
@@ -55,6 +61,8 @@
     {{ chatCount }}
   </span>
 </a>
+
+
 
         <a (click)="goToNotifications(); closeMenu()" class="nav-icon-btn bell-animate" aria-label="Notification">
           <i class="fas fa-bell"></i>
