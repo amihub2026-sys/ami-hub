@@ -113,6 +113,9 @@ if (event instanceof NavigationEnd) {
     await this.loadSavedLocation();
     await this.loadNotificationCount();
     await this.loadChatCount();
+    setInterval(() => {
+  this.loadChatCount();
+}, 3000);
     this.cdr.detectChanges();
   }
 
