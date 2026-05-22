@@ -33,7 +33,11 @@
       </div>
     </div>
 
-    <div class="chat-container">
+   <div 
+  class="chat-container"
+  [class.mobile-show]="selectedChat()"
+  *ngIf="selectedChat()"
+>
       <div class="chat-header">
         {{ selectedChat()?.otherUserName || 'Chat' }}
       </div>
