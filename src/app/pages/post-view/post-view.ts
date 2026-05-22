@@ -571,21 +571,31 @@ setTimeout(() => {
   }
 }
 
-  chatSeller() {
-    const post = this.postData();
+ async chatSeller() {
 
-    if (!post?.userid) {
-      alert('Seller not available');
-      return;
-    }
+  const userId = await this.supabaseService.resolveEffectiveUserUuid();
 
-    this.router.navigate(['/chats'], {
-      queryParams: {
-        postId: post.postid,
-        sellerId: post.userid
-      }
-    });
+  if (!userId) {
+    this.showAlert('Please login first', 'error');
+    this.router.navigate(['/login']);
+    return;
   }
+
+  const post = this.postData();
+
+  if (!post?.userid) {
+    alert('Seller not available');
+    return;
+  }
+
+  this.router.navigate(['/chats'], {
+    queryParams: {
+      postId: post.postid,
+      sellerId: post.userid
+    }
+  });
+
+}
 
   onImageSelected(event: any) {
     const files = event?.target?.files;

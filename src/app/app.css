@@ -710,7 +710,8 @@
 .nav-icon-btn:hover,
 .menu-icon-btn:hover,
 .profile:hover {
-  background: linear-gradient(135deg, #ffb300 0%, #f59e0b 55%, #ea580c 100%);
+  
+
   transform: translateY(-2px);
 }
 
@@ -2591,7 +2592,7 @@ router-outlet,
 
 /* Hover effect */
 .profile:hover {
-  background: linear-gradient(135deg, #ffb300, #ea580c);
+
   transform: translateY(-2px);
 }
 
@@ -3557,3 +3558,4 @@ body app-root {
   }
 
 }
+

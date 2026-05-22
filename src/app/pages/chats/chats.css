@@ -512,4 +512,17 @@
     height: 40px;
     font-size: 15px;
   }
+} 
+/* MOBILE CHAT OPEN FIX */
+
+@media (max-width:768px){
+
+  .chat-container{
+    display:none;
+  }
+
+  .chat-container.mobile-show{
+    display:flex !important;
+  }
+
 }

@@ -64,9 +64,7 @@ export class Chats implements OnInit, OnDestroy {
         this.selectedChat.set(tempChat);
         this.messages.set([]);
       }
-    } else if (this.conversations().length > 0) {
-      await this.openChat(this.conversations()[0]);
-    }
+    } 
 
     this.listenMessages();
   }
@@ -98,7 +96,11 @@ export class Chats implements OnInit, OnDestroy {
           grouped.set(key, {
             post_id: row.post_id,
             otherUserId,
-            otherUserName: 'User',
+         otherUserName:
+  row.sender_name ||
+  row.receiver_name ||
+  row.username ||
+  'User',
             lastMessage: row.message,
             created_at: row.created_at,
             unreadCount:
