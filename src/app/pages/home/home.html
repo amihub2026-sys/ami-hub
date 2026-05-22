@@ -132,6 +132,36 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
   </a>
  </div>
     </div>
+    <div class="mobile-only-card">
+
+  <div class="promo-card matrimony-card featured-matrimony-card">
+    <div class="promo-top-line"></div>
+
+    <div class="promo-icon-wrap">
+      <span class="promo-icon">💖</span>
+    </div>
+
+    <span class="promo-badge">Top Choice</span>
+
+    <h3>Thirumagal Matrimony</h3>
+
+    <p>
+      Find your perfect life partner with trusted profiles and secure
+      connections.
+    </p>
+
+    <div class="promo-action">
+      <a
+        href="https://thirumagalmatrimony.in/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <button type="button">Start Your Journey →</button>
+      </a>
+    </div>
+  </div>
+
+</div>
 
   </div>
 </section>
@@ -302,7 +332,7 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
     >
       <div class="trending-row">
         <div
-          class="product-card trending-card"
+           class="featured-card trending-card"
           *ngFor="let post of getVisibleTrendingPosts()"
           (click)="openDetails(post)"
         >
@@ -344,7 +374,7 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
     </div>
 
     <div class="deals-grid" *ngIf="latestProducts().length > 0">
-      <div class="deal-card" *ngFor="let post of latestProducts()" (click)="openDetails(post)">
+      <div class="featured-card" *ngFor="let post of latestProducts()" (click)="openDetails(post)">
         <div class="deal-tag">New</div>
         <div class="fav-btn">♡</div>
         <img [src]="getLatestProductImage(post)" [alt]="post.title">

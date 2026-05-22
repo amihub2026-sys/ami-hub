@@ -1000,11 +1000,13 @@ DOTS SPACE FIX
 }
 
 .trending-scroll-wrap {
-  margin-top: 8px;
-  overflow: hidden;
-  width: 100%;
-}
 
+  margin-top: 8px;
+
+  width: 100%;
+
+  overflow: visible !important;
+}
 .trending-row {
   display: flex;
   gap: 20px;
@@ -1013,12 +1015,31 @@ DOTS SPACE FIX
   flex-wrap: nowrap;
 }
 
-.trending-card {
-  flex: 0 0 calc(25% - 14px);
-  max-width: calc(25% - 14px);
-  min-width: 230px;
+/* HOT ADS PERFECT DESKTOP */
+
+.trending-row{
+
+  display:grid;
+
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+
+  gap:22px;
+
+  align-items:stretch;
 }
 
+/* REMOVE OLD FIXED WIDTH */
+
+.trending-card{
+
+  width:100% !important;
+
+  max-width:100% !important;
+
+  min-width:100% !important;
+
+  flex:none !important;
+}
 .trending-card img {
   height: 200px;
 }
@@ -2451,7 +2472,66 @@ DOTS SPACE FIX
     max-width: 100%;
   }
 }
+/* ===============================
+   MOBILE PROMO AUTO SLIDE
+================================= */
 
+@media (max-width:768px){
+
+  .mini-promos{
+    overflow:hidden;
+    padding:0 12px;
+  }
+
+  .promo-grid{
+    display:flex !important;
+
+    gap:14px;
+
+    width:max-content;
+
+    animation: promoScroll 12s linear infinite;
+  }
+
+  .promo-card{
+
+    min-width:280px !important;
+
+    max-width:280px !important;
+
+    flex-shrink:0;
+  }
+
+}
+
+/* ONLY LEFT SIDE RUN */
+
+@keyframes promoScroll{
+
+  0%{
+    transform:translateX(0);
+  }
+
+  100%{
+    transform:translateX(-620px);
+  }
+
+}
+/* HIDE DUPLICATE IN DESKTOP */
+
+.mobile-only-card{
+  display:none;
+}
+
+/* SHOW ONLY MOBILE */
+
+@media (max-width:768px){
+
+  .mobile-only-card{
+    display:block;
+  }
+
+}
 /* mobile */
 @media (max-width: 768px) {
   .mini-promos {
@@ -4148,5 +4228,41 @@ DOTS SPACE FIX
 /* sometimes wrapper div adds gap */
 .top-ad + * {
   margin-top: 0 !important;
+}
+/* HOT ADS SAME AS FEATURED PRODUCTS */
+
+.trending-row .featured-card{
+
+  flex: unset !important;
+
+  max-width: unset !important;
+
+  min-width: unset !important;
+
+  width: 100% !important;
+}
+
+/* GRID LIKE FEATURED */
+
+.trending-row{
+
+  display:grid !important;
+
+  grid-template-columns: repeat(4, minmax(0,1fr)) !important;
+
+  gap:22px !important;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+  .trending-row{
+
+    grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+
+    gap:12px !important;
+  }
+
 }
 
