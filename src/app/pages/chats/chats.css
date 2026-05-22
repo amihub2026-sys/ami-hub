@@ -513,7 +513,7 @@
     font-size: 15px;
   }
 } 
-/* MOBILE CHAT OPEN FIX */
+/* MOBILE FULL CHAT SCREEN */
 
 @media (max-width:768px){
 
@@ -521,8 +521,57 @@
     display:none;
   }
 
-  .chat-container.mobile-show{
-    display:flex !important;
+ .chat-container.mobile-show{
+  display:flex !important;
+
+  position:fixed !important;
+
+  top:72px;                 
+  left:0;
+
+  width:100%;
+  height:calc(100vh - 72px);
+
+  z-index:9999;
+  background:#fff;
+}
+
+  .chat-sidebar.mobile-hide{
+    display:none !important;
+  }
+
+}
+/* MOBILE BACK BUTTON */
+
+.back-btn{
+  display:none;
+}
+
+@media (max-width:768px){
+
+  .back-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:34px;
+    height:34px;
+
+    border:none;
+    border-radius:50%;
+
+    background:rgba(255,255,255,0.2);
+    color:#fff;
+
+    font-size:20px;
+    margin-right:10px;
+
+    cursor:pointer;
+  }
+
+  .chat-header{
+    display:flex;
+    align-items:center;
   }
 
 }

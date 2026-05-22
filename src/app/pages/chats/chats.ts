@@ -75,7 +75,7 @@ export class Chats implements OnInit, OnDestroy {
     try {
       const { data, error } = await supabase
         .from('messages')
-        .select('*')
+   .select('*')
         .or(`sender_id.eq.${this.currentUser.id},receiver_id.eq.${this.currentUser.id}`)
         .order('created_at', { ascending: false });
 
@@ -96,12 +96,11 @@ export class Chats implements OnInit, OnDestroy {
           grouped.set(key, {
             post_id: row.post_id,
             otherUserId,
-         otherUserName:
-  row.sender_name ||
-  row.receiver_name ||
-  row.username ||
-  'User',
-            lastMessage: row.message,
+      otherUserName:
+  String(row.sender_id) === String(this.currentUser.id)
+    ? 'Seller'
+    : 'Buyer',
+       lastMessage: row.message,
             created_at: row.created_at,
             unreadCount:
               String(row.receiver_id) === String(this.currentUser.id) && !row.is_read ? 1 : 0
