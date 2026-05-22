@@ -26,6 +26,7 @@ imports: [
 })
 export class App implements OnInit {
   notificationCount = 0;
+  chatCount = 0;
 
   selectedCity: string = '';
   searchText: string = '';
@@ -111,6 +112,7 @@ if (event instanceof NavigationEnd) {
 });
     await this.loadSavedLocation();
     await this.loadNotificationCount();
+    await this.loadChatCount();
     this.cdr.detectChanges();
   }
 
@@ -238,7 +240,40 @@ if (event instanceof NavigationEnd) {
       this.notificationCount = 0;
     }
   }
+async loadChatCount(): Promise<void> {
 
+  try {
+
+    const userUuid =
+      await this.supabaseService.resolveEffectiveUserUuid();
+
+    if (!userUuid) {
+      this.chatCount = 0;
+      return;
+    }
+
+    const { count, error } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('receiver_id', userUuid)
+      .eq('is_read', false);
+
+    if (error) {
+      this.chatCount = 0;
+      return;
+    }
+
+    this.chatCount = count || 0;
+
+    this.cdr.detectChanges();
+
+  } catch (e) {
+
+    this.chatCount = 0;
+
+  }
+
+}
   goToNotifications(): void {
     this.isLoggedIn().then((loggedIn) => {
       if (!loggedIn) {
