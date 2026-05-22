@@ -260,27 +260,33 @@
   .my-posts-page{
     padding:16px !important;
   }
+.posts-grid{
 
-  .posts-grid{
+  display:grid !important;
 
-    display:grid !important;
+  grid-template-columns:repeat(2,1fr) !important;
 
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
 
-    gap:12px !important;
-  }
+  width:100% !important;
 
+  overflow:hidden !important;
+}
+.feature-btn{
+
+  font-size:9px !important;
+}
   .post-card{
 
-    width:100% !important;
+  width:100% !important;
 
-    max-width:100% !important;
+  max-width:100% !important;
 
-    min-width:100% !important;
+  min-width:0 !important;
 
-    padding-bottom:10px !important;
+  overflow:hidden !important;
 
-    border-radius:18px !important;
+  box-sizing:border-box !important;
   }
 
   .post-card img{
@@ -336,64 +342,95 @@
 
 @media(max-width:768px){
 
-  .post-actions{
+.post-actions{
 
-    display:grid !important;
+  display:flex !important;
 
-    grid-template-columns:repeat(3,1fr);
+  gap:4px !important;
 
-    gap:6px !important;
+  width:100% !important;
 
-    width:100%;
-  }
+  padding:0 8px !important;
+
+  box-sizing:border-box !important;
+}
 
   .edit-btn,
-  .feature-btn,
-  .delete-btn{
+.feature-btn,
+.delete-btn{
 
-    width:100% !important;
+  flex:1 !important;
 
-    min-width:0 !important;
+  min-width:0 !important;
 
-    height:36px !important;
+  height:34px !important;
 
-    padding:0 6px !important;
+  padding:0 4px !important;
 
-    font-size:10px !important;
+  font-size:9px !important;
 
-    border-radius:12px !important;
+  border-radius:10px !important;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
+  display:flex !important;
 
-    white-space:nowrap;
-  }
+  align-items:center !important;
+
+  justify-content:center !important;
+
+  white-space:nowrap !important;
+
+  overflow:hidden !important;
+
+  text-overflow:ellipsis !important;
+}
 
   .edit-btn span,
-  .feature-btn span,
   .delete-btn span{
 
     font-size:10px !important;
   }
 
 }
-/* FEATURE BUTTON TEXT FIX */
 
-@media(max-width:768px){
+.post-card img{
 
-  .feature-btn{
+  width:100% !important;
 
-    font-size:9px !important;
+  object-fit:cover !important;
 
-    padding:0 4px !important;
+  border-radius:14px !important;
+}
+.post-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 12px;
+  padding: 0 8px;
+}
+
+/* BUTTON COMMON FIX */
+.edit-btn,
+
+.delete-btn {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+} 
+@media (max-width: 480px) {
+  .post-actions {
+    grid-template-columns: 1fr;
   }
-
-  .feature-btn span{
-
-    font-size:9px !important;
-
-    letter-spacing:-0.2px;
-  }
-
+} .feature-btn{
+  background:linear-gradient(135deg,#8b5cf6,#6366f1);
+  box-shadow:0 10px 24px rgba(99,102,241,0.28);
 }
