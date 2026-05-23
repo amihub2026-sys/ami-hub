@@ -154,9 +154,15 @@
           ❤️ Favorites
         </a>
 
-        <a (click)="goToChat(); closeMenu()">
-          💬 Chats
-        </a>
+       <a (click)="goToChat(); closeMenu()" class="chat-menu-item">
+
+  💬 Chats
+
+  <span *ngIf="chatCount > 0" class="chat-menu-badge">
+    {{ chatCount }}
+  </span>
+
+</a>
 
         <div class="menu-item notification-item" (click)="goToNotifications(); closeMenu()">
           <i class="fas fa-bell"></i>
