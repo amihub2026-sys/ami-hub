@@ -31,6 +31,7 @@ interface SubcategoryItem {
 })
 export class ProductList implements OnInit {
   isFilterOpen = false;
+  currentUserId = signal<string>('');
   posts = signal<any[]>([]);
   displayedPosts = signal<any[]>([]);
   isLoading = signal(false);
@@ -62,6 +63,8 @@ export class ProductList implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    const user = await this.supabaseService.getCurrentUser();
+this.currentUserId.set(user?.id || '');
     this.loadSelectedLocationAndRadius();
     await this.loadCategories();
     await this.loadAllSubcategories();
@@ -424,6 +427,13 @@ export class ProductList implements OnInit {
     }
 
     let data = [...this.posts()];
+    if (this.currentUserId()) {
+
+  data = data.filter((post) =>
+    String(post?.userid || '') !== String(this.currentUserId())
+  );
+
+}
 
     const search = this.searchText.trim().toLowerCase();
     const locationSearch = this.locationText.trim().toLowerCase();
