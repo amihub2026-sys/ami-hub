@@ -66,6 +66,7 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') 
   postId = '';
   postData = signal<any | null>(null);
   isLoading = signal(false);
+  currentUserId = signal<string>('');
 
   selectedMedia = signal<{ type: 'image' | 'video'; url: string }>({
     type: 'image',
@@ -87,18 +88,21 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') 
   private sanitizer: DomSanitizer,
   private snackbar: SnackbarService
 ) {}
+async ngOnInit(): Promise<void> {
+  this.postId = this.route.snapshot.paramMap.get('id') || '';
 
-  async ngOnInit(): Promise<void> {
-    this.postId = this.route.snapshot.paramMap.get('id') || '';
-
-    if (!this.postId) {
-      console.error('Post id not found in route');
-      return;
-    }
-
-    await this.loadPost();
+  if (!this.postId) {
+    console.error('Post id not found in route');
+    return;
   }
 
+  const userId = await this.supabaseService.resolveEffectiveUserUuid();
+  this.currentUserId.set(userId || '');
+
+  await this.loadPost();
+}
+
+  
   setRating(star: number) {
     this.selectedRating = star;
   }
@@ -129,7 +133,40 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') 
     const total = ratings.reduce((sum: number, value: number) => sum + value, 0);
     this.averageRating.set(Math.round(total / ratings.length));
   }
+  async removePost() {
 
+  const post = this.postData();
+
+  if (!post?.postid) {
+    alert('Post not found');
+    return;
+  }
+
+  const confirmDelete = confirm('Are you sure you want to remove this post?');
+
+  if (!confirmDelete) return;
+
+  const { error } = await supabase
+    .from('post')
+    .delete()
+    .eq('postid', post.postid);
+
+  if (error) {
+    console.error(error);
+    alert('Failed to remove post');
+    return;
+  }
+
+  alert('Post removed successfully');
+
+  this.router.navigate(['/my-posts']);
+} 
+isMyPost(): boolean {
+
+  const post = this.postData();
+
+  return String(post?.userid || '') === String(this.currentUserId() || '');
+}
   async loadReviews() {
     const post = this.postData();
 
@@ -588,6 +625,7 @@ setTimeout(() => {
     return;
   }
 
+
   this.router.navigate(['/chats'], {
     queryParams: {
       postId: post.postid,
@@ -705,4 +743,5 @@ setTimeout(() => {
       this.isReviewSubmitting.set(false);
     }
   }
+  
 }
