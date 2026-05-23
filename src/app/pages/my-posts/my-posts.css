@@ -426,11 +426,26 @@
   overflow: hidden;
   text-overflow: ellipsis;
 } 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+
   .post-actions {
-    grid-template-columns: 1fr;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 4px !important;
+    padding: 0 8px !important;
+    margin-top: 10px !important;
   }
-} .feature-btn{
-  background:linear-gradient(135deg,#8b5cf6,#6366f1);
-  box-shadow:0 10px 24px rgba(99,102,241,0.28);
+
+  .edit-btn,
+  .feature-btn,
+  .delete-btn {
+    flex: 1 !important;
+    width: 40px !important;
+   min-width: 40px !important;
+    height: 34px !important;
+    padding: 0 4px !important;
+    font-size: 9px !important;
+    border-radius: 5px !important;
+    white-space: nowrap !important;
+  }
 }
