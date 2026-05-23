@@ -3730,3 +3730,23 @@ body app-root {
 
   z-index:1000 !important;
 }
+.back-btn{
+  width:38px;
+  height:38px;
+  border:none;
+  border-radius:12px;
+  background:#f1f5f9;
+  color:#111827;
+  font-size:22px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+@media(max-width:768px){
+  .back-btn{
+    width:32px;
+    height:32px;
+    font-size:18px;
+    border-radius:8px;
+  }
+}

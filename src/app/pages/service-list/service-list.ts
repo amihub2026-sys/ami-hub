@@ -1,6 +1,7 @@
 import { Component, OnInit, HostListener, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../services/supabase.service';
 import { supabase } from '../../../supabaseClient';
@@ -55,11 +56,11 @@ export class ServiceList implements OnInit {
   selectedCategoryId: number | null = null;
   selectedSubcategoryId: number | null = null;
   selectedCategoryName = '';
-
-  constructor(
-    private supabaseService: SupabaseService,
-    private route: ActivatedRoute
-  ) {}
+constructor(
+  private supabaseService: SupabaseService,
+  private route: ActivatedRoute,
+  private location: Location
+) {}
 
   async ngOnInit(): Promise<void> {
     this.loadSelectedLocationAndRadius();
@@ -788,5 +789,8 @@ export class ServiceList implements OnInit {
   }
   toggleFilter(): void {
   this.isFilterOpen = !this.isFilterOpen;
+}
+goBack(): void {
+  this.location.back();
 }
 }

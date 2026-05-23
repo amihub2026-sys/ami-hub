@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { SupabaseService } from '../../services/supabase.service';
 
 @Component({
@@ -16,7 +17,8 @@ export class Categories implements OnInit {
 
   constructor(
     private supabaseService: SupabaseService,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) {}
 
   async ngOnInit() {
@@ -55,4 +57,7 @@ export class Categories implements OnInit {
     const target = event.target as HTMLImageElement;
     target.src = 'assets/icons/default.png';
   }
+  goBack(): void {
+  this.location.back();
+}
 }
