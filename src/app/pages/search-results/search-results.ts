@@ -1,6 +1,7 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { supabase } from '../../../supabaseClient';
 
@@ -51,8 +52,12 @@ export class SearchResults {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+      private location: Location
   ) {}
+  goBack(): void {
+  this.location.back();
+}
 
   ngOnInit() {
     this.route.queryParams.subscribe(async (params) => {
