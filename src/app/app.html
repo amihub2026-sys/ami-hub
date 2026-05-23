@@ -136,13 +136,13 @@
       <div class="links-container">
         <a [routerLink]="['/']" (click)="closeMenu()">Home</a>
 
-        <a (click)="goToMyPosts(); closeMenu()">My Posts</a>
+        <a (click)=" closeMenu(); goToMyPosts()">My Posts</a>
 
         <!-- <a (click)="postProduct(); closeMenu()" class="special-link product">
           Post Product
         </a> -->
 
-        <a (click)="postService(); closeMenu()" class="special-link service">
+        <a (click)=" closeMenu(); postService()" class="special-link service">
           📢 ADVERTISE
         </a>
 
@@ -150,11 +150,11 @@
           🛒 Cart
         </a> -->
 
-        <a (click)="goToFavorites(); closeMenu()">
+        <a (click)=" closeMenu();goToFavorites();">
           ❤️ Favorites
         </a>
 
-       <a (click)="goToChat(); closeMenu()" class="chat-menu-item">
+       <a (click)=" closeMenu(); goToChat()" class="chat-menu-item">
 
   💬 Chats
 
@@ -179,7 +179,7 @@
 
         <!-- <a [routerLink]="['/news']" (click)="closeMenu()">📰 News</a> -->
 
-      <div class="menu-item" (click)="goToProfile(); closeMenu()">
+      <div class="menu-item" (click)=" closeMenu();goToProfile()">
   <i class="fas fa-user-circle"></i>
   <span>Profile</span>
 </div>
