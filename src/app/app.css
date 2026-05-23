@@ -3713,3 +3713,20 @@ body app-root {
 
   justify-content:center;
 }
+.menu-overlay{
+
+  position:fixed;
+
+  inset:0;
+
+  background:rgba(0,0,0,0.25);
+
+  z-index:999;
+
+  backdrop-filter:blur(2px);
+}
+
+.side-menu{
+
+  z-index:1000 !important;
+}
