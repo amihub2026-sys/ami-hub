@@ -185,18 +185,22 @@
       </span>
       <span>{{ averageRating() }}/5 ({{ reviews().length }} Reviews)</span>
     </div>
+<div *ngIf="!isMyPost()" class="actions">
+  <button (click)="callSeller()">Call</button>
+  <button (click)="whatsappSeller()">WhatsApp</button>
+  <button type="button" (click)="sharePost()">Share</button>
+</div>
 
-    <div class="actions">
-      <button (click)="callSeller()">Call</button>
-      <button (click)="whatsappSeller()">WhatsApp</button>
-      <button type="button" (click)="sharePost()">Share</button>
-    </div>
+<div *ngIf="!isMyPost()" class="quick-actions">
+  <button class="quick-btn favorite-btn" (click)="addToFavorites()">❤ Favorite</button>
+  <button class="quick-btn chat-btn" (click)="chatSeller()">💬 Chat Seller</button>
+</div>
 
-    <div class="quick-actions">
-      <!-- <button class="quick-btn cart-btn" (click)="addToCart()">🛒 Add to Cart</button> -->
-      <button class="quick-btn favorite-btn" (click)="addToFavorites()">❤ Favorite</button>
-      <button class="quick-btn chat-btn" (click)="chatSeller()">💬 Chat Seller</button>
-    </div>
+<div *ngIf="isMyPost()" class="quick-actions">
+  <button class="quick-btn delete-btn" type="button" (click)="removePost()">
+    Remove Post
+  </button>
+</div>
 
     <div class="seller-card">
       <img [src]="postData()?.sellerImage" alt="Seller image">

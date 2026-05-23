@@ -70,7 +70,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   activeTab: string = 'all';
   searchQuery: string = '';
   recognition: any;
-
+currentUserId = signal<string>('');
   trendingPosts = signal<any[]>([]);
   isTrendingLoading = signal(false);
 
@@ -89,16 +89,19 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   private trendingInterval: any;
   readonly visibleTrendingCount = 5;
 
-  async ngOnInit() {
-    this.startAutoSlide();
+ async ngOnInit() {
+  const user = await this.supabaseService.getCurrentUser();
+  this.currentUserId.set(user?.id || '');
 
-    await this.loadBrowseCategories();
-    await this.loadFeaturedBusinesses();
-    await this.loadTrendingPosts();
-    await this.loadNewProducts();
+  this.startAutoSlide();
 
-    this.startTrendingAutoScroll();
-  }
+  await this.loadBrowseCategories();
+  await this.loadFeaturedBusinesses();
+  await this.loadTrendingPosts();
+  await this.loadNewProducts();
+
+  this.startTrendingAutoScroll();
+}
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -483,4 +486,8 @@ goToPage() {
     clearInterval(this.counterInterval);
     this.stopTrendingAutoScroll();
   }
+  isMyPost(post: any): boolean {
+  return String(post?.userid || '') === String(this.currentUserId() || '');
+}
+  
 }

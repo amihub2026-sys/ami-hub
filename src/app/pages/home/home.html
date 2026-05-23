@@ -336,7 +336,12 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
           *ngFor="let post of getVisibleTrendingPosts()"
           (click)="openDetails(post)"
         >
-          <div class="deal-tag">Hot</div>
+        <div
+  class="deal-tag"
+  [class.my-ad-tag]="isMyPost(post)"
+>
+  {{ isMyPost(post) ? 'My Ads' : 'Hot' }}
+</div>
           <div class="fav-btn">♡</div>
 
           <img
