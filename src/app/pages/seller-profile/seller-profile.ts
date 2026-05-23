@@ -7,6 +7,7 @@ import {
   NgZone,
   ChangeDetectorRef
 } from '@angular/core';
+import { Location } from '@angular/common';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -56,6 +57,7 @@ constructor(
   private supabaseService: SupabaseService,
   private zone: NgZone,
   private cdr: ChangeDetectorRef,
+  private location: Location,
   private snackbar: SnackbarService   // ✅ ADD THIS
 ) {}
 
@@ -543,5 +545,8 @@ await Promise.race([
 
  private showMessage(message: string, type: 'success' | 'error' | 'info' = 'info') {
   this.snackbar.show(message, type);
+}
+goBack(): void {
+  this.location.back();
 }
 }

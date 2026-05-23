@@ -1,6 +1,7 @@
 import { Component, OnInit, HostListener, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../services/supabase.service';
 import { supabase } from '../../../supabaseClient';
@@ -57,10 +58,11 @@ export class ProductList implements OnInit {
   selectedSubcategoryId: number | null = null;
   selectedCategoryName = '';
 
-  constructor(
-    private supabaseService: SupabaseService,
-    private route: ActivatedRoute
-  ) {}
+constructor(
+  private supabaseService: SupabaseService,
+  private route: ActivatedRoute,
+  private location: Location
+) {}
 
   async ngOnInit(): Promise<void> {
     const user = await this.supabaseService.getCurrentUser();
@@ -714,5 +716,8 @@ this.currentUserId.set(user?.id || '');
   /* ADD THIS */
 toggleFilter() {
   this.isFilterOpen = !this.isFilterOpen;
+}
+goBack(): void {
+  this.location.back();
 }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { SnackbarService } from '../../services/snackbar.service';
+import { Location } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -148,6 +149,7 @@ constructor(
   private route: ActivatedRoute,
   private cdr: ChangeDetectorRef,
   private ngZone: NgZone,
+  private location: Location,
   private snackbar: SnackbarService   // ✅ ADD THIS
 ) {}
 
@@ -1078,4 +1080,7 @@ video_urls: videoUrls,
       this.ngZone.run(() => this.cdr.detectChanges());
     }
   }
+  goBack(): void {
+  this.location.back();
+}
 }

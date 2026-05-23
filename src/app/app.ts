@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Location } from '@angular/common';
 import { RouterOutlet, RouterLink, Router, NavigationEnd, NavigationStart } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { SupabaseService } from './services/supabase.service';
@@ -68,7 +69,9 @@ export class App implements OnInit {
 
   currentUrl: string = '';
 isRouteLoading = false;
+
  constructor(
+  private location: Location,
   public router: Router,
   private supabaseService: SupabaseService,
   private cdr: ChangeDetectorRef,
@@ -127,6 +130,7 @@ if (event instanceof NavigationEnd) {
     if (!this.isBrowser()) return false;
     return localStorage.getItem('userToken') === 'loggedUser';
   }
+  
 
   private async isLoggedIn(): Promise<boolean> {
     if (!this.isBrowser()) return false;
@@ -670,5 +674,10 @@ async loadChatCount(): Promise<void> {
     this.notificationCount = 0;
     this.cdr.detectChanges();
     this.router.navigate(['/login']);
+
   }
+  goBack(): void {
+  this.location.back();
+}
+  
 }

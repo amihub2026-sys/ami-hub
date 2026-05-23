@@ -3,6 +3,9 @@
     <div class="nav-container">
 
       <div style="display:flex; align-items:center; gap:12px;">
+        <button class="back-btn" type="button" (click)="goBack()">
+  ←
+</button>
         <button class="menu-icon-btn" (click)="toggleMenu()">
 
   <span></span>
@@ -130,6 +133,7 @@
     <div class="menu-content">
       <div class="menu-header">
         <!-- <div class="logo">AMI<span>HUB</span></div> -->
+         <button class="back-btn" type="button" (click)="goBack()">←</button>
         <button class="close-icon" type="button" (click)="closeMenu()"></button>
       </div>
 

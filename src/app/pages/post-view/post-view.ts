@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -86,7 +87,8 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') 
   private router: Router,
   private supabaseService: SupabaseService,
   private sanitizer: DomSanitizer,
-  private snackbar: SnackbarService
+  private snackbar: SnackbarService,
+  private location: Location
 ) {}
 async ngOnInit(): Promise<void> {
   this.postId = this.route.snapshot.paramMap.get('id') || '';
@@ -743,5 +745,8 @@ setTimeout(() => {
       this.isReviewSubmitting.set(false);
     }
   }
+  goBack(): void {
+  this.location.back();
+}
   
 }
