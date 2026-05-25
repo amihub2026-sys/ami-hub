@@ -745,8 +745,13 @@ setTimeout(() => {
       this.isReviewSubmitting.set(false);
     }
   }
-  goBack(): void {
-  this.location.back();
+goBack(event: Event): void {
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  this.router.navigateByUrl('/home');
+
 }
   
 }

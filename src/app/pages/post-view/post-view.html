@@ -7,9 +7,12 @@
 </div>
 
 <div class="post-view-container" *ngIf="!isLoading() && postData()">
-  <div class="page-back-arrow" (click)="goBack()">
+  <button
+  type="button"
+  class="page-back-arrow"
+  (click)="goBack($event)">
   ←
-</div>
+</button>
 
   <div class="media-section">
 
