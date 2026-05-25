@@ -280,27 +280,44 @@ currentUserId = signal<string>('');
   }
 
   openCategory(category: any) {
-    const type = category?.category_type || '';
 
-    if (type === 'service') {
-      this.router.navigate(['/service-list'], {
-        queryParams: { category: category.categoryid }
-      });
-      return;
-    }
+  const categoryName =
+    (category?.categoryname || '').toLowerCase();
 
-    if (type === 'product') {
-      this.router.navigate(['/products'], {
-        queryParams: { category: category.categoryid }
-      });
-      return;
-    }
-
-    this.router.navigate(['/search'], {
-      queryParams: { category: category.categoryid, type: 'all' }
-    });
+  // JOB CATEGORY
+  if (categoryName === 'job') {
+    this.router.navigate(['/job']);
+    return;
   }
 
+  // SERVICE CATEGORY
+  if (category?.category_type === 'service') {
+    this.router.navigate(['/service-list'], {
+      queryParams: {
+        category: category.categoryid
+      }
+    });
+    return;
+  }
+
+  // PRODUCT CATEGORY
+  if (category?.category_type === 'product') {
+    this.router.navigate(['/products'], {
+      queryParams: {
+        category: category.categoryid
+      }
+    });
+    return;
+  }
+
+  // DEFAULT SEARCH
+  this.router.navigate(['/search'], {
+    queryParams: {
+      category: category.categoryid,
+      type: 'all'
+    }
+  });
+}
   openProductCategory(category: any) {
     this.router.navigate(['/products'], {
       queryParams: { category: category.categoryid }

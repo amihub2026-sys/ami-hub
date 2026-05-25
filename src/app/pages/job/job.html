@@ -1,0 +1,234 @@
+
+<section class="job-area">
+
+  <div class="job-left">
+  <h2>Available Jobs</h2>
+
+  <div class="job-tabs">
+    <button type="button" [class.active]="selectedType === 'All'" (click)="selectedType='All'">All</button>
+    <button type="button" [class.active]="selectedType === 'Full Time'" (click)="selectedType='Full Time'">Full Time</button>
+    <button type="button" [class.active]="selectedType === 'Part Time'" (click)="selectedType='Part Time'">Part Time</button>
+    <button type="button" [class.active]="selectedType === 'Internship'" (click)="selectedType='Internship'">Internship</button>
+  </div>
+
+  <div class="job-card" *ngFor="let job of filteredJobs()">
+    <h3>{{ job.title }}</h3>
+    <p><strong>Company:</strong> {{ job.company }}</p>
+    <p><strong>Location:</strong> {{ job.location }}</p>
+    <p><strong>Salary:</strong> {{ job.salary }}</p>
+
+  <div class="job-card-bottom">
+  <button type="button" class="view-details-btn" (click)="openJobDetails(job)">
+    View Details
+  </button>
+
+  <button type="button" class="apply-btn" (click)="openApplyForm(job)">
+    Apply Now
+  </button>
+</div>
+<div class="job-details-overlay" *ngIf="showJobDetails" (click)="showJobDetails=false">
+  <div class="job-details-popup" (click)="$event.stopPropagation()">
+
+    <button type="button" class="close-popup-btn" (click)="showJobDetails=false">✕</button>
+
+    <h2>{{ selectedJob?.title }}</h2>
+
+    <div class="details-grid">
+
+  <div class="detail-item">
+    <div class="detail-icon">🏢</div>
+    <div>
+      <span>Company Name</span>
+      <h4>{{ selectedJob?.company }}</h4>
+    </div>
+  </div>
+
+  <div class="detail-item">
+    <div class="detail-icon">📍</div>
+    <div>
+      <span>Location</span>
+      <h4>{{ selectedJob?.location }}</h4>
+    </div>
+  </div>
+
+  <div class="detail-item">
+    <div class="detail-icon">💰</div>
+    <div>
+      <span>Salary</span>
+      <h4>{{ selectedJob?.salary }}</h4>
+    </div>
+  </div>
+
+  <div class="detail-item">
+    <div class="detail-icon">📈</div>
+    <div>
+      <span>Experience</span>
+      <h4>{{ selectedJob?.experience || '1 - 3 Years' }}</h4>
+    </div>
+  </div>
+
+  <div class="detail-item">
+    <div class="detail-icon">👥</div>
+    <div>
+      <span>Vacancies</span>
+      <h4>{{ selectedJob?.vacancies || '5' }}</h4>
+    </div>
+  </div>
+
+  <div class="detail-item">
+    <div class="detail-icon">🛠️</div>
+    <div>
+      <span>Skills Required</span>
+      <h4>{{ selectedJob?.skills || 'Angular, Flutter, Supabase' }}</h4>
+    </div>
+  </div>
+
+  <div class="detail-item full">
+    <div class="detail-icon">📝</div>
+    <div>
+      <span>Job Description</span>
+      <h4>
+        {{ selectedJob?.description || 'Candidate should have good knowledge and work experience.' }}
+      </h4>
+    </div>
+  </div>
+
+  <div class="detail-item">
+    <div class="detail-icon">📧</div>
+    <div>
+      <span>Email</span>
+      <h4>{{ selectedJob?.contactEmail || 'hr@company.com' }}</h4>
+    </div>
+  </div>
+
+  <div class="detail-item">
+    <div class="detail-icon">📞</div>
+    <div>
+      <span>Phone</span>
+      <h4>{{ selectedJob?.phone || '+91 98765 43210' }}</h4>
+    </div>
+  </div>
+
+</div>
+
+  </div>
+</div>
+
+  <!-- APPLY POPUP -->
+<div
+  class="apply-popup-overlay"
+  *ngIf="showApplyForm"
+  (click)="showApplyForm=false">
+
+  <div
+    class="apply-popup"
+    (click)="$event.stopPropagation()">
+
+    <button
+      type="button"
+      class="close-popup-btn"
+      (click)="showApplyForm=false">
+
+      ✕
+
+    </button>
+
+    <h3>
+      Apply for {{ selectedJob?.title }}
+    </h3>
+
+    <form
+      class="apply-form"
+      (ngSubmit)="submitApplication()">
+
+      <input
+        type="text"
+        placeholder="Your Name"
+        [(ngModel)]="application.name"
+        name="name">
+
+      <input
+        type="email"
+        placeholder="Email Address"
+        [(ngModel)]="application.email"
+        name="email">
+
+      <input
+        type="tel"
+        placeholder="Phone Number"
+        [(ngModel)]="application.phone"
+        name="phone">
+
+      <textarea
+        placeholder="Message / Experience"
+        [(ngModel)]="application.message"
+        name="message">
+      </textarea>
+
+      <div class="resume-upload">
+        <label>Upload Resume</label>
+
+        <input
+          type="file"
+          accept=".pdf,.doc,.docx"
+          (change)="onResumeSelected($event)">
+      </div>
+
+      <button type="submit">
+        Submit Application
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+  </div>
+  </div>
+  <div class="job-right">
+
+  <div class="job-post-top">
+    <button
+      type="button"
+      class="post-job-btn"
+      (click)="goToAddJob()">
+      🚀 Post Your Job Now
+    </button>
+  </div>
+
+  <div class="add-job-highlight">
+    <h3>Find the Perfect Employee for Your Business</h3>
+
+    <p>
+      Post your jobs and connect with thousands of skilled candidates instantly.
+    </p>
+
+    <div class="job-features">
+      <div class="feature-item">✅ Reach More Candidates</div>
+      <div class="feature-item">⚡ Fast Hiring Process</div>
+      <div class="feature-item">💼 Trusted Job Platform</div>
+    </div>
+  </div>
+
+</div>
+
+    <form class="job-form" *ngIf="showJobForm" (ngSubmit)="saveJob()">
+      <h3>Add New Job</h3>
+
+      <input type="text" placeholder="Job Title" [(ngModel)]="newJob.title" name="title">
+      <input type="text" placeholder="Company Name" [(ngModel)]="newJob.company" name="company">
+      <input type="text" placeholder="Location" [(ngModel)]="newJob.location" name="location">
+      <input type="text" placeholder="Salary" [(ngModel)]="newJob.salary" name="salary">
+
+      <select [(ngModel)]="newJob.type" name="type">
+        <option value="">Select Job Type</option>
+        <option value="Full Time">Full Time</option>
+        <option value="Part Time">Part Time</option>
+        <option value="Work From Home">Work From Home</option>
+      </select>
+
+      <button type="submit">Save Job</button>
+    </form>
+
+
+</section>
