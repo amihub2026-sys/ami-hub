@@ -1591,6 +1591,8 @@
   }
 
   .location-modal-header h3 {
+    margin-left: 20px;
+    margin-top: 10px;
     font-size: 16px;
   }
 
@@ -3749,4 +3751,46 @@ body app-root {
     font-size:18px;
     border-radius:8px;
   }
+  @media (max-width: 768px) {
+
+  .location-modal-card {
+    margin-top: 65px !important;
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 95px) !important;
+    overflow-y: auto !important;
+    border-radius: 10px !important;
+  }
+
+  .location-modal-header {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 10;
+    padding-bottom: 5px;
+  }
+
+}
+@media (max-width:768px){
+
+  .close-location-btn{
+
+    width:36px;
+    height:36px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0;
+
+    border-radius:10px;
+
+    font-size:20px;
+
+    margin-left:10px;
+
+    flex-shrink:0;
+  }
+
+}
 }

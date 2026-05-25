@@ -1,5 +1,11 @@
 
 <div class="profile-container">
+  <button
+  type="button"
+  class="page-back-arrow"
+  (click)="goBack($event)">
+  ←
+</button>
 
   <h2>{{ isEditMode ? 'Edit Profile' : 'Profile Setup' }}</h2>
 

@@ -546,7 +546,12 @@ await Promise.race([
  private showMessage(message: string, type: 'success' | 'error' | 'info' = 'info') {
   this.snackbar.show(message, type);
 }
-goBack(): void {
-  this.location.back();
+goBack(event: Event): void {
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  this.router.navigateByUrl('/home');
+
 }
 }
