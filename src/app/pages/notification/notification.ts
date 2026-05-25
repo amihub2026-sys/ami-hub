@@ -243,4 +243,12 @@ export class Notification implements OnInit {
       this.router.navigate(['/post-view', item.refid]);
     }
   }
+  goBack(event: Event): void {
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  this.router.navigateByUrl('/home');
+
+}
 }
