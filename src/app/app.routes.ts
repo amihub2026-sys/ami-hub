@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-
+import { AddJob } from './pages/add-job/add-job';
+import { Job } from './pages/job/job';
 import { Home } from './pages/home/home';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
@@ -42,7 +43,14 @@ function adminGuard() {
 
 export const routes: Routes = [
   { path: '', component: Home },
-
+{
+  path: 'job',
+  component: Job
+},
+{
+  path: 'add-job',
+  component: AddJob
+},
   { path: 'account-setup', component: AccountSetup },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
