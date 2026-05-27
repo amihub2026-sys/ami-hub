@@ -326,3 +326,12 @@
   }
 
 }
+.required-label::after{
+  content:" *";
+  color:red;
+}
+.submit-btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+  transform:none;
+}
