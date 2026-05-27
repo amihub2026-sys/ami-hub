@@ -6,8 +6,10 @@
     <p>Add your job details and connect with the right candidates faster.</p>
   </div>
 
-  <form class="add-job-form" (ngSubmit)="submitJob()">
-
+<form
+  class="add-job-form"
+  #jobForm="ngForm"
+  (ngSubmit)="submitJob()">
     <!-- BASIC DETAILS -->
     <div class="form-section">
       <div class="section-title">
@@ -17,13 +19,23 @@
 
       <div class="form-grid">
         <div class="form-group">
-          <label>Job Title</label>
-          <input type="text" placeholder="Frontend Developer" [(ngModel)]="job.title" name="title">
+       <label class="required-label">Job Title</label>
+         <input
+  type="text"
+  placeholder="Frontend Developer"
+  [(ngModel)]="job.title"
+  name="title"
+  required>
         </div>
 
         <div class="form-group">
-          <label>Company Name</label>
-          <input type="text" placeholder="AMI HUB" [(ngModel)]="job.company" name="company">
+      <label class="required-label">Company name</label>
+          <input
+  type="text"
+  placeholder="AMI HUB"
+  [(ngModel)]="job.company"
+  name="company"
+  required>
         </div>
 
         <div class="form-group">
@@ -103,13 +115,22 @@
         </div>
 
         <div class="form-group">
-          <label>Contact Phone</label>
-          <input type="tel" placeholder="+91 98765 43210" [(ngModel)]="job.contactPhone" name="contactPhone">
-        </div>
+        <label class="required-label">Contact Phone</label>
+<input
+  type="tel"
+  placeholder="+91 98765 43210"
+  [(ngModel)]="job.contactPhone"
+  name="contactPhone"
+  required
+  minlength="10"
+  maxlength="15">        </div>
       </div>
     </div>
 
-    <button type="submit" class="submit-btn">
+    <button
+  type="submit"
+  class="submit-btn"
+  [disabled]="jobForm.invalid">
       🚀 Add Job Vacancy
     </button>
 
