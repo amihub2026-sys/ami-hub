@@ -34,7 +34,9 @@
         <!-- <button type="button" (click)="logout(); closeMenu()">Logout</button> -->
         <!-- <a (click)="postProduct(); closeMenu()" class="post-btn">Post Product</a> -->
         <a (click)="postService(); closeMenu()" class="post-btn service-btn">📢 ADVERTISE</a>
+        
         <a (click)="goToMyPosts(); closeMenu()">My Posts</a>
+
       </div>
 
       <div class="nav-actions">
@@ -46,6 +48,7 @@
         <a (click)="goToMyPosts(); closeMenu()" class="nav-icon-btn mobile-my-posts-btn myposts-animate" aria-label="My Posts">
           <i class="fas fa-clipboard-list"></i>
         </a>
+      
 
         <!-- <a [routerLink]="['/cart']" class="nav-icon-btn" aria-label="Cart">
           <i class="fas fa-shopping-cart"></i>
@@ -147,6 +150,14 @@
         <a (click)=" closeMenu(); postService()" class="special-link service">
           📢 ADVERTISE
         </a>
+        <a
+  (click)="goToJobs(); closeMenu()"
+  class="jobs-btn"
+  >
+
+    💼 Find My Job
+
+</a>
 
         <!-- <a [routerLink]="['/cart']" (click)="closeMenu()">
           🛒 Cart
