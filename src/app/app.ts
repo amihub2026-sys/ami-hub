@@ -73,6 +73,7 @@ isRouteLoading = false;
  constructor(
   private location: Location,
   public router: Router,
+  
   private supabaseService: SupabaseService,
   private cdr: ChangeDetectorRef,
   private snackbar: SnackbarService,   // ✅ ADD THIS
@@ -678,6 +679,9 @@ async loadChatCount(): Promise<void> {
   }
   goBack(): void {
   this.location.back();
+}
+goToJobs() {
+  this.router.navigate(['/job']);
 }
   
 }
