@@ -12,8 +12,8 @@
   </div>
 
   <div class="job-card" *ngFor="let job of filteredJobs()">
-    <h3>{{ job.title }}</h3>
-    <p><strong>Company:</strong> {{ job.company }}</p>
+ <h3>{{ job.job_title }}</h3>
+<p><strong>Company:</strong> {{ job.company_name }}</p>
     <p><strong>Location:</strong> {{ job.location }}</p>
     <p><strong>Salary:</strong> {{ job.salary }}</p>
 
@@ -39,7 +39,7 @@
     <div class="detail-icon">🏢</div>
     <div>
       <span>Company Name</span>
-      <h4>{{ selectedJob?.company }}</h4>
+      <h4>{{ selectedJob?.company_name }}</h4>
     </div>
   </div>
 
@@ -114,7 +114,7 @@
   </div>
 </div>
 
-  <!-- APPLY POPUP -->
+  
 <div
   class="apply-popup-overlay"
   *ngIf="showApplyForm"
@@ -211,7 +211,7 @@
   </div>
 
 </div>
-
+<!-- 
     <form class="job-form" *ngIf="showJobForm" (ngSubmit)="saveJob()">
       <h3>Add New Job</h3>
 
@@ -228,7 +228,7 @@
       </select>
 
       <button type="submit">Save Job</button>
-    </form>
+    </form> -->
 
 
 </section>
