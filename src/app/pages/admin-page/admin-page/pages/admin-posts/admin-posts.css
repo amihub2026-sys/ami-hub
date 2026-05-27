@@ -429,3 +429,30 @@ tbody tr:hover {
   font-weight: 800;
   color: #334155;
 }
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 0 5px;
+}
+
+.pagination button {
+  border: none;
+  padding: 10px 22px;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: 700;
+  color: #0f172a;
+}
