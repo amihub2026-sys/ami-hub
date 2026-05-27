@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { supabase } from '../../../supabaseClient';
 
 @Component({
   selector: 'app-job',
@@ -10,143 +11,88 @@ import { Router } from '@angular/router';
   templateUrl: './job.html',
   styleUrl: './job.css'
 })
-export class Job {
+export class Job implements OnInit {
+
   showJobList = true;
   showJobForm = false;
 
-  jobs = [
-    {
-      title: 'Frontend Developer',
-      company: 'AMI HUB',
-      location: 'Madurai',
-      salary: '₹20,000 - ₹35,000',
-      type: 'Full Time'
-    },
-    {
-      title: 'Flutter Developer',
-      company: 'Tech Solutions',
-      location: 'Chennai',
-      salary: '₹25,000 - ₹45,000',
-      type: 'Full Time'
-    },
-    {
-      title: 'Digital Marketing Executive',
-      company: 'Marketing Pro',
-      location: 'Coimbatore',
-      salary: '₹15,000 - ₹25,000',
-      type: 'Part Time'
-    }
-  ];
+  jobs: any[] = [];
 
-  newJob = {
-    title: '',
-    company: '',
-    location: '',
-    salary: '',
-    type: ''
+  selectedType = 'All';
+  showApplyForm = false;
+  showJobDetails = false;
+
+  selectedJob: any = null;
+  selectedResume: File | null = null;
+
+  application = {
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
   };
+
   constructor(private router: Router) {}
 
-  openJobs() {
-    this.showJobList = true;
-    this.showJobForm = false;
+  ngOnInit() {
+    this.loadJobs();
   }
 
-  openAddJob() {
-    this.showJobForm = true;
-  }
+  async loadJobs() {
+    const { data, error } = await supabase
+      .from('job_vacancies')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  saveJob() {
-    if (!this.newJob.title || !this.newJob.company) {
-      alert('Please enter job title and company');
+    if (error) {
+      console.error('Load jobs error:', error);
       return;
     }
 
-    this.jobs.unshift({ ...this.newJob });
-
-    this.newJob = {
-      title: '',
-      company: '',
-      location: '',
-      salary: '',
-      type: ''
-    };
-
-    this.showJobForm = false;
+    this.jobs = data || [];
   }
+
+  filteredJobs() {
+    if (this.selectedType === 'All') {
+      return this.jobs;
+    }
+
+    return this.jobs.filter(job => job.job_type === this.selectedType);
+  }
+
   goToAddJob() {
-  this.router.navigate(['/add-job']);
-}
-selectedType = 'All';
-showApplyForm = false;
-selectedJob: any = null;
-
-application = {
-  name: '',
-  email: '',
-  phone: '',
-  message: ''
-};
-
-filteredJobs() {
-  if (this.selectedType === 'All') {
-    return this.jobs;
+    this.router.navigate(['/add-job']);
   }
 
-  return this.jobs.filter(job => job.type === this.selectedType);
-}
-
-openApplyForm(job: any) {
-  this.selectedJob = job;
-  this.showApplyForm = true;
-}
-
-submitApplication() {
-  alert('Application submitted successfully!');
-  this.showApplyForm = false;
-
-  this.application = {
-    name: '',
-    email: '',
-    phone: '',
-    message: ''
-  };
-}
-showJobDetails = false;
-
-openJobDetails(job: any) {
-  this.selectedJob = job;
-  this.showJobDetails = true;
-}
-selectedResume: File | null = null;
-
-onResumeSelected(event: Event) {
-  const input = event.target as HTMLInputElement;
-
-  if (!input.files || input.files.length === 0) {
-    return;
+  openApplyForm(job: any) {
+    this.selectedJob = job;
+    this.showApplyForm = true;
   }
 
-  this.selectedResume = input.files[0];
-
-  if (!this.selectedResume) {
-    alert('Please upload your resume');
-    return;
+  openJobDetails(job: any) {
+    this.selectedJob = job;
+    this.showJobDetails = true;
   }
 
-  console.log('Application:', this.application);
-  console.log('Resume:', this.selectedResume);
+  submitApplication() {
+    alert('Application submitted successfully!');
+    this.showApplyForm = false;
 
-  alert('Application submitted successfully!');
+    this.application = {
+      name: '',
+      email: '',
+      phone: '',
+      message: ''
+    };
+  }
 
-  this.showApplyForm = false;
-  this.selectedResume = null;
+  onResumeSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
 
-  this.application = {
-    name: '',
-    email: '',
-    phone: '',
-    message: ''
-  };
-}
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    this.selectedResume = input.files[0];
+  }
 }
