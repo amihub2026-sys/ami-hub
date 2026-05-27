@@ -83,7 +83,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let user of filteredUsers; trackBy: trackByUser">
+         <tr *ngFor="let user of paginatedUsers; trackBy: trackByUser">
             <td class="id-cell">#{{ user.id }}</td>
 
             <td>
@@ -135,6 +135,25 @@
           </tr>
         </tbody>
       </table>
+      <div class="pagination" *ngIf="filteredUsers.length > pageSize">
+  <button
+    type="button"
+    (click)="prevPage()"
+    [disabled]="currentPage === 1">
+    Previous
+  </button>
+
+  <span>
+    Page {{ currentPage }} of {{ totalPages }}
+  </span>
+
+  <button
+    type="button"
+    (click)="nextPage()"
+    [disabled]="currentPage === totalPages">
+    Next
+  </button>
+</div>
     </div>
 
     <ng-template #loadingBlock>

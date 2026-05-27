@@ -25,6 +25,7 @@ interface AdminUserItem {
   isonboardingcompleted: boolean;
   usertypeid: number | null;
   createdonRaw: string;
+  
 }
 
 @Component({
@@ -37,6 +38,8 @@ interface AdminUserItem {
 export class AdminUsers implements OnInit {
   private supabaseService = inject(SupabaseService);
   private cdr = inject(ChangeDetectorRef);
+    currentPage = 1;
+  pageSize = 5;
 
   @Input() searchQuery = '';
 
@@ -156,6 +159,7 @@ export class AdminUsers implements OnInit {
   get pendingUsers(): number {
     return this.users.filter((u) => u.status === 'Pending').length;
   }
+  
 
   async toggleStatus(user: AdminUserItem): Promise<void> {
     const nextIsActive = user.status !== 'Active';
@@ -192,7 +196,26 @@ export class AdminUsers implements OnInit {
       this.cdr.detectChanges();
     }
   }
+get totalPages(): number {
+  return Math.ceil(this.filteredUsers.length / this.pageSize);
+}
 
+get paginatedUsers() {
+  const start = (this.currentPage - 1) * this.pageSize;
+  return this.filteredUsers.slice(start, start + this.pageSize);
+}
+
+nextPage(): void {
+  if (this.currentPage < this.totalPages) {
+    this.currentPage++;
+  }
+}
+
+prevPage(): void {
+  if (this.currentPage > 1) {
+    this.currentPage--;
+  }
+}
   getActionLabel(user: AdminUserItem): string {
     return user.status === 'Active' ? 'Block' : 'Activate';
   }
