@@ -42,7 +42,7 @@ export class AdminPosts implements OnInit {
   errorMessage = '';
   posts: AdminPostItem[] = [];
   currentPage = 1;
-itemsPerPage = 10;
+itemsPerPage = 5;
 
   async ngOnInit(): Promise<void> {
     await this.loadPosts();
