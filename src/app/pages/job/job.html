@@ -16,15 +16,38 @@
 <p><strong>Company:</strong> {{ job.company_name }}</p>
     <p><strong>Location:</strong> {{ job.location }}</p>
     <p><strong>Salary:</strong> {{ job.salary }}</p>
+<div class="job-card-actions">
 
-  <div class="job-card-bottom">
-  <button type="button" class="view-details-btn" (click)="openJobDetails(job)">
+  <button
+    type="button"
+    class="view-details-btn"
+    (click)="openJobDetails(job)">
+
     View Details
+
   </button>
 
-  <button type="button" class="apply-btn" (click)="openApplyForm(job)">
-    Apply Now
-  </button>
+  <div class="contact-buttons">
+
+    <a
+      class="whatsapp-btn"
+      [href]="'https://wa.me/' + job.contact_phone"
+      target="_blank">
+
+      <i class="fab fa-whatsapp"></i>
+
+    </a>
+
+    <a
+      class="call-btn"
+      [href]="'tel:' + job.contact_phone">
+
+      <i class="fas fa-phone-alt"></i>
+
+    </a>
+
+  </div>
+
 </div>
 <div class="job-details-overlay" *ngIf="showJobDetails" (click)="showJobDetails=false">
   <div class="job-details-popup" (click)="$event.stopPropagation()">
@@ -115,7 +138,7 @@
 </div>
 
   
-<div
+<!-- <div
   class="apply-popup-overlay"
   *ngIf="showApplyForm"
   (click)="showApplyForm=false">
@@ -182,7 +205,8 @@
 
   </div>
 
-</div>
+</div> -->
+
   </div>
   </div>
   <div class="job-right">
