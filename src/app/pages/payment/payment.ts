@@ -535,51 +535,92 @@ private snackbar = inject(SnackbarService);
   }
 
   private async saveBoostEntry(
-    paymentPayload: {
-      razorpay_payment_id?: string;
-      razorpay_order_id?: string;
-      razorpay_signature?: string;
-    } = {}
-  ): Promise<void> {
-    const postId = Number(this.postData?.postid || 0);
-    if (!postId) {
-      throw new Error('Post id not found for featured ad');
-    }
+  paymentPayload: {
+    razorpay_payment_id?: string;
+    razorpay_order_id?: string;
+    razorpay_signature?: string;
+  } = {}
+): Promise<void> {
 
-    const planId = this.getSelectedPlanId();
-    const planName = this.getSelectedPlanName();
-    const durationDays = Number(this.planData?.duration_days || 0);
-    const amount = Number(this.planData?.amount || this.planData?.price || 0);
+  const postId = Number(this.postData?.postid || 0);
 
-    const startDate = new Date();
-    const endDate = new Date();
-    endDate.setDate(startDate.getDate() + durationDays);
-
-    const boostPayload = {
-      userid: this.postData?.userid ?? null,
-      postid: postId,
-      boost_plan_id: planId,
-      boost_name: planName,
-      price: amount,
-      duration_days: durationDays,
-      startdate: startDate.toISOString(),
-      enddate: endDate.toISOString(),
-      isactive: true,
-      createdon: new Date().toISOString(),
-      razorpay_payment_id: paymentPayload.razorpay_payment_id || null,
-      razorpay_order_id: paymentPayload.razorpay_order_id || null,
-      razorpay_signature: paymentPayload.razorpay_signature || null
-    };
-
-    const { error } = await this.supabaseService.supabase
-      .from('post_boosts')
-      .insert([boostPayload]);
-
-    if (error) {
-      console.warn('post_boosts insert skipped/failed:', error);
-    }
+  if (!postId) {
+    throw new Error('Post id not found for featured ad');
   }
 
+  const planId = this.getSelectedPlanId();
+  const planName = this.getSelectedPlanName();
+
+  const durationDays = Number(
+    this.planData?.duration_days || 0
+  );
+
+  const amount = Number(
+    this.planData?.amount ||
+    this.planData?.price ||
+    0
+  );
+
+  const startDate = new Date();
+
+  const endDate = new Date();
+
+  endDate.setDate(
+    startDate.getDate() + durationDays
+  );
+
+  const userUuid =
+    await this.getEffectiveUserUuid();
+
+  const boostPayload = {
+    userid: this.postData?.userid ?? null,
+
+    auth_user_id: userUuid,
+
+    post_id: postId,
+
+    ad_type:
+      this.postData?.adtype ||
+      this.postData?.conditiontype ||
+      this.adType,
+
+    boost_plan_id: planId,
+
+    boost_name: planName,
+
+    amount: amount,
+
+    paymentstatus: 'paid',
+
+    razorpay_payment_id:
+      paymentPayload.razorpay_payment_id || null,
+
+    razorpay_order_id:
+      paymentPayload.razorpay_order_id || null,
+
+    startdate: startDate.toISOString(),
+
+    enddate: endDate.toISOString(),
+
+    isactive: true,
+
+    createdon: new Date().toISOString()
+  };
+
+  const { error } =
+    await this.supabaseService.supabase
+      .from('user_boost_purchases')
+      .insert([boostPayload]);
+
+  if (error) {
+    console.error(
+      'user_boost_purchases insert failed:',
+      error
+    );
+
+    throw error;
+  }
+}
   private async updateExistingPostAsFeatured(
     paymentPayload: {
       razorpay_payment_id?: string;
