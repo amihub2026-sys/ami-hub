@@ -454,3 +454,41 @@ tbody td {
     width: 100%;
   }
 }
+.pagination{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:16px;
+  margin-top:20px;
+  padding:10px 0;
+}
+
+.pagination button{
+  border:none;
+  outline:none;
+  padding:10px 22px;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s ease;
+  background:#2563eb;
+  color:#fff;
+}
+
+.pagination button:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(37,99,235,0.25);
+}
+
+.pagination button:disabled{
+  background:#cbd5e1;
+  cursor:not-allowed;
+  box-shadow:none;
+}
+
+.pagination span{
+  font-size:15px;
+  font-weight:700;
+  color:#0f172a;
+}
