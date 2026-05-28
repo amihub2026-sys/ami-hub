@@ -569,16 +569,24 @@ private snackbar = inject(SnackbarService);
     startDate.getDate() + durationDays
   );
 
-  const userUuid =
-    await this.getEffectiveUserUuid();
+const userUuid = await this.getEffectiveUserUuid();
+
+let numericUserId: number | null = null;
+
+if (userUuid) {
+  const { data: dbUser, error: dbUserError } = await this.supabaseService.supabase
+    .from('users')
+    .select('userid')
+    .or(`supabase_uid.eq.${userUuid},auth_user_id.eq.${userUuid},user_id.eq.${userUuid}`)
+    .maybeSingle();
+
+  if (!dbUserError && dbUser?.userid) {
+    numericUserId = Number(dbUser.userid);
+  }
+}
 
   const boostPayload = {
- userid: Number(
-  localStorage.getItem('pending_post_userid') ||
-  this.postData?.userid ||
-  0
-) || null,
-
+   userid: numericUserId,
     auth_user_id: userUuid,
 
     post_id: postId,
