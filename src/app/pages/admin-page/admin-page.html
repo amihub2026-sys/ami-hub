@@ -67,6 +67,10 @@
       *ngIf="activeMenu === 'boost-plans'"
       [searchQuery]="searchQuery"
     ></app-admin-boost-plans>
+    <app-admin-user-boost-plans
+  *ngIf="activeMenu === 'user-boost-plans'"
+  [searchQuery]="searchQuery"
+></app-admin-user-boost-plans>
 
     <app-admin-payments
       *ngIf="activeMenu === 'payments'"

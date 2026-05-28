@@ -14,7 +14,8 @@ export type AdminMenuKey =
   | 'subscriptions'
   | 'user-subscriptions'
   | 'boost-plans'
-  | 'payments'
+| 'user-boost-plans'
+| 'payments'
   | 'reports'
   | 'locations'
   | 'banners'
@@ -52,8 +53,9 @@ export class AdminSidebar {
     { key: 'jobs', label: 'Jobs', icon: '💼' },
     { key: 'subscriptions', label: 'Subscriptions', icon: '📦' },
     { key: 'user-subscriptions', label: 'User Subscriptions', icon: '🧾' },
-    { key: 'boost-plans', label: 'Boost Plans', icon: '🚀' },
-    { key: 'payments', label: 'Payments', icon: '💳' },
+  { key: 'boost-plans', label: 'Boost Plans', icon: '🚀' },
+{ key: 'user-boost-plans', label: 'User Boost Plans', icon: '🔥' },
+{ key: 'payments', label: 'Payments', icon: '💳' },
     { key: 'reports', label: 'Reports', icon: '📈' },
     { key: 'locations', label: 'Locations', icon: '📍' },
     { key: 'banners', label: 'Banners', icon: '🖼️' },
