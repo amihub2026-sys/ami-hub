@@ -38,6 +38,8 @@ type UserSubscriptionStatusFilter = 'all' | 'active' | 'expired' | 'inactive';
 })
 export class AdminUserSubscriptionsComponent implements OnInit {
   @Input() searchQuery = '';
+  currentPage = 1;
+itemsPerPage = 5;
 
   userSubscriptionStatusFilter: UserSubscriptionStatusFilter = 'all';
 
@@ -79,6 +81,24 @@ export class AdminUserSubscriptionsComponent implements OnInit {
   get supabase() {
     return this.supabaseService.supabase;
   }
+  get totalPages(): number {
+  return Math.ceil(this.filteredUserSubscriptions.length / this.itemsPerPage) || 1;
+}
+
+get paginatedUserSubscriptions(): AdminUserSubscriptionItem[] {
+  const start = (this.currentPage - 1) * this.itemsPerPage;
+
+  return this.filteredUserSubscriptions.slice(
+    start,
+    start + this.itemsPerPage
+  );
+}
+
+goToPage(page: number): void {
+  if (page < 1 || page > this.totalPages) return;
+
+  this.currentPage = page;
+}
 
   private getStatusLabel(item: {
     isactive: boolean;
