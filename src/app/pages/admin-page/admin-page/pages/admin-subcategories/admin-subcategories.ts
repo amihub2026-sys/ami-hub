@@ -35,6 +35,8 @@ type SubcategoryStatusFilter = 'all' | 'active' | 'inactive';
 export class AdminSubcategories implements OnInit {
   private supabaseService = inject(SupabaseService);
   private cdr = inject(ChangeDetectorRef);
+  currentPage = 1;
+itemsPerPage = 5;
 
   @Input() searchQuery = '';
 
@@ -65,7 +67,24 @@ export class AdminSubcategories implements OnInit {
     sortorder: 1,
     isactive: true,
   };
+get totalPages(): number {
+  return Math.ceil(this.filteredSubcategories.length / this.itemsPerPage) || 1;
+}
 
+get paginatedSubcategories(): AdminSubcategoryItem[] {
+  const start = (this.currentPage - 1) * this.itemsPerPage;
+
+  return this.filteredSubcategories.slice(
+    start,
+    start + this.itemsPerPage
+  );
+}
+
+goToPage(page: number): void {
+  if (page < 1 || page > this.totalPages) return;
+
+  this.currentPage = page;
+}
   async ngOnInit(): Promise<void> {
     await Promise.all([this.loadCategories(), this.loadSubcategories()]);
   }

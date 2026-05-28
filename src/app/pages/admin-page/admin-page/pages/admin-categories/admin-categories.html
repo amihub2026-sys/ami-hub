@@ -210,7 +210,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let item of filteredCategories; trackBy: trackByCategory">
+          <tr *ngFor="let item of paginatedCategories; trackBy: trackByCategory">
             <td class="id-cell">#{{ item.categoryid }}</td>
 
             <td>
@@ -271,6 +271,7 @@
                 >
                   Deactivate
                 </button>
+                
               </div>
             </td>
           </tr>
@@ -283,11 +284,35 @@
         </tbody>
       </table>
     </div>
+   <div class="pagination" *ngIf="filteredCategories.length >itemsPerPage">
+  <button
+    type="button"
+    (click)="goToPage(currentPage - 1)"
+    [disabled]="currentPage === 1"
+  >
+    Previous
+  </button>
+
+  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+
+  <button
+    type="button"
+    (click)="goToPage(currentPage + 1)"
+    [disabled]="currentPage === totalPages"
+  >
+    Next
+  </button>
+</div>
+</div>
+
+
 
     <ng-template #loadingBlock>
       <div class="loading-wrap">
-        <div class="loading-card" *ngFor="let i of [1, 2, 3, 4, 5]"></div>
+        <div class="loading-card" *ngFor="let i of [1, 2, 3, 4, 5]">
+
+        </div>
       </div>
+  
     </ng-template>
-  </div>
-</div>
+  

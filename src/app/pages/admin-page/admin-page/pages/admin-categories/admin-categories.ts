@@ -32,6 +32,8 @@ interface AdminCategoryItem {
 export class AdminCategoriesComponent implements OnInit {
   private supabaseService = inject(SupabaseService);
   private cdr = inject(ChangeDetectorRef);
+  currentPage = 1;
+itemsPerPage = 5;
 
   @Input() searchQuery = '';
 
@@ -117,6 +119,19 @@ export class AdminCategoriesComponent implements OnInit {
       this.cdr.detectChanges();
     }
   }
+  get totalPages(): number {
+  return Math.ceil(this.filteredCategories.length / this.itemsPerPage) || 1;
+}
+
+get paginatedCategories(): AdminCategoryItem[] {
+  const start = (this.currentPage - 1) * this.itemsPerPage;
+  return this.filteredCategories.slice(start, start + this.itemsPerPage);
+}
+
+goToPage(page: number): void {
+  if (page < 1 || page > this.totalPages) return;
+  this.currentPage = page;
+}
 
   get filteredCategories(): AdminCategoryItem[] {
     const q = this.searchQuery.trim().toLowerCase();

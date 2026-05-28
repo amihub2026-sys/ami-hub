@@ -216,6 +216,7 @@
           <tr>
             <th>ID</th>
             <th>Subcategory</th>
+
             <th>Category</th>
             <th>Slug</th>
             <th>Sort Order</th>
@@ -227,8 +228,8 @@
 
         <tbody>
           <tr
-            *ngFor="let subcategory of filteredSubcategories; trackBy: trackBySubcategory"
-          >
+  *ngFor="let subcategory of paginatedSubcategories; trackBy: trackBySubcategory"
+>
             <td>#{{ subcategory.subcategoryid }}</td>
 
             <td>
@@ -311,7 +312,30 @@
         </tbody>
       </table>
     </div>
+         <div
+  class="pagination"
+  *ngIf="filteredSubcategories.length > itemsPerPage"
+>
+  <button
+    type="button"
+    (click)="goToPage(currentPage - 1)"
+    [disabled]="currentPage === 1"
+  >
+    Previous
+  </button>
 
+  <span>
+    Page {{ currentPage }} of {{ totalPages }}
+  </span>
+
+  <button
+    type="button"
+    (click)="goToPage(currentPage + 1)"
+    [disabled]="currentPage === totalPages"
+  >
+    Next
+  </button>
+</div>
     <ng-template #loadingBlock>
       <div class="loading-wrap">
         <div class="loading-card" *ngFor="let i of [1, 2, 3, 4]"></div>
