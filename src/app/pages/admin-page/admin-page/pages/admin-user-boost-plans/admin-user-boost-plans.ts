@@ -5,7 +5,7 @@ import { SupabaseService } from '../../../../../services/supabase.service';
 
 interface AdminUserBoostPlanItem {
   boost_purchase_id: string;
-  userid: string | null;
+ userid: number | null;
   auth_user_id: string | null;
 post_id: number | null;
   ad_type: string | null;
@@ -119,6 +119,8 @@ export class AdminUserBoostPlansComponent implements OnInit {
     }));
 
     this.loading = false;
+
+
     this.cdr.detectChanges();
   }
 
