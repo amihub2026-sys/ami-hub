@@ -1,1 +1,69 @@
-<p>admin-user-boost-plans works!</p>
+<div class="boost-users-page">
+  <div class="section-card">
+    <div class="page-header">
+      <div>
+        <h2>User Boost Plans</h2>
+        <p>Live data from user_boost_purchases table</p>
+      </div>
+
+      <div class="count-badge">
+        {{ filteredUserBoostPlans.length }} record(s)
+      </div>
+    </div>
+
+    <div class="loading-wrap" *ngIf="loading">
+      Loading user boost plans...
+    </div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Post ID</th>
+            <th>Boost Plan</th>
+            <th>Ad Type</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Start</th>
+            <th>End</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of paginatedUserBoostPlans; trackBy: trackByBoost">
+            <td>{{ item.userid || '-' }}</td>
+            <td>{{ item.post_id || '-' }}</td>
+            <td>
+              <b>{{ item.boost_name || '-' }}</b><br />
+              <small>{{ item.boost_plan_id }}</small>
+            </td>
+            <td>{{ item.ad_type || '-' }}</td>
+            <td>₹{{ item.amount }}</td>
+            <td>{{ item.paymentstatus || '-' }}</td>
+            <td>{{ item.statusLabel }}</td>
+            <td>{{ item.startLabel }}</td>
+            <td>{{ item.endLabel }}</td>
+          </tr>
+
+          <tr *ngIf="!filteredUserBoostPlans.length">
+            <td colspan="9">No boost purchases found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="filteredUserBoostPlans.length > itemsPerPage">
+      <button type="button" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+        Previous
+      </button>
+
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+
+      <button type="button" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+        Next
+      </button>
+    </div>
+  </div>
+</div>
