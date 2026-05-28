@@ -34,6 +34,7 @@ import { Cart } from './pages/cart/cart';
 import { Favt } from './pages/favt/favt';
 import { Payment } from './pages/payment/payment';
 import { DeleteAccount } from './pages/delete-account/delete-account';
+import { AdminUserBoostPlansComponent } from './pages/admin-page/admin-page/pages/admin-user-boost-plans/admin-user-boost-plans';
 function adminGuard() {
   return () => {
     const token = localStorage.getItem('adminToken');
@@ -50,6 +51,10 @@ export const routes: Routes = [
 {
   path: 'add-job',
   component: AddJob
+},
+{
+  path: 'user-boost-plans',
+  component: AdminUserBoostPlansComponent
 },
   { path: 'account-setup', component: AccountSetup },
   { path: 'login', component: Login },

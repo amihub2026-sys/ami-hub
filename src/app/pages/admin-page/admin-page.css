@@ -120,7 +120,8 @@ app-admin-subcategories,
 app-admin-subscriptions,
 app-admin-user-subscriptions,
 app-admin-boost-plans,
-app-admin-payments {
+app-admin-user-boost-plans,
+app-admin-payments { 
   display: block;
   width: 100%;
   min-width: 0;

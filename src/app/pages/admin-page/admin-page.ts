@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AdminUserBoostPlansComponent } from './admin-page/pages/admin-user-boost-plans/admin-user-boost-plans';
 
 import {
   AdminSidebar,
@@ -36,7 +37,9 @@ type AdminMenuKey = SidebarAdminMenuKey | 'advertise';
     AdminSubscriptionsComponent,
     AdminUserSubscriptionsComponent,
     AdminBoostPlansComponent,
+    AdminUserBoostPlansComponent,
     AdminPaymentsComponent,
+    
   ],
   templateUrl: './admin-page.html',
   styleUrls: ['./admin-page.css'],
@@ -91,10 +94,12 @@ export class AdminPage {
         return 'Subscriptions';
       case 'user-subscriptions':
         return 'User Subscriptions';
-      case 'boost-plans':
-        return 'Boost Plans';
-      case 'payments':
-        return 'Payments';
+     case 'boost-plans':
+  return 'Boost Plans';
+case 'user-boost-plans':
+  return 'User Boost Plans';
+case 'payments':
+  return 'Payments';
       case 'reports':
         return 'Reports';
       case 'locations':
@@ -119,6 +124,7 @@ export class AdminPage {
       this.activeMenu === 'subscriptions' ||
       this.activeMenu === 'user-subscriptions' ||
       this.activeMenu === 'boost-plans' ||
+      this.activeMenu === 'user-boost-plans' ||
       this.activeMenu === 'payments'
     );
   }
@@ -139,6 +145,8 @@ export class AdminPage {
         return 'Search user subscriptions by user id, plan id, payment, ads or auth user id';
       case 'boost-plans':
         return 'Search boosts by boost name, plan id, user id, post id, price or duration';
+        case 'user-boost-plans':
+  return 'Search user boost plans by user id, post id, plan, payment or status';
       case 'payments':
         return 'Search payments by id, user id, auth user id, plan, amount, payment id, order id or status';
       default:
