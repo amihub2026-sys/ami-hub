@@ -573,10 +573,9 @@ private snackbar = inject(SnackbarService);
     await this.getEffectiveUserUuid();
 
   const boostPayload = {
-   userid: Number(
-  this.postData?.id ||
-  this.postData?.userid ||
+ userid: Number(
   localStorage.getItem('pending_post_userid') ||
+  this.postData?.userid ||
   0
 ) || null,
 
