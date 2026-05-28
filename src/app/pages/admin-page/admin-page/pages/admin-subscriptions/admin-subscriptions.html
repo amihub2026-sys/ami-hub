@@ -97,8 +97,8 @@
 
         <tbody>
           <tr
-            *ngFor="let plan of filteredSubscriptionPlans; trackBy: trackBySubscription"
-          >
+  *ngFor="let plan of paginatedSubscriptionPlans; trackBy: trackBySubscription"
+>
             <td>#{{ plan.subscriptionplanid }}</td>
 
             <td>
@@ -177,7 +177,19 @@
         </tbody>
       </table>
     </div>
-  </div>
+  
+  <div class="pagination" *ngIf="filteredSubscriptionPlans.length > itemsPerPage">
+  <button type="button" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+    Previous
+  </button>
+
+  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+
+  <button type="button" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+    Next
+  </button>
+</div>
+</div>
 
   <div class="modal-backdrop" *ngIf="showForm">
     <div class="modal-card">

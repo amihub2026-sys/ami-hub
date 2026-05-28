@@ -33,6 +33,8 @@ type SubscriptionStatusFilter = 'all' | 'active' | 'inactive';
 })
 export class AdminSubscriptionsComponent implements OnInit {
   @Input() searchQuery = '';
+  currentPage = 1;
+itemsPerPage = 5;
 
   subscriptionStatusFilter: SubscriptionStatusFilter = 'all';
 
@@ -72,7 +74,20 @@ export class AdminSubscriptionsComponent implements OnInit {
   get supabase() {
     return this.supabaseService.supabase;
   }
+get totalPages(): number {
+  return Math.ceil(this.filteredSubscriptionPlans.length / this.itemsPerPage) || 1;
+}
 
+get paginatedSubscriptionPlans(): AdminSubscriptionPlanItem[] {
+  const start = (this.currentPage - 1) * this.itemsPerPage;
+  return this.filteredSubscriptionPlans.slice(start, start + this.itemsPerPage);
+}
+
+goToPage(page: number): void {
+  if (page < 1 || page > this.totalPages) return;
+
+  this.currentPage = page;
+}
   async fetchSubscriptionPlans(): Promise<void> {
     this.loading = true;
     this.cdr.detectChanges();
