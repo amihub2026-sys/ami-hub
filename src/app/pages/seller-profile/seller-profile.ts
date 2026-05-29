@@ -446,16 +446,25 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
         this.router.navigate(['/login']);
         return;
       }
+if (!session.authUser && session.userid) {
 
-      if (!session.authUser && session.userid) {
-        const payload = {
-          fullname: this.seller.name || '',
-          name: this.seller.name || '',
-          email: this.seller.email || '',
-          phonenumber: this.seller.phone || '',
-          phone_number: this.seller.phone || '',
-          username: this.seller.username || '',
-          password: this.seller.password || '',
+  const savedAuthId =
+    localStorage.getItem('supabase_uid') ||
+    localStorage.getItem('user_id') ||
+    '';
+
+  const payload = {
+    fullname: this.seller.name || '',
+    name: this.seller.name || '',
+    email: this.seller.email || '',
+    phonenumber: this.seller.phone || '',
+    phone_number: this.seller.phone || '',
+    username: this.seller.username || '',
+    password: this.seller.password || '',
+
+    auth_user_id: savedAuthId || null,
+    supabase_uid: savedAuthId || null,
+    user_id: savedAuthId || null,
           profileimageurl: this.seller.profileImage || null,
           avatar_url: this.seller.profileImage || null,
           accounttype: this.seller.accountType || '',
@@ -468,14 +477,7 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
           termsaccepted: this.seller.termsAccepted ?? false,
           isonboardingcompleted: true,
           updatedon: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-       auth_user_id:
-  localStorage.getItem('supabase_uid') ||
-  null,
-
-supabase_uid:
-  localStorage.getItem('supabase_uid') ||
-  null,
+          updated_at: new Date().toISOString()
         };
 
         const { error } = await this.supabaseService.supabase
