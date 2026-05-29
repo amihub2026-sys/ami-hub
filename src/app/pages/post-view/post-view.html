@@ -156,24 +156,24 @@
       </div>
     </div>
 
-    <div class="report-section">
-      <button class="report-btn" (click)="toggleReportForm()">
-        Report Ad
-      </button>
+    <div *ngIf="!isMyPost()" class="report-section">
+  <button class="report-btn" (click)="toggleReportForm()">
+    Report Ad
+  </button>
 
-      <div *ngIf="showReportForm()" class="report-form">
-        <textarea
-          [(ngModel)]="reportText"
-          name="reportText"
-          placeholder="Describe the issue with this ad..."
-          rows="3"
-        ></textarea>
+  <div *ngIf="showReportForm()" class="report-form">
+    <textarea
+      [(ngModel)]="reportText"
+      name="reportText"
+      placeholder="Describe the issue with this ad..."
+      rows="3"
+    ></textarea>
 
-        <button type="button" (click)="submitReport()">
-          Submit Report
-        </button>
-      </div>
-    </div>
+    <button type="button" (click)="submitReport()">
+      Submit Report
+    </button>
+  </div>
+</div>
 
   </div>
 
@@ -216,7 +216,7 @@
         <p>{{ postData()?.location }}</p>
       </div>
 
-      <button type="button">Follow</button>
+      <!-- <button type="button">Follow</button> -->
     </div>
 
     <div class="highlights">

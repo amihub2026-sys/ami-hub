@@ -1096,12 +1096,27 @@
 }
 
 .clear-location-btn {
-  border: none;
-  border-radius: 12px;
-  padding: 10px 14px;
-  cursor: pointer;
+  width: auto;      /* not 100% */
+  max-width: 180px;
+  padding: 6px 8px;
+  background-color: #187bdb;
+   border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #edf4ff;
+  
 }
-
+@media (max-width: 768px) {
+  .clear-location-btn {
+    width: auto;
+    min-width: 120px;
+    padding: 6px 8px;
+    font-size: 12px;
+    height: 40px;
+    margin-left: 20px;
+  }
+}
 .radius-section {
   margin-top: 14px;
   margin-bottom: 14px;
