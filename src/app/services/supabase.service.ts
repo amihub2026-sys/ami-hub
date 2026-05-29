@@ -1367,16 +1367,20 @@ async signInWithOAuth(provider: 'google' | 'github') {
     if (fetchError) {
       return { data: null, error: fetchError };
     }
+if (existingUser) {
+  const { data: updatedUser, error: updateError } = await this.supabase
+    .from('users')
+   .update({
+  fullname: existingUser.fullname || fullName,
+  phonenumber: existingUser.phonenumber || phone,
 
-    if (existingUser) {
-      const { data: updatedUser, error: updateError } = await this.supabase
-        .from('users')
-        .update({
-          fullname: existingUser.fullname || fullName,
-          phonenumber: existingUser.phonenumber || phone,
-          isactive: true,
-          updatedon: new Date().toISOString()
-        })
+  auth_user_id: authUser.id,
+  supabase_uid: authUser.id,
+  user_id: authUser.id,
+
+  isactive: true,
+  updatedon: new Date().toISOString()
+})
         .eq('userid', existingUser.userid)
         .select()
         .single();
