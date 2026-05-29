@@ -468,7 +468,14 @@ if (this.seller.phone && !/^\d{10}$/.test(this.seller.phone)) {
           termsaccepted: this.seller.termsAccepted ?? false,
           isonboardingcompleted: true,
           updatedon: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+       auth_user_id:
+  localStorage.getItem('supabase_uid') ||
+  null,
+
+supabase_uid:
+  localStorage.getItem('supabase_uid') ||
+  null,
         };
 
         const { error } = await this.supabaseService.supabase
