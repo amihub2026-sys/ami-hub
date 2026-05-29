@@ -92,7 +92,7 @@ private snackbar = inject(SnackbarService);
         }
       }
 
- 
+
       if (!this.postData) {
         this.errorMessage.set('Post details not found. Please fill the form again.');
       }
@@ -314,7 +314,7 @@ private snackbar = inject(SnackbarService);
 
       if (typeof response.text === 'function') {
         const rawText = await response.text();
-    
+
 
         if (!rawText) {
           return error?.message || 'Payment verification failed';
@@ -720,7 +720,7 @@ if (userUuid) {
       delete finalPayload.postid;
       delete finalPayload.id;
 
-      
+
 
       const { error } = await supabase
         .from('post')
@@ -813,22 +813,26 @@ this.snackbar.show(msg, 'error');
       ad_type: this.adType
     };
 
-   
 
-    const invokeOptions: any = {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: verifyPayload
-    };
 
-    if (accessToken) {
-      invokeOptions.headers.Authorization = `Bearer ${accessToken}`;
-    }
+   const invokeOptions: any = {
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: verifyPayload
+};
+
+console.log('ACCESS TOKEN:', accessToken);
+
+if (!accessToken) {
+  throw new Error('No Supabase JWT found');
+}
+
+invokeOptions.headers.Authorization = `Bearer ${accessToken}`;
 
     const { data, error } = await supabase.functions.invoke('verify-payment', invokeOptions);
 
-    
+
 
     if (error) {
       const detailedMessage = await this.readEdgeFunctionError(error);
@@ -890,7 +894,7 @@ this.snackbar.show(msg, 'error');
       const selectedPlanId = this.getSelectedPlanId();
       const selectedPlanName = this.getSelectedPlanName();
 
-  
+
 
       if (!effectiveSession.isAuthenticated) {
         throw new Error('Login session expired. Please login again.');
@@ -915,7 +919,7 @@ this.snackbar.show(msg, 'error');
 
       const { data, error } = await supabase.functions.invoke('create-order', invokeOptions);
 
-  
+
 
       if (error) {
         throw new Error(error.message || 'Unable to create order');
