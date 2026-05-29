@@ -92,10 +92,10 @@
       <p>Jobs module will be connected next.</p>
     </div>
 
-    <div class="content-card" *ngIf="activeMenu === 'reports'">
-      <h1>Reports</h1>
-      <p>Reports module will be connected next.</p>
-    </div>
+  <app-admin-reports
+  *ngIf="activeMenu === 'reports'"
+  [searchQuery]="searchQuery">
+</app-admin-reports>  
 
     <div class="content-card" *ngIf="activeMenu === 'locations'">
       <h1>Locations</h1>
