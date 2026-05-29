@@ -317,11 +317,16 @@ const { data: users, error: userError } =
 
 console.log('USERS:', users);
 console.log('USER ERROR:', userError);
-
 const existingUser =
   users && users.length > 0
     ? users[0]
     : null;
+
+console.log('EXISTING USER:', existingUser);
+console.log('supabase_uid:', existingUser?.supabase_uid);
+console.log('auth_user_id:', existingUser?.auth_user_id);
+
+
 
   if (existingUser) {
 
