@@ -479,11 +479,14 @@ if (!session.authUser && session.userid) {
           updatedon: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
+console.log('SAVED AUTH ID:', savedAuthId);
+console.log('SESSION USERID:', session.userid);
+console.log('PAYLOAD:', payload);
 
-        const { error } = await this.supabaseService.supabase
-          .from('users')
-          .update(payload)
-          .eq('userid', Number(session.userid));
+       const { error } = await this.supabaseService.supabase
+       .from('users')
+       .update(payload)
+       .eq('supabase_uid', savedAuthId);
 
         if (error) {
           throw error;
@@ -555,6 +558,7 @@ await Promise.race([
  private showMessage(message: string, type: 'success' | 'error' | 'info' = 'info') {
   this.snackbar.show(message, type);
 }
+
 goBack(event: Event): void {
 
   event.preventDefault();
