@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AdminUserBoostPlansComponent } from './admin-page/pages/admin-user-boost-plans/admin-user-boost-plans';
-
+import { AdminReports } from './pages/admin-reports/admin-reports';
 import {
   AdminSidebar,
   AdminMenuKey as SidebarAdminMenuKey,
@@ -30,6 +30,7 @@ type AdminMenuKey = SidebarAdminMenuKey | 'advertise';
     AdminSidebar,
     AdminTopbar,
     AdminDashboard,
+    AdminReports,
     AdminUsers,
     AdminPosts,
     AdminCategoriesComponent,
