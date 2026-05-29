@@ -317,16 +317,11 @@ const { data: users, error: userError } =
 
 console.log('USERS:', users);
 console.log('USER ERROR:', userError);
+
 const existingUser =
   users && users.length > 0
     ? users[0]
     : null;
-
-console.log('EXISTING USER:', existingUser);
-console.log('supabase_uid:', existingUser?.supabase_uid);
-console.log('auth_user_id:', existingUser?.auth_user_id);
-
-
 
   if (existingUser) {
 
@@ -349,22 +344,34 @@ localStorage.removeItem('login_otp');
 
 /* CREATE NEW USER */
 
+
+const newAuthId = crypto.randomUUID();
+
 const { data: newUser, error: insertError } =
   await this.supabaseService.supabase
     .from('users')
     .insert([
- {
-  phonenumber: phone,
-  fullname: 'New User',
-  username: `user_${phone}`,
-  isactive: true,
-  isverified: true,
-  isonboardingcompleted: false,
-  createdon: new Date().toISOString()
-}
-])
+      {
+        phonenumber: phone,
+        phone_number: phone,
+        fullname: 'New User',
+        name: 'New User',
+        username: `user_${phone}`,
+
+        user_id: newAuthId,
+        supabase_uid: newAuthId,
+        auth_user_id: newAuthId,
+
+        isactive: true,
+        isverified: true,
+        isonboardingcompleted: false,
+        createdon: new Date().toISOString()
+      }
+    ])
     .select()
     .single();
+  
+  
 
 if (insertError) {
 
@@ -383,6 +390,7 @@ localStorage.removeItem('login_otp');
 localStorage.removeItem('login_mobile');
 
 this.storeUserSession(newUser);
+localStorage.setItem('supabase_uid', newUser.supabase_uid || newUser.auth_user_id || newUser.user_id);
 
 localStorage.setItem('userToken', 'loggedUser');
 localStorage.setItem('mobile', phone);
