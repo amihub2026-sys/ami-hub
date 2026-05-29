@@ -44,6 +44,8 @@ export class AdminDashboard implements OnInit {
   totalPosts = 0;
   activeSubscriptions = 0;
   totalRevenueAmount = 0;
+  subscriptionRevenue = 0;
+boostRevenue = 0;
 
   recentActivities: ActivityItem[] = [];
 
@@ -129,24 +131,61 @@ export class AdminDashboard implements OnInit {
     });
   }
 
-  async loadRevenue(): Promise<void> {
-    const { data, error } = await this.supabaseService.supabase
-      .from('user_subscriptions')
-      .select('amountpaid, paymentstatus, isactive')
-      .eq('isactive', true);
+ async loadRevenue(): Promise<void> {
 
-    this.ngZone.run(() => {
-      if (error) {
-        console.error('loadRevenue error:', error);
-        this.totalRevenueAmount = 0;
-      } else {
-        this.totalRevenueAmount = (data || [])
-          .filter((item: any) => (item.paymentstatus || '').toLowerCase() === 'paid')
-          .reduce((sum: number, item: any) => sum + Number(item.amountpaid || 0), 0);
-      }
-      this.cdr.detectChanges();
-    });
-  }
+  const [subsRes, boostRes] = await Promise.all([
+
+    this.supabaseService.supabase
+      .from('user_subscriptions')
+      .select('amountpaid,paymentstatus,isactive')
+      .eq('isactive', true),
+
+    this.supabaseService.supabase
+      .from('user_boost_purchases')
+      .select('amount,paymentstatus')
+
+  ]);
+
+  this.ngZone.run(() => {
+
+    this.subscriptionRevenue = 0;
+    this.boostRevenue = 0;
+
+    if (!subsRes.error) {
+      this.subscriptionRevenue =
+        (subsRes.data || [])
+          .filter(
+            (x: any) =>
+              (x.paymentstatus || '').toLowerCase() === 'paid'
+          )
+          .reduce(
+            (sum: number, x: any) =>
+              sum + Number(x.amountpaid || 0),
+            0
+          );
+    }
+
+    if (!boostRes.error) {
+      this.boostRevenue =
+        (boostRes.data || [])
+          .filter(
+            (x: any) =>
+              (x.paymentstatus || '').toLowerCase() === 'paid'
+          )
+          .reduce(
+            (sum: number, x: any) =>
+              sum + Number(x.amount || 0),
+            0
+          );
+    }
+
+    this.totalRevenueAmount =
+      this.subscriptionRevenue +
+      this.boostRevenue;
+
+    this.cdr.detectChanges();
+  });
+}
 
   async loadRecentActivities(): Promise<void> {
     const activityItems: ActivityItem[] = [];
@@ -275,14 +314,31 @@ export class AdminDashboard implements OnInit {
         bg: 'linear-gradient(135deg, #ecfdf3 0%, #dcfce7 100%)',
         change: 'Live',
       },
+      
       {
-        title: 'Revenue',
-        value: this.formattedRevenue,
-        icon: '💰',
-        color: '#7c3aed',
-        bg: 'linear-gradient(135deg, #f7f0ff 0%, #ede9fe 100%)',
-        change: 'Paid',
-      },
+  title: 'Subscription Revenue',
+  value: `₹${this.subscriptionRevenue.toLocaleString('en-IN')}`,
+  icon: '💳',
+  color: '#16a34a',
+   bg: 'linear-gradient(135deg, #fff0f5 0%, #ffe4ec 100%)',
+  change: 'Paid',
+},
+{
+  title: 'Boost Revenue',
+  value: `₹${this.boostRevenue.toLocaleString('en-IN')}`,
+  icon: '🚀',
+  color: '#f97316',
+   bg: 'linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%)',
+  change: 'Paid',
+},
+{
+  title: 'Total Revenue',
+  value: this.formattedRevenue,
+  icon: '💰',
+  color: '#7c3aed',
+  bg: 'linear-gradient(135deg, #f7f0ff 0%, #ede9fe 100%)',
+  change: 'Paid',
+},
     ];
   }
 
