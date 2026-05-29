@@ -483,11 +483,18 @@ console.log('SAVED AUTH ID:', savedAuthId);
 console.log('SESSION USERID:', session.userid);
 console.log('PAYLOAD:', payload);
 
-       const { error } = await this.supabaseService.supabase
-       .from('users')
-       .update(payload)
-       .eq('supabase_uid', savedAuthId);
+      const { data: updatedUser, error } = await this.supabaseService.supabase
+  .from('users')
+  .update({
+    ...payload,
+    auth_user_id: savedAuthId
+  })
+  .eq('supabase_uid', savedAuthId)
+  .select('userid, supabase_uid, auth_user_id')
+  .single();
 
+console.log('UPDATED USER:', updatedUser);
+console.log('UPDATE ERROR:', error);
         if (error) {
           throw error;
         }
