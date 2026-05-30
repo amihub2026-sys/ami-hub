@@ -263,14 +263,15 @@ private snackbar = inject(SnackbarService);
   }
 
   private async getAccessToken(): Promise<string | null> {
-    const effectiveSession = await this.supabaseService.getEffectiveAuthUser();
-    if (!effectiveSession.isAuthenticated) {
-      return null;
-    }
+  const effectiveSession = await this.supabaseService.getEffectiveAuthUser();
 
-    const { data } = await supabase.auth.getSession();
-    return data.session?.access_token ?? null;
+  if (!effectiveSession.isAuthenticated) {
+    return null;
   }
+
+  // FIX: use your stored login identity instead of supabase session
+  return localStorage.getItem('supabase_uid');
+}
 
   private async getEffectiveUserUuid(): Promise<string | null> {
     const effectiveSession = await this.supabaseService.getEffectiveAuthUser();
@@ -797,21 +798,35 @@ this.snackbar.show(msg, 'error');
     const userUuid = await this.getEffectiveUserUuid();
     const selectedPlanId = this.getSelectedPlanId();
     const selectedPlanName = this.getSelectedPlanName();
+    let numericUserId: number | null = null;
+
+if (userUuid) {
+  const { data: dbUser } = await this.supabaseService.supabase
+    .from('users')
+    .select('userid')
+    .or(`supabase_uid.eq.${userUuid},auth_user_id.eq.${userUuid},user_id.eq.${userUuid}`)
+    .maybeSingle();
+
+  numericUserId = dbUser?.userid ?? null;
+}
 
     const verifyPayload = {
-      plan_id: selectedPlanId,
-      plan_name: selectedPlanName,
-      amount: this.amount,
-      currency: 'INR',
-      receipt: `post_${Date.now()}`,
-      razorpay_payment_id: payload.razorpay_payment_id,
-      razorpay_order_id: payload.razorpay_order_id,
-      razorpay_signature: payload.razorpay_signature,
-      user_id: this.postData?.userid ?? userUuid ?? null,
-      post_payload: this.postData || {},
-      plan_payload: this.planData || {},
-      ad_type: this.adType
-    };
+  plan_id: selectedPlanId,
+  plan_name: selectedPlanName,
+  amount: this.amount,
+  currency: 'INR',
+  receipt: `post_${Date.now()}`,
+  razorpay_payment_id: payload.razorpay_payment_id,
+  razorpay_order_id: payload.razorpay_order_id,
+  razorpay_signature: payload.razorpay_signature,
+
+  user_id: numericUserId,
+  auth_user_id: userUuid,
+
+  post_payload: this.postData || {},
+  plan_payload: this.planData || {},
+  ad_type: this.adType
+};
 
 
 
@@ -824,11 +839,9 @@ this.snackbar.show(msg, 'error');
 
 console.log('ACCESS TOKEN:', accessToken);
 
-if (!accessToken) {
-  throw new Error('No Supabase JWT found');
+if (accessToken) {
+  invokeOptions.headers.Authorization = `Bearer ${accessToken}`;
 }
-
-invokeOptions.headers.Authorization = `Bearer ${accessToken}`;
 
     const { data, error } = await supabase.functions.invoke('verify-payment', invokeOptions);
 

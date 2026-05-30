@@ -577,16 +577,23 @@ export class SupabaseService {
       throw new Error('No authenticated user found');
     }
 
-    const { data: existingUser, error: fetchError } = await this.supabase
-      .from('users')
-      .select('*')
-      .eq('supabase_uid', user.id)
-      .maybeSingle();
+   let { data: existingUser, error: fetchError } = await this.supabase
+  .from('users')
+  .select('*')
+  .eq('supabase_uid', user.id)
+  .maybeSingle();
 
-    if (fetchError) {
-      console.error('Error fetching existing user before update:', fetchError);
-      throw fetchError;
-    }
+if (!existingUser && user.email) {
+  const { data: emailUser } = await this.supabase
+    .from('users')
+    .select('*')
+    .eq('email', user.email)
+    .maybeSingle();
+
+  if (emailUser) {
+    existingUser = emailUser;
+  }
+}
 
     const payload = {
       fullname: seller.name || existingUser?.fullname || '',
@@ -936,7 +943,7 @@ export class SupabaseService {
       catalog: safeCatalog
     };
 
-    
+
     console.time('SUPABASE_POST_INSERT');
 
     const { data, error } = await this.supabase
@@ -1332,83 +1339,96 @@ async signInWithOAuth(provider: 'google' | 'github') {
     }
   }
 
-  async syncGoogleUserToPublicUsers() {
-    if (!this.isBrowser()) {
-      return {
-        data: null,
-        error: new Error('Not running in browser')
-      };
-    }
-
-    const { data: authData, error: authError } = await this.supabase.auth.getUser();
-
-    if (authError || !authData.user) {
-      return {
-        data: null,
-        error: authError || new Error('No authenticated Google user found')
-      };
-    }
-
-    const authUser = authData.user;
-
-    const email = authUser.email || '';
-    const fullName =
-      authUser.user_metadata?.['full_name'] ||
-      authUser.user_metadata?.['name'] ||
-      '';
-    const phone = authUser.user_metadata?.['phone'] || '';
-
-    const { data: existingUser, error: fetchError } = await this.supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .maybeSingle();
-
-    if (fetchError) {
-      return { data: null, error: fetchError };
-    }
-if (existingUser) {
-  const { data: updatedUser, error: updateError } = await this.supabase
-    .from('users')
-   .update({
-  fullname: existingUser.fullname || fullName,
-  phonenumber: existingUser.phonenumber || phone,
-
-  auth_user_id: authUser.id,
-  supabase_uid: authUser.id,
-  user_id: authUser.id,
-
-  isactive: true,
-  updatedon: new Date().toISOString()
-})
-        .eq('userid', existingUser.userid)
-        .select()
-        .single();
-
-      return { data: updatedUser, error: updateError };
-    }
-
-    const { data: newUser, error: insertError } = await this.supabase
-      .from('users')
-      .insert([
-        {
-          fullname: fullName || 'Google User',
-          email,
-          phonenumber: phone,
-          username: '',
-          usertypeid: 1,
-          isverified: true,
-          isactive: true,
-          createdon: new Date().toISOString(),
-          updatedon: new Date().toISOString()
-        }
-      ])
-      .select()
-      .single();
-
-    return { data: newUser, error: insertError };
+async syncGoogleUserToPublicUsers() {
+  if (!this.isBrowser()) {
+    return { data: null, error: new Error('Not running in browser') };
   }
 
+  const { data: authData, error: authError } =
+    await this.supabase.auth.getUser();
+
+  if (authError || !authData.user) {
+    return {
+      data: null,
+      error: authError || new Error('No authenticated Google user found')
+    };
+  }
+
+  const authUser = authData.user;
+
+  const email = authUser.email || '';
+  const fullName =
+    authUser.user_metadata?.['full_name'] ||
+    authUser.user_metadata?.['name'] ||
+    email.split('@')[0] ||
+    'Google User';
+
+  const avatar =
+    authUser.user_metadata?.['avatar_url'] ||
+    authUser.user_metadata?.['picture'] ||
+    null;
+
+  // CHECK BY SUPABASE UID FIRST
+const { data: existingByUid } = await this.supabase
+  .from('users')
+  .select('*')
+  .eq('supabase_uid', authUser.id)
+  .maybeSingle();
+
+if (existingByUid) {
+  return { data: existingByUid, error: null };
+}
+
+// CHECK BY EMAIL
+const { data: existingByEmail } = await this.supabase
+  .from('users')
+  .select('*')
+  .eq('email', email)
+  .maybeSingle();
+
+if (existingByEmail) {
+  const { data, error } = await this.supabase
+    .from('users')
+    .update({
+      supabase_uid: authUser.id,
+      auth_user_id: authUser.id,
+      user_id: existingByEmail.user_id || authUser.id,
+      isactive: true,
+      isverified: true,
+      updatedon: new Date().toISOString()
+    })
+    .eq('userid', existingByEmail.userid)
+    .select()
+    .single();
+
+  return { data, error };
+}
+
+// CREATE NEW USER
+const { data, error } = await this.supabase
+  .from('users')
+  .insert([
+    {
+      fullname: fullName || 'Google User',
+      email: email,
+
+      user_id: authUser.id,
+      supabase_uid: authUser.id,
+      auth_user_id: authUser.id,
+
+      usertypeid: 1,
+      isverified: true,
+      isactive: true,
+      isonboardingcompleted: false,
+      createdon: new Date().toISOString(),
+      updatedon: new Date().toISOString()
+    }
+  ])
+  .select()
+  .single();
+
+return { data, error };
+}
   async getAllBrowseCategories(): Promise<Category[]> {
     const { data, error } = await this.supabase
       .from('categories')
@@ -1454,32 +1474,43 @@ if (existingUser) {
     return data || [];
   }
 
-  async updateUserOnboarding(payload: {
-    userid: number;
-    usertypeid: number;
-    listingtype?: string | null;
-    isonboardingcompleted: boolean;
-    password?: string;
-  }) {
-    const updatePayload: any = {
-      usertypeid: payload.usertypeid,
-      listingtype: payload.listingtype ?? null,
-      isonboardingcompleted: payload.isonboardingcompleted,
-      updatedon: new Date().toISOString()
-    };
+ async updateUserOnboarding(payload: {
+  userid: number;
+  usertypeid: number;
+  listingtype?: string | null;
+  isonboardingcompleted: boolean;
+  password?: string;
+}) {
+  const updatePayload: any = {
+    usertypeid: payload.usertypeid,
+    listingtype: payload.listingtype ?? null,
+    isonboardingcompleted: payload.isonboardingcompleted,
+    updatedon: new Date().toISOString()
+  };
 
-    if (payload.password) {
-      updatePayload.password = payload.password;
-    }
-
-    const { data, error } = await this.supabase
-      .from('users')
-      .update(updatePayload)
-      .eq('userid', payload.userid)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+  if (payload.password) {
+    updatePayload.password = payload.password;
   }
+
+  console.log('UPDATE USERID:', payload.userid);
+  console.log('UPDATE PAYLOAD:', updatePayload);
+
+  const { data, error } = await this.supabase
+    .from('users')
+    .update(updatePayload)
+    .eq('userid', payload.userid)
+    .select()
+    .maybeSingle();
+
+  if (error) {
+    console.error('UPDATE USER ERROR:', error);
+    throw error;
+  }
+
+  if (!data) {
+    throw new Error('No user row updated. Check userid.');
+  }
+
+  return data;
+}
 }
