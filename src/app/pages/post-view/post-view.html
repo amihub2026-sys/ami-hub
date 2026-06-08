@@ -64,7 +64,9 @@
           >
           <div class="catalog-body">
             <h4>{{ item.title || 'Service' }}</h4>
-            <p *ngIf="item.price !== null">₹ {{ item.price }}</p>
+           <p *ngIf="item.price && item.price > 0">
+  ₹ {{ item.price }}
+</p>
           </div>
         </div>
       </div>
@@ -181,8 +183,11 @@
 
     <h2>{{ postData()?.title }}</h2>
 
-    <p class="price">₹ {{ postData()?.price || 0 }}</p>
-
+   <p
+  class="price"
+  *ngIf="postData()?.price && postData()?.price > 0">
+  ₹ {{ postData()?.price }}
+</p>
     <div class="ratings">
       <span class="stars">
         <span *ngFor="let s of [1,2,3,4,5]" [class.filled]="s <= averageRating()">

@@ -286,7 +286,9 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
         <img [src]="getFeaturedImage(business)" [alt]="business.title">
         <div class="card-body">
           <h4>{{ business.title }}</h4>
-          <p class="price-text">₹{{ business.price || 0 }}</p>
+          <p class="price-text" *ngIf="business.price && business.price > 0">
+  ₹{{ business.price }}
+</p>
           <p class="location-text">📍 {{ business.location || business.address || 'Location not available' }}</p>
           <a class="card-link">View Details ›</a>
         </div>
@@ -353,7 +355,9 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
 
           <div class="card-body">
             <h3>{{ post.title }}</h3>
-            <p class="price">₹{{ post.price || 0 }}</p>
+            <p class="price" *ngIf="post.price && post.price > 0">
+  ₹{{ post.price }}
+</p>
             <p class="location-text">📍 {{ post.location || post.address || 'Location not available' }}</p>
           </div>
         </div>
@@ -385,7 +389,9 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
         <img [src]="getLatestProductImage(post)" [alt]="post.title">
         <div class="card-body">
           <h4>{{ post.title }}</h4>
-          <p class="price">₹{{ post.price || 0 }}</p>
+          <p class="price" *ngIf="post.price && post.price > 0">
+  ₹{{ post.price }}
+</p>
           <p class="location-text">📍 {{ post.location || post.address || 'Location not available' }}</p>
         </div>
       </div>

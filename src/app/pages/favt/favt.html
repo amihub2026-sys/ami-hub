@@ -31,7 +31,11 @@
 
         <div class="favorite-content">
           <h3>{{ item.name }}</h3>
-          <p class="favorite-price">₹{{ item.price }}</p>
+          <p
+  class="favorite-price"
+  *ngIf="item.price && item.price > 0">
+  ₹{{ item.price }}
+</p>
           <p class="favorite-location">📍 {{ item.location }}</p>
 
           <div class="favorite-actions">
