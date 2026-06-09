@@ -135,18 +135,20 @@ currentUserId = signal<string>('');
   }
 
   async loadTrendingPosts() {
-    this.isTrendingLoading.set(true);
+  this.isTrendingLoading.set(true);
 
-    try {
-      const data = await this.supabaseService.getPosts(0, 10);
-      this.trendingPosts.set(data || []);
-    } catch (error) {
-      console.error('Error loading trending posts:', error);
-      this.trendingPosts.set([]);
-    } finally {
-      this.isTrendingLoading.set(false);
-    }
+  try {
+    const data = await this.supabaseService.getServicePosts(0, 20);
+
+    this.trendingPosts.set(data || []);
+    this.trendingOffset.set(0);
+  } catch (error) {
+    console.error('Error loading service posts:', error);
+    this.trendingPosts.set([]);
+  } finally {
+    this.isTrendingLoading.set(false);
   }
+}
 
   async loadFeaturedBusinesses() {
     this.isFeaturedLoading.set(true);

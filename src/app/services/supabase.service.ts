@@ -1013,25 +1013,25 @@ if (!existingUser && user.email) {
 
     return data || [];
   }
+async getServicePosts(page: number = 0, pageSize: number = 12) {
+  const from = page * pageSize;
+  const to = from + pageSize - 1;
 
-  async getServicePosts(page: number = 0, pageSize: number = 12) {
-    const from = page * pageSize;
-    const to = from + pageSize - 1;
+  const { data, error } = await this.supabase
+    .from('post')
+    .select('*')
+   .eq('adtype', 'service')
+    .eq('isactive', true)
+    .order('createdon', { ascending: false })
+    .range(from, to);
 
-    const { data, error } = await this.supabase
-      .from('post')
-      .select('*')
-      .eq('conditiontype', 'service')
-      .range(from, to)
-      .order('createdon', { ascending: false });
-
-    if (error) {
-      console.error('Get Service Posts Error:', error);
-      throw error;
-    }
-
-    return data || [];
+  if (error) {
+    console.error('Get Service Posts Error:', error);
+    throw error;
   }
+
+  return data || [];
+}
 
   async getFeaturedPosts(from = 0, limit = 8) {
     const to = from + limit - 1;

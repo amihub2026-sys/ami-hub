@@ -268,15 +268,15 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
   <!-- FEATURED PRODUCTS -->
   <section class="featured-section">
     <div class="section-head">
-      <h2>Featured Products</h2>
+      <h2>Featured Ads</h2>
     </div>
 
     <div class="loading-text" *ngIf="isFeaturedLoading()">
-      Loading featured products...
+      Loading featured Ads...
     </div>
 
     <div class="loading-text" *ngIf="!isFeaturedLoading() && featuredBusinesses().length === 0">
-      No featured products available right now.
+      No featured Ads available right now.
     </div>
 
     <div class="featured-grid" *ngIf="featuredBusinesses().length > 0">
@@ -312,18 +312,18 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
   <!-- TRENDING NEAR YOU -->
   <section class="trending">
     <div class="section-head">
-      <h2>Hot Ads</h2>
+      <h2>Service</h2>
       <a class="section-link" (click)="goToAllDeals()">
         View All Deals →
       </a>
     </div>
 
     <div class="loading-text" *ngIf="isTrendingLoading()">
-      Loading hot ads...
+      Loading Service ads...
     </div>
 
     <div class="loading-text" *ngIf="!isTrendingLoading() && trendingPosts().length === 0">
-      No hot ads available right now.
+      No service ads available right now.
     </div>
 
     <div
@@ -338,12 +338,12 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
           *ngFor="let post of getVisibleTrendingPosts()"
           (click)="openDetails(post)"
         >
-        <div
+        <!-- <div
   class="deal-tag"
   [class.my-ad-tag]="isMyPost(post)"
 >
   {{ isMyPost(post) ? 'My Ads' : 'Hot' }}
-</div>
+</div> -->
           <div class="fav-btn">♡</div>
 
           <img
@@ -368,18 +368,18 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
   <!-- NEW PRODUCTS -->
   <section class="featured-deals">
     <div class="section-head">
-      <h2>New Products</h2>
+      <h2> Products</h2>
       <a class="section-link" (click)="goToAllDeals()">
         View All Deals →
       </a>
     </div>
 
     <div class="loading-text" *ngIf="isLatestLoading()">
-      Loading new products...
+      Loading  products...
     </div>
 
     <div class="loading-text" *ngIf="!isLatestLoading() && latestProducts().length === 0">
-      No new products available right now.
+      No products available right now.
     </div>
 
     <div class="deals-grid" *ngIf="latestProducts().length > 0">
