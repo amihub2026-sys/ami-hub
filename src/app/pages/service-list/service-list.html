@@ -140,7 +140,9 @@
 
         <div class="card-body">
           <h3>{{ post.title }}</h3>
-          <p class="price">₹{{ post.price || 0 }}</p>
+          <p class="price" *ngIf="post.price && post.price > 0">
+  ₹{{ post.price }}
+</p>
           <p class="meta">{{ getShortLocation(post) }}</p>
           <a [routerLink]="['/details', post.postid]">View Details</a>
         </div>
