@@ -66,22 +66,24 @@ export const routes: Routes = [
   { path: 'products', component: ProductList },
   { path: 'product-categories', component: ProductCategories },
 
-  { path: 'post-ad', component: PostAd },
-  { path: 'details/:id', component: PostViewComponent },
-  { path: 'post-view/:id', component: PostViewComponent },
-  { path: 'post-view', component: PostViewComponent },
+{ path: 'post-ad', component: PostAd },
 
-  { path: 'all-categories', component: Categories },
+{ path: 'details/:id', component: PostViewComponent },
+{ path: 'post-view/:id', component: PostViewComponent },
+{ path: 'post-view', component: PostViewComponent },
 
-  {
-    path: 'all-listings',
-    loadComponent: () =>
-      import('./pages/search-results/search-results').then(m => m.SearchResults)
-  },
+{ path: 'all-categories', component: Categories },
 
-  { path: 'service', component: Service },
-  { path: 'service-list', component: ServiceList },
-  { path: 'service-categories', component: ServiceCategories },
+{
+  path: 'all-listings',
+  loadComponent: () =>
+    import('./pages/search-results/search-results').then(m => m.SearchResults)
+},
+
+{ path: 'service', component: Service },
+{ path: 'service/:id', component: Service },
+{ path: 'service-list', component: ServiceList },
+{ path: 'service-categories', component: ServiceCategories },
 
   { path: 'coustme', component: Coustme },
   { path: 'custom-fields', component: CustomFields },

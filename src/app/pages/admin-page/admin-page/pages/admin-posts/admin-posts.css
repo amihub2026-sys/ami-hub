@@ -456,3 +456,12 @@ tbody tr:hover {
   font-weight: 700;
   color: #0f172a;
 }
+
+.edit-btn{
+  background:#2563eb;
+  color:#fff;
+}
+
+.edit-btn:hover{
+  background:#1d4ed8;
+}

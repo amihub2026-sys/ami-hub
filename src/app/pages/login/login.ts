@@ -370,8 +370,8 @@ const { data: newUser, error: insertError } =
     ])
     .select()
     .single();
-  
-  
+
+
 
 if (insertError) {
 
