@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone, Input } from '@angular/core';
 import { SnackbarService } from '../../services/snackbar.service';
 import { Location } from '@angular/common';
 import { CommonModule } from '@angular/common';
@@ -31,10 +31,11 @@ import {
   
 })
 export class Service implements OnInit {
+    @Input() adminEditPostId: number | null = null;
   goToSubscriptionPlans() {
     this.router.navigate(['/subscription-plan']);
   }
-
+  
   goToFeatureAd(): void {
     if (!this.editPostId) {
       this.showAlert('Post id not found');
@@ -175,10 +176,12 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'):
           ? String(history.state.postId)
           : null;
 
-      const id = routeId || navStateId;
+  const id = this.adminEditPostId
+  ? String(this.adminEditPostId)
+  : routeId || navStateId;
 
-      this.editPostId = id;
-      this.isEditMode = !!id;
+this.editPostId = id;
+this.isEditMode = !!id;
 
       try {
         const categoriesResult = await Promise.race([
@@ -935,9 +938,15 @@ if (this.mainAd.whatsappnumber && !/^\d{10}$/.test(this.mainAd.whatsappnumber)) 
           return;
         }
 
-       this.showAlert('Post updated successfully', 'success');
-        this.router.navigate(['/my-posts']);
-        return;
+      this.showAlert('Post updated successfully', 'success');
+
+if (this.adminEditPostId) {
+  // Admin edit - stay inside admin page
+  return;
+}
+
+this.router.navigate(['/my-posts']);
+return;
       }
 let mainImageUrl = '';
 
