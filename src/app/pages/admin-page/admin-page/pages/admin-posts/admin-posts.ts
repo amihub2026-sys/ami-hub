@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   ChangeDetectorRef,
   Component,
@@ -6,6 +7,7 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { SupabaseService } from '../../../../../services/supabase.service';
 
 interface AdminPostItem {
@@ -28,13 +30,14 @@ interface AdminPostItem {
 @Component({
   selector: 'app-admin-posts',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-posts.html',
   styleUrls: ['./admin-posts.css'],
 })
 export class AdminPosts implements OnInit {
   private supabaseService = inject(SupabaseService);
   private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   @Input() searchQuery = '';
 
@@ -43,6 +46,20 @@ export class AdminPosts implements OnInit {
   posts: AdminPostItem[] = [];
   currentPage = 1;
 itemsPerPage = 5;
+
+editingPost: AdminPostItem | null = null;
+
+editForm: any = {
+  title: '',
+  price: 0,
+  category: '',
+  subcategory: '',
+  type: '',
+  adType: '',
+  isActive: true,
+  isFeatured: false,
+  imageUrl: ''
+};
 
   async ngOnInit(): Promise<void> {
     await this.loadPosts();
@@ -234,9 +251,14 @@ itemsPerPage = 5;
     return post.isActive ? 'status-active' : 'status-inactive';
   }
 
-  trackByPost(index: number, post: AdminPostItem): number {
-    return post.id;
-  }
+ trackByPost(index: number, post: AdminPostItem): number {
+  return post.id;
+}
+
+editPost(post: AdminPostItem): void {
+  this.router.navigate(['/service', post.id]);
+}
+
 get totalPages(): number {
   return Math.ceil(this.filteredPosts.length / this.itemsPerPage) || 1;
 }
@@ -250,15 +272,16 @@ goToPage(page: number): void {
   if (page < 1 || page > this.totalPages) return;
   this.currentPage = page;
 }
-  private formatDate(value: string | null | undefined): string {
-    if (!value) return '-';
 
-    const date = new Date(value);
+private formatDate(value: string | null | undefined): string {
+  if (!value) return '-';
 
-    return date.toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-  }
+  const date = new Date(value);
+
+  return date.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
 }
