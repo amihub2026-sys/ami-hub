@@ -394,3 +394,39 @@
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 20px;
 }
+.revenue-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 22px 0;
+}
+
+.revenue-card {
+  padding: 22px;
+  border-radius: 22px;
+  color: #fff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.revenue-card h2 {
+  margin: 10px 0;
+  font-size: 30px;
+}
+
+.day-card {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+.week-card {
+  background: linear-gradient(135deg, #f97316, #fb923c);
+}
+
+.month-card {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+}
+
+@media (max-width: 768px) {
+  .revenue-grid {
+    grid-template-columns: 1fr;
+  }
+}
