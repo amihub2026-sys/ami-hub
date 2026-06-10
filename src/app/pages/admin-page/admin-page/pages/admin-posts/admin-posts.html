@@ -56,47 +56,7 @@
     </div>
   </div>
 
-  <div class="edit-box" *ngIf="editingPost">
-    <h3>Edit Post #{{ editingPost.id }}</h3>
-
-    <input type="text" [(ngModel)]="editForm.title" placeholder="Title" />
-
-    <input type="number" [(ngModel)]="editForm.price" placeholder="Price" />
-
-    <input type="text" [(ngModel)]="editForm.category" placeholder="Category" />
-
-    <input
-      type="text"
-      [(ngModel)]="editForm.subcategory"
-      placeholder="Subcategory"
-    />
-
-    <input type="text" [(ngModel)]="editForm.type" placeholder="Type" />
-
-    <input type="text" [(ngModel)]="editForm.adType" placeholder="Ad Type" />
-
-    <input
-      type="text"
-      [(ngModel)]="editForm.imageUrl"
-      placeholder="Image URL"
-    />
-
-    <label>
-      <input type="checkbox" [(ngModel)]="editForm.isActive" />
-      Active
-    </label>
-
-    <label>
-      <input type="checkbox" [(ngModel)]="editForm.isFeatured" />
-      Featured
-    </label>
-
-    <br /><br />
-
-    <button type="button" (click)="updatePost()">Update</button>
-
-    <button type="button" (click)="cancelEdit()">Cancel</button>
-  </div>
+ 
 
   <div class="section-card">
     <div class="section-head">
