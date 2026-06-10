@@ -46,7 +46,9 @@ export class AdminDashboard implements OnInit {
   totalRevenueAmount = 0;
   subscriptionRevenue = 0;
 boostRevenue = 0;
-
+todayRevenue = 0;
+weekRevenue = 0;
+monthRevenue = 0;
   recentActivities: ActivityItem[] = [];
 
   async ngOnInit(): Promise<void> {
@@ -132,61 +134,74 @@ boostRevenue = 0;
   }
 
  async loadRevenue(): Promise<void> {
-
   const [subsRes, boostRes] = await Promise.all([
-
     this.supabaseService.supabase
       .from('user_subscriptions')
-      .select('amountpaid,paymentstatus,isactive')
+      .select('amountpaid,paymentstatus,isactive,createdon')
       .eq('isactive', true),
 
     this.supabaseService.supabase
       .from('user_boost_purchases')
-      .select('amount,paymentstatus')
-
+      .select('amount,paymentstatus,createdon')
   ]);
 
+  const now = new Date();
+
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  weekStart.setHours(0, 0, 0, 0);
+
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  let subscriptionTotal = 0;
+  let boostTotal = 0;
+  let todayTotal = 0;
+  let weekTotal = 0;
+  let monthTotal = 0;
+
+  const addRevenue = (amount: number, createdon: string) => {
+    const createdDate = new Date(createdon);
+
+    if (createdDate >= todayStart) todayTotal += amount;
+    if (createdDate >= weekStart) weekTotal += amount;
+    if (createdDate >= monthStart) monthTotal += amount;
+  };
+
+  if (!subsRes.error) {
+    for (const item of subsRes.data || []) {
+      if ((item.paymentstatus || '').toLowerCase() === 'paid') {
+        const amount = Number(item.amountpaid || 0);
+        subscriptionTotal += amount;
+        addRevenue(amount, item.createdon);
+      }
+    }
+  }
+
+  if (!boostRes.error) {
+    for (const item of boostRes.data || []) {
+      if ((item.paymentstatus || '').toLowerCase() === 'paid') {
+        const amount = Number(item.amount || 0);
+        boostTotal += amount;
+        addRevenue(amount, item.createdon);
+      }
+    }
+  }
+
   this.ngZone.run(() => {
+    this.subscriptionRevenue = subscriptionTotal;
+    this.boostRevenue = boostTotal;
+    this.totalRevenueAmount = subscriptionTotal + boostTotal;
 
-    this.subscriptionRevenue = 0;
-    this.boostRevenue = 0;
-
-    if (!subsRes.error) {
-      this.subscriptionRevenue =
-        (subsRes.data || [])
-          .filter(
-            (x: any) =>
-              (x.paymentstatus || '').toLowerCase() === 'paid'
-          )
-          .reduce(
-            (sum: number, x: any) =>
-              sum + Number(x.amountpaid || 0),
-            0
-          );
-    }
-
-    if (!boostRes.error) {
-      this.boostRevenue =
-        (boostRes.data || [])
-          .filter(
-            (x: any) =>
-              (x.paymentstatus || '').toLowerCase() === 'paid'
-          )
-          .reduce(
-            (sum: number, x: any) =>
-              sum + Number(x.amount || 0),
-            0
-          );
-    }
-
-    this.totalRevenueAmount =
-      this.subscriptionRevenue +
-      this.boostRevenue;
+    this.todayRevenue = todayTotal;
+    this.weekRevenue = weekTotal;
+    this.monthRevenue = monthTotal;
 
     this.cdr.detectChanges();
   });
 }
-
   async loadRecentActivities(): Promise<void> {
     const activityItems: ActivityItem[] = [];
 
@@ -353,7 +368,17 @@ boostRevenue = 0;
 
     return `₹${this.totalRevenueAmount.toLocaleString('en-IN')}`;
   }
+get formattedTodayRevenue(): string {
+  return `₹${this.todayRevenue.toLocaleString('en-IN')}`;
+}
 
+get formattedWeekRevenue(): string {
+  return `₹${this.weekRevenue.toLocaleString('en-IN')}`;
+}
+
+get formattedMonthRevenue(): string {
+  return `₹${this.monthRevenue.toLocaleString('en-IN')}`;
+}
   get totalActivities(): number {
     return this.recentActivities.length;
   }
