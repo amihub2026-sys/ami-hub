@@ -6,7 +6,7 @@
   ></div>
 
   <app-admin-sidebar
-    [activeMenu]="activeMenu"
+    [activeMenu]="activeMenu === 'edit-post' ? 'posts' : activeMenu"
     [sidebarOpen]="sidebarOpen"
     (menuChange)="setActiveMenu($event)"
   ></app-admin-sidebar>
@@ -29,9 +29,7 @@
       </div>
     </div>
 
-    <app-admin-dashboard
-      *ngIf="activeMenu === 'dashboard'"
-    ></app-admin-dashboard>
+    <app-admin-dashboard *ngIf="activeMenu === 'dashboard'"></app-admin-dashboard>
 
     <app-admin-users
       *ngIf="activeMenu === 'users'"
@@ -41,10 +39,18 @@
     <app-admin-posts
       *ngIf="activeMenu === 'posts'"
       [searchQuery]="searchQuery"
+      (adminEditPost)="openAdminEditPost($event)"
     ></app-admin-posts>
- <app-service
-  *ngIf="activeMenu === 'advertise'"
-></app-service>
+
+    <app-service
+      *ngIf="activeMenu === 'advertise'"
+      [adminEditPostId]="null"
+    ></app-service>
+
+    <app-service
+      *ngIf="activeMenu === 'edit-post'"
+      [adminEditPostId]="editingPostId"
+    ></app-service>
 
     <app-admin-categories
       *ngIf="activeMenu === 'categories'"
@@ -70,10 +76,11 @@
       *ngIf="activeMenu === 'boost-plans'"
       [searchQuery]="searchQuery"
     ></app-admin-boost-plans>
+
     <app-admin-user-boost-plans
-  *ngIf="activeMenu === 'user-boost-plans'"
-  [searchQuery]="searchQuery"
-></app-admin-user-boost-plans>
+      *ngIf="activeMenu === 'user-boost-plans'"
+      [searchQuery]="searchQuery"
+    ></app-admin-user-boost-plans>
 
     <app-admin-payments
       *ngIf="activeMenu === 'payments'"
@@ -95,10 +102,10 @@
       <p>Jobs module will be connected next.</p>
     </div>
 
-  <app-admin-reports
-  *ngIf="activeMenu === 'reports'"
-  [searchQuery]="searchQuery">
-</app-admin-reports>  
+    <app-admin-reports
+      *ngIf="activeMenu === 'reports'"
+      [searchQuery]="searchQuery"
+    ></app-admin-reports>
 
     <div class="content-card" *ngIf="activeMenu === 'locations'">
       <h1>Locations</h1>

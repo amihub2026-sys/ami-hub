@@ -19,7 +19,8 @@ import { AdminUserSubscriptionsComponent } from './admin-page/pages/admin-user-s
 import { AdminBoostPlansComponent } from './admin-page/pages/admin-boost-plans/admin-boost-plans';
 import { AdminPaymentsComponent } from './admin-page/pages/admin-payments/admin-payments';
 
-type AdminMenuKey = SidebarAdminMenuKey | 'advertise';
+
+type AdminMenuKey = SidebarAdminMenuKey | 'advertise' | 'edit-post';
 
 @Component({
   selector: 'app-admin-page',
@@ -51,6 +52,8 @@ export class AdminPage {
   sidebarOpen = false;
   searchQuery = '';
   activeMenu: AdminMenuKey = 'dashboard';
+  editingPostId: number | null = null;
+  
 
  
 
@@ -59,8 +62,11 @@ export class AdminPage {
     this.searchQuery = '';
     this.activeMenu = menu;
   }
-
-  toggleSidebar(): void {
+openAdminEditPost(postId: number): void {
+  this.editingPostId = postId;
+  this.activeMenu = 'edit-post';
+}
+ toggleSidebar(): void {
     this.sidebarOpen = !this.sidebarOpen;
   }
 
@@ -108,6 +114,11 @@ case 'payments':
         return 'Settings';
       default:
         return 'Dashboard';
+        case 'advertise':
+  return 'Advertise';
+
+case 'edit-post':
+  return 'Edit Post';
     }
   }
 

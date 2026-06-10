@@ -4,11 +4,14 @@ import {
   ChangeDetectorRef,
   Component,
   Input,
+  Output,
+  EventEmitter,
   OnInit,
   inject,
 } from '@angular/core';
-import { Router } from '@angular/router';
+
 import { SupabaseService } from '../../../../../services/supabase.service';
+
 
 interface AdminPostItem {
   id: number;
@@ -37,9 +40,10 @@ interface AdminPostItem {
 export class AdminPosts implements OnInit {
   private supabaseService = inject(SupabaseService);
   private cdr = inject(ChangeDetectorRef);
-  private router = inject(Router);
+  
 
   @Input() searchQuery = '';
+  @Output() adminEditPost = new EventEmitter<number>();
 
   isLoading = true;
   errorMessage = '';
@@ -256,7 +260,7 @@ editForm: any = {
 }
 
 editPost(post: AdminPostItem): void {
-  this.router.navigate(['/service', post.id]);
+  this.adminEditPost.emit(post.id);
 }
 
 get totalPages(): number {
