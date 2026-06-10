@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Service } from '../service/service';
 import { AdminUserBoostPlansComponent } from './admin-page/pages/admin-user-boost-plans/admin-user-boost-plans';
 import { AdminReports } from './pages/admin-reports/admin-reports';
 import {
@@ -24,24 +24,25 @@ type AdminMenuKey = SidebarAdminMenuKey | 'advertise';
 @Component({
   selector: 'app-admin-page',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    AdminSidebar,
-    AdminTopbar,
-    AdminDashboard,
-    AdminReports,
-    AdminUsers,
-    AdminPosts,
-    AdminCategoriesComponent,
-    AdminSubcategories,
-    AdminSubscriptionsComponent,
-    AdminUserSubscriptionsComponent,
-    AdminBoostPlansComponent,
-    AdminUserBoostPlansComponent,
-    AdminPaymentsComponent,
-    
-  ],
+  
+ imports: [
+  CommonModule,
+  FormsModule,
+  AdminSidebar,
+  AdminTopbar,
+  AdminDashboard,
+  AdminReports,
+  AdminUsers,
+  AdminPosts,
+  AdminCategoriesComponent,
+  AdminSubcategories,
+  AdminSubscriptionsComponent,
+  AdminUserSubscriptionsComponent,
+  AdminBoostPlansComponent,
+  AdminUserBoostPlansComponent,
+  AdminPaymentsComponent,
+  Service
+],
   templateUrl: './admin-page.html',
   styleUrls: ['./admin-page.css'],
 })
@@ -51,17 +52,11 @@ export class AdminPage {
   searchQuery = '';
   activeMenu: AdminMenuKey = 'dashboard';
 
-  constructor(private router: Router) {}
+ 
 
   setActiveMenu(menu: AdminMenuKey): void {
     this.sidebarOpen = false;
     this.searchQuery = '';
-
-    if (menu === 'advertise') {
-      this.router.navigate(['/service']);
-      return;
-    }
-
     this.activeMenu = menu;
   }
 

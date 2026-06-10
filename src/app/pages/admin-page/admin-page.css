@@ -189,3 +189,13 @@ app-admin-payments {
     line-height: 1.6;
   }
 }
+.admin-layout {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}

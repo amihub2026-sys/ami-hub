@@ -28,6 +28,7 @@ import {
   imports: [CommonModule, FormsModule, LocationPickerComponent],
   templateUrl: './service.html',
   styleUrls: ['./service.css']
+  
 })
 export class Service implements OnInit {
   goToSubscriptionPlans() {

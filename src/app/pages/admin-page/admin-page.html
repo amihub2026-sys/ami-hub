@@ -42,6 +42,9 @@
       *ngIf="activeMenu === 'posts'"
       [searchQuery]="searchQuery"
     ></app-admin-posts>
+ <app-service
+  *ngIf="activeMenu === 'advertise'"
+></app-service>
 
     <app-admin-categories
       *ngIf="activeMenu === 'categories'"
