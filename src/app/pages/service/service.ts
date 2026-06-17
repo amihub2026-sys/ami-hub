@@ -4,6 +4,7 @@ import { Location } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+
 import {
   SupabaseService,
   Category,
@@ -32,6 +33,7 @@ import {
 })
 export class Service implements OnInit {
     @Input() adminEditPostId: number | null = null;
+  @Input() adminUser: any = null;
   goToSubscriptionPlans() {
     this.router.navigate(['/subscription-plan']);
   }
@@ -168,6 +170,10 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'):
       this.isPageLoading = true;
       this.cdr.detectChanges();
     });
+if (this.adminUser) {
+  this.mainAd.contactphone = this.adminUser.phone || '';
+  this.mainAd.whatsappnumber = this.adminUser.phone || '';
+}
 
     try {
       const routeId = this.route.snapshot.paramMap.get('id');
@@ -858,7 +864,12 @@ if (this.mainAd.whatsappnumber && !/^\d{10}$/.test(this.mainAd.whatsappnumber)) 
       const authUserId = session.authUser?.id || '';
       const localUserId = session.userid || '';
       const resolvedUuid = await this.supabaseService.resolveEffectiveUserUuid();
-      const effectiveUserId = authUserId || resolvedUuid || localUserId;
+  const effectiveUserId =
+  this.adminUser?.auth_user_id ||
+  this.adminUser?.supabase_uid ||
+  authUserId ||
+  resolvedUuid ||
+  localUserId;
 
       if (!effectiveUserId) {
         this.showAlert('User id not found');
@@ -1011,17 +1022,28 @@ if (this.mainAd.videos.length > 0) {
         cityid: selectedCity?.cityid ?? null,
         areaid: selectedArea?.areaid ?? null,
 
-        contactname:
-          session.name ||
-          session.authUser?.user_metadata?.['full_name'] ||
-          session.authUser?.user_metadata?.['name'] ||
-          '',
-        contactphone: this.mainAd.contactphone || '',
-        contactemail:
-          session.email ||
-          session.authUser?.email ||
-          '',
-        whatsappnumber: this.mainAd.whatsappnumber || '',
+      contactname:
+  this.adminUser?.name ||
+  session.name ||
+  session.authUser?.user_metadata?.['full_name'] ||
+  session.authUser?.user_metadata?.['name'] ||
+  '',
+
+contactphone:
+  this.adminUser?.phone ||
+  this.mainAd.contactphone ||
+  '',
+
+contactemail:
+  this.adminUser?.email ||
+  session.email ||
+  session.authUser?.email ||
+  '',
+
+whatsappnumber:
+  this.adminUser?.phone ||
+  this.mainAd.whatsappnumber ||
+  '',
 
       image_url: mainImageUrl,
 image_urls: otherImageUrls,

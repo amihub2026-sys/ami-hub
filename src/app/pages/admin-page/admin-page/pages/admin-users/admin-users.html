@@ -83,7 +83,7 @@
         </thead>
 
         <tbody>
-         <tr *ngFor="let user of paginatedUsers; trackBy: trackByUser">
+          <tr *ngFor="let user of paginatedUsers; trackBy: trackByUser">
             <td class="id-cell">#{{ user.id }}</td>
 
             <td>
@@ -125,6 +125,14 @@
               >
                 {{ getActionLabel(user) }}
               </button>
+
+              <button
+                type="button"
+                class="action-btn posts-btn"
+                (click)="createPostForUser(user)"
+              >
+                Post
+              </button>
             </td>
           </tr>
 
@@ -135,26 +143,36 @@
           </tr>
         </tbody>
       </table>
+
       <div class="pagination" *ngIf="filteredUsers.length > pageSize">
-  <button
-    type="button"
-    (click)="prevPage()"
-    [disabled]="currentPage === 1">
-    Previous
-  </button>
+        <button
+          type="button"
+          (click)="prevPage()"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
 
-  <span>
-    Page {{ currentPage }} of {{ totalPages }}
-  </span>
+        <span>
+          Page {{ currentPage }} of {{ totalPages }}
+        </span>
 
-  <button
-    type="button"
-    (click)="nextPage()"
-    [disabled]="currentPage === totalPages">
-    Next
-  </button>
-</div>
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
     </div>
+    <div class="modal-backdrop" *ngIf="showPostModal">
+  <div class="post-modal">
+    <app-service
+      [adminUser]="selectedUser">
+    </app-service>
+  </div>
+</div>
 
     <ng-template #loadingBlock>
       <div class="loading-wrap">

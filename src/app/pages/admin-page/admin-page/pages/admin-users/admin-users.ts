@@ -6,12 +6,16 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { SupabaseService } from '../../../../../services/supabase.service';
+import { Service } from '../../../../service/service';
 
 type UserStatus = 'Active' | 'Blocked' | 'Pending';
 
 interface AdminUserItem {
   id: number;
+    auth_user_id: string | null;
+  supabase_uid: string | null;
   name: string;
   email: string;
   phone: string;
@@ -31,21 +35,25 @@ interface AdminUserItem {
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule],
+imports: [CommonModule, Service],
   templateUrl: './admin-users.html',
   styleUrls: ['./admin-users.css'],
 })
 export class AdminUsers implements OnInit {
   private supabaseService = inject(SupabaseService);
   private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
     currentPage = 1;
   pageSize = 5;
 
   @Input() searchQuery = '';
-
+ 
   isLoading = true;
   errorMessage = '';
   users: AdminUserItem[] = [];
+  showPostModal = false;
+selectedUser: AdminUserItem | null = null;
+
 
   async ngOnInit(): Promise<void> {
     await this.loadUsers();
@@ -61,6 +69,8 @@ export class AdminUsers implements OnInit {
         .from('users')
         .select(`
           userid,
+          auth_user_id,
+supabase_uid,
           fullname,
           name,
           email,
@@ -76,6 +86,7 @@ export class AdminUsers implements OnInit {
           isonboardingcompleted
         `)
         .order('createdon', { ascending: false });
+        
 
       if (error) {
         console.error('Load users error:', error);
@@ -91,7 +102,7 @@ export class AdminUsers implements OnInit {
           row.name?.trim() ||
           row.email?.split('@')?.[0] ||
           'User';
-
+             
         const resolvedPhone =
           row.phonenumber?.trim() ||
           row.phone_number?.trim() ||
@@ -101,6 +112,8 @@ export class AdminUsers implements OnInit {
 
         return {
           id: Number(row.userid),
+          auth_user_id: row.auth_user_id || null,
+supabase_uid: row.supabase_uid || null,
           name: resolvedName,
           email: row.email || '-',
           phone: resolvedPhone,
@@ -261,5 +274,19 @@ prevPage(): void {
       month: 'short',
       year: 'numeric',
     });
+    
   }
+
+
+ createPostForUser(user: AdminUserItem): void {
+  this.selectedUser = user;
+  this.showPostModal = true;
+}
+
+closePostModal(): void {
+  this.showPostModal = false;
+  this.selectedUser = null;
+}
+
+ 
 }
