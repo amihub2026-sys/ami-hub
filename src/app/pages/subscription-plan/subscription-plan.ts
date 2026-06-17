@@ -10,12 +10,17 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { supabase } from '../../../supabaseClient';
 import { SnackbarService } from '../../services/snackbar.service';
+
 interface SubscriptionPlanItem {
   subscriptionplanid: number;
+  plan_id: string;
   planname: string;
   price: number;
   description: string;
   validitydays: number;
+  postlimit: number;
+  ad_limit: number;
+  remaining_ads: number;
   isactive: boolean;
 }
 
@@ -31,7 +36,7 @@ export class SubscriptionPlan implements OnInit {
   private isBrowser = isPlatformBrowser(this.platformId);
 
   showSuccess = false;
-  selectedPlan: string = '';
+  selectedPlan = '';
   isSaving = false;
   isLoadingPlans = false;
   flowType: 'normal' | 'featured' = 'normal';
@@ -41,13 +46,13 @@ export class SubscriptionPlan implements OnInit {
 
   plans: SubscriptionPlanItem[] = [];
 
-constructor(
-  private router: Router,
-  private route: ActivatedRoute,
-  private cd: ChangeDetectorRef,
-  private ngZone: NgZone,
-  private snackbar: SnackbarService   // 🔥 ADD THIS
-) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private cd: ChangeDetectorRef,
+    private ngZone: NgZone,
+    private snackbar: SnackbarService
+  ) {}
 
   async ngOnInit(): Promise<void> {
     const flow = this.route.snapshot.queryParamMap.get('flow');
@@ -76,22 +81,18 @@ constructor(
 
       if (error) throw error;
 
-      this.plans = (data || []).map((item: any) => {
-        const planId = String(item.plan_id || '').trim().toLowerCase();
-        const planName = String(item.planname || '').trim().toLowerCase();
-
-        return {
-          subscriptionplanid: Number(item.subscriptionplanid),
-          planname: String(item.planname || ''),
-          price:
-            planId === 'basic_plan' || planName === 'basic plan'
-              ? 1
-              : Number(item.price || 0),
-          description: String(item.description || ''),
-          validitydays: Number(item.validitydays || 30),
-          isactive: Boolean(item.isactive)
-        };
-      });
+      this.plans = (data || []).map((item: any) => ({
+        subscriptionplanid: Number(item.subscriptionplanid),
+        plan_id: String(item.plan_id || ''),
+        planname: String(item.planname || item.name || ''),
+        price: Number(item.price || 0),
+        description: String(item.description || ''),
+        validitydays: Number(item.validitydays || 30),
+        postlimit: Number(item.postlimit || item.ad_limit || 1),
+        ad_limit: Number(item.ad_limit || item.postlimit || 1),
+        remaining_ads: Number(item.remaining_ads || item.ad_limit || item.postlimit || 1),
+        isactive: Boolean(item.isactive ?? item.is_active)
+      }));
 
       if (!this.plans.length) {
         this.setFallbackPlans();
@@ -109,34 +110,50 @@ constructor(
     this.plans = [
       {
         subscriptionplanid: 7,
+        plan_id: 'basic_plan',
         planname: 'Basic Plan',
-        price: 1,
+        price: 0,
         description: 'Access to core features',
         validitydays: 30,
+        postlimit: 1,
+        ad_limit: 1,
+        remaining_ads: 1,
         isactive: true
       },
       {
         subscriptionplanid: 8,
+        plan_id: 'starter_plan',
         planname: 'Starter Plan',
         price: 500,
         description: 'Priority support and better visibility',
         validitydays: 30,
+        postlimit: 5,
+        ad_limit: 5,
+        remaining_ads: 5,
         isactive: true
       },
       {
         subscriptionplanid: 9,
+        plan_id: 'premium_plan',
         planname: 'Premium Plan',
         price: 1500,
         description: 'Dedicated support and extended usage',
         validitydays: 60,
+        postlimit: 15,
+        ad_limit: 15,
+        remaining_ads: 15,
         isactive: true
       },
       {
         subscriptionplanid: 10,
+        plan_id: 'pro_plan',
         planname: 'Pro Plan',
         price: 2500,
         description: 'Maximum ads and full access',
         validitydays: 90,
+        postlimit: 999,
+        ad_limit: 999,
+        remaining_ads: 999,
         isactive: true
       }
     ];
@@ -146,35 +163,19 @@ constructor(
     const name = (planName || '').toLowerCase();
 
     if (name === 'basic' || name === 'basic plan') {
-      return [
-        'Access to core features',
-        'Basic support',
-        'Single user'
-      ];
+      return ['Access to core features', 'Basic support', 'Single user'];
     }
 
     if (name === 'starter' || name === 'starter plan') {
-      return [
-        'All Basic features',
-        'Priority support',
-        'Up to 5 ads'
-      ];
+      return ['All Basic features', 'Priority support', 'Up to 5 ads'];
     }
 
     if (name === 'premium' || name === 'premium plan') {
-      return [
-        'Extended plan validity',
-        'Higher ad limit',
-        'Priority usage'
-      ];
+      return ['Extended plan validity', 'Higher ad limit', 'Priority usage'];
     }
 
     if (name === 'pro' || name === 'pro plan') {
-      return [
-        'Maximum ad limit',
-        'Longest validity',
-        'Full access benefits'
-      ];
+      return ['Maximum ad limit', 'Longest validity', 'Full access benefits'];
     }
 
     return ['Plan benefits included'];
@@ -185,44 +186,18 @@ constructor(
     return name === 'starter' || name === 'starter plan';
   }
 
-  private getPlanIdFromPlanName(planName: string): string {
-    const name = (planName || '').trim().toLowerCase();
-
-    switch (name) {
-      case 'basic':
-      case 'basic plan':
-        return 'basic_plan';
-
-      case 'starter':
-      case 'starter plan':
-        return 'starter_plan';
-
-      case 'premium':
-      case 'premium plan':
-        return 'premium_plan';
-
-      case 'pro':
-      case 'pro plan':
-        return 'pro_plan';
-
-      default:
-        return 'basic_plan';
-    }
-  }
-
   async selectPlan(plan: SubscriptionPlanItem): Promise<void> {
     if (this.isSaving) return;
 
     if (!this.isBrowser) {
-     this.snackbar.show('Please try again in browser.', 'error');
+      this.snackbar.show('Please try again in browser.', 'error');
       return;
     }
 
     const pendingPostPayload = localStorage.getItem('pending_post_payload');
-    
 
     if (!pendingPostPayload) {
-    this.snackbar.show('Session expired. Please fill the form again.', 'error');
+      this.snackbar.show('Session expired. Please fill the form again.', 'error');
       this.router.navigate(['/service']);
       return;
     }
@@ -235,7 +210,7 @@ constructor(
     });
 
     try {
-      const planId = this.getPlanIdFromPlanName(plan.planname);
+      const planId = plan.plan_id;
 
       const planPayload = {
         subscriptionplanid: plan.subscriptionplanid,
@@ -246,8 +221,8 @@ constructor(
         duration_days: plan.validitydays,
         validitydays: plan.validitydays,
 
-        total_ads: 1,
-        remaining_ads: 1,
+        total_ads: plan.ad_limit || plan.postlimit || 1,
+        remaining_ads: plan.remaining_ads || plan.ad_limit || plan.postlimit || 1,
 
         isfeatured: this.flowType === 'featured',
         featured_plan_id: this.flowType === 'featured' ? planId : null,
@@ -255,12 +230,7 @@ constructor(
         flow_type: this.flowType
       };
 
-      
-
-      localStorage.setItem(
-        'selected_plan_payload',
-        JSON.stringify(planPayload)
-      );
+      localStorage.setItem('selected_plan_payload', JSON.stringify(planPayload));
 
       this.ngZone.run(() => {
         this.isSaving = false;
@@ -278,7 +248,7 @@ constructor(
         this.cd.detectChanges();
       });
 
-     this.snackbar.show('Something went wrong. Please try again.', 'error');
+      this.snackbar.show('Something went wrong. Please try again.', 'error');
     }
   }
 }
