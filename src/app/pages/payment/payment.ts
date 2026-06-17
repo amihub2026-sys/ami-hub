@@ -882,13 +882,26 @@ this.snackbar.show(msg, 'error');
 
       return;
     }
+if (!this.amount || this.amount <= 0) {
+  this.isPaying.set(true);
+  this.paymentFailed.set(false);
+  this.errorMessage.set('');
 
-    if (!this.amount || this.amount <= 0) {
-     const msg = 'Invalid payment amount.';
-this.errorMessage.set(msg);
-this.snackbar.show(msg, 'error');
-      return;
-    }
+  try {
+    await this.savePostAfterPayment({});
+    this.snackbar.show('Free post saved successfully!', 'success');
+    this.router.navigate(['/my-ads']);
+  } catch (error: any) {
+    const msg = error?.message || 'Post save failed.';
+    this.paymentFailed.set(true);
+    this.errorMessage.set(msg);
+    this.snackbar.show(msg, 'error');
+  } finally {
+    this.isPaying.set(false);
+  }
+
+  return;
+}
 
     if (!window.Razorpay) {
      const msg = 'Razorpay SDK not loaded. Please refresh and try again.';
