@@ -137,7 +137,7 @@ constructor(
       await this.supabaseService.waitForSession(2500);
 
       const session = await this.supabaseService.getEffectiveAuthUser();
-      
+
 
 
       if (!session.isAuthenticated) {
@@ -167,7 +167,7 @@ constructor(
             email: profileById?.email || session.email || '',
             phone: profileById?.phone_number || profileById?.phonenumber || '',
             username: profileById?.username || session.username || '',
-           
+
             accountType: profileById?.accounttype || '',
             category: profileById?.category || '',
             profileImage: profileById?.profileimageurl || profileById?.avatar_url || null,
@@ -228,7 +228,7 @@ constructor(
           ...this.seller,
           name:
             profile?.name ||
-            
+
             profile?.fullname ||
             user?.user_metadata?.['full_name'] ||
             user?.user_metadata?.['name'] ||
@@ -454,43 +454,38 @@ if (!session.authUser && session.userid) {
     '';
 
   const payload = {
-    fullname: this.seller.name || '',
-    name: this.seller.name || '',
-    email: this.seller.email || '',
-    phonenumber: this.seller.phone || '',
-    phone_number: this.seller.phone || '',
-    username: this.seller.username || '',
-    password: this.seller.password || '',
-
-    auth_user_id: savedAuthId || null,
-    supabase_uid: savedAuthId || null,
-    user_id: savedAuthId || null,
-          profileimageurl: this.seller.profileImage || null,
-          avatar_url: this.seller.profileImage || null,
-          accounttype: this.seller.accountType || '',
-          category: this.seller.category || '',
-          kycimage: this.seller.kycImage || null,
-          qrcodeimage: this.seller.qrCodeImage || null,
-          rating: this.seller.rating ?? 4,
-          isverified: this.seller.verified ?? true,
-          isactive: true,
-          termsaccepted: this.seller.termsAccepted ?? false,
-          isonboardingcompleted: true,
-          updatedon: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
+  fullname: this.seller.name || '',
+  name: this.seller.name || '',
+  email: (this.seller.email || '').trim().toLowerCase(),
+  username: this.seller.username || '',
+  password: this.seller.password || '',
+  profileimageurl: this.seller.profileImage || null,
+  avatar_url: this.seller.profileImage || null,
+  accounttype: this.seller.accountType || '',
+  category: this.seller.category || '',
+  kycimage: this.seller.kycImage || null,
+  qrcodeimage: this.seller.qrCodeImage || null,
+  rating: this.seller.rating ?? 4,
+  isverified: this.seller.verified ?? true,
+  isactive: true,
+  termsaccepted: this.seller.termsAccepted ?? false,
+  isonboardingcompleted: true,
+  updatedon: new Date().toISOString(),
+  updated_at: new Date().toISOString()
+};
 console.log('SAVED AUTH ID:', savedAuthId);
 console.log('SESSION USERID:', session.userid);
 console.log('PAYLOAD:', payload);
-
-      const { data: updatedUser, error } = await this.supabaseService.supabase
+const { data: updatedUser, error } = await this.supabaseService.supabase
   .from('users')
   .update({
     ...payload,
-    auth_user_id: savedAuthId
+    email: (this.seller.email || '').trim().toLowerCase(),
+    password: this.seller.password || '',
+    isonboardingcompleted: true
   })
-  .eq('supabase_uid', savedAuthId)
-  .select('userid, supabase_uid, auth_user_id')
+  .eq('userid', Number(session.userid))
+  .select('*')
   .single();
 
 console.log('UPDATED USER:', updatedUser);
@@ -500,7 +495,7 @@ console.log('UPDATE ERROR:', error);
         }
       } else {
         await this.supabaseService.waitForSession(1500);
-       
+
 await Promise.race([
   this.supabaseService.upsertSellerProfileToUsers(this.seller),
   new Promise((_, reject) =>
