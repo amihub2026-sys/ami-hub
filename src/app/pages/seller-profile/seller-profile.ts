@@ -102,21 +102,7 @@ constructor(
 
     await this.loadSellerProfile(false);
 
-    setTimeout(async () => {
-      if (!this.destroyed && !this.hasLoadedProfile) {
-        await this.zone.run(async () => {
-          await this.loadSellerProfile(true);
-        });
-      }
-    }, 1200);
 
-    setTimeout(async () => {
-      if (!this.destroyed && !this.hasLoadedProfile) {
-        await this.zone.run(async () => {
-          await this.loadSellerProfile(true);
-        });
-      }
-    }, 2200);
   }
 
   ngOnDestroy(): void {
@@ -134,9 +120,40 @@ constructor(
     this.cdr.detectChanges();
 
     try {
-      await this.supabaseService.waitForSession(2500);
+  const localUserId = localStorage.getItem('userId');
 
-      const session = await this.supabaseService.getEffectiveAuthUser();
+  if (localUserId) {
+    const { data: profileById, error: profileError } =
+      await this.supabaseService.getUserById(Number(localUserId));
+
+    if (!profileError && profileById) {
+      this.seller = {
+        ...this.seller,
+        name: profileById?.name || profileById?.fullname || '',
+        password: profileById?.password || '',
+        email: profileById?.email || '',
+        phone: profileById?.phone_number || profileById?.phonenumber || '',
+        username: profileById?.username || '',
+        accountType: profileById?.accounttype || '',
+        category: profileById?.category || '',
+        profileImage: profileById?.profileimageurl || profileById?.avatar_url || null,
+        kycImage: profileById?.kycimage || null,
+        qrCodeImage: profileById?.qrcodeimage || null,
+        rating: profileById?.rating ?? 4,
+        verified: profileById?.isverified ?? true,
+        termsAccepted: profileById?.termsaccepted ?? false
+      };
+
+      this.isEditMode = this.hasExistingProfileData(profileById);
+      this.hasLoadedProfile = true;
+      this.authChecked = true;
+      this.isLoading = false;
+      this.cdr.detectChanges();
+      return;
+    }
+  }
+
+  const session = await this.supabaseService.getEffectiveAuthUser();
 
 
 
@@ -494,7 +511,7 @@ console.log('UPDATE ERROR:', error);
           throw error;
         }
       } else {
-        await this.supabaseService.waitForSession(1500);
+        await this.supabaseService.waitForSession(500);
 
 await Promise.race([
   this.supabaseService.upsertSellerProfileToUsers(this.seller),

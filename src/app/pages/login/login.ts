@@ -313,7 +313,7 @@ const { data: users, error: userError } =
   await this.supabaseService.supabase
     .from('users')
     .select('*')
-    .eq('phonenumber', phone);
+    .or(`phonenumber.eq.${phone},phone_number.eq.${phone}`);
 
 console.log('USERS:', users);
 console.log('USER ERROR:', userError);
