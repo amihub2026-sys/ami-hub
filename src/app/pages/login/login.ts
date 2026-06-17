@@ -200,7 +200,7 @@ export class Login implements OnInit {
   }
 
   async loginWithEmailPassword() {
-    const identifier = this.email.trim();
+  const identifier = this.email.trim().toLowerCase();
     const enteredPassword = this.password.trim();
 
     if (!identifier || !enteredPassword) {
@@ -505,7 +505,7 @@ setTimeout(async () => {
       return;
     }
 
-    const email = this.email.trim();
+    const email = this.email.trim().toLowerCase();
     const password = this.newPassword.trim();
 
     const { error: signUpError } =
