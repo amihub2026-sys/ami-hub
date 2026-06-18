@@ -1020,8 +1020,9 @@ async getServicePosts(page: number = 0, pageSize: number = 12) {
   const { data, error } = await this.supabase
     .from('post')
     .select('*')
-   .eq('adtype', 'service')
     .eq('isactive', true)
+    .or('adtype.eq.service,conditiontype.eq.service')
+    .order('isfeatured', { ascending: false })
     .order('createdon', { ascending: false })
     .range(from, to);
 
@@ -1032,7 +1033,6 @@ async getServicePosts(page: number = 0, pageSize: number = 12) {
 
   return data || [];
 }
-
   async getFeaturedPosts(from = 0, limit = 8) {
     const to = from + limit - 1;
 
