@@ -589,3 +589,6 @@ body {
     margin-bottom:10px;
   }
 }
+.desc {
+  display: none;
+}
