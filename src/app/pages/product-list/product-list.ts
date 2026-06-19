@@ -43,10 +43,10 @@ export class ProductList implements OnInit {
   allSubcategories: SubcategoryItem[] = [];
 
   private page = 0;
-  private readonly pageSize = 12;
+  private readonly pageSize = 100;
 
   private selectedLocation: any = null;
-  selectedRadiusKm = 10;
+  selectedRadiusKm = 50;
   locationText = '';
 
   searchText = '';
@@ -113,7 +113,9 @@ this.currentUserId.set(user?.id || '');
     const savedRadius = localStorage.getItem('selectedRadiusKm');
     if (savedRadius && !isNaN(Number(savedRadius))) {
       this.selectedRadiusKm = Number(savedRadius);
-    }
+    }else {
+  this.selectedRadiusKm = 50;
+}
 
     const savedLocation = localStorage.getItem('amh_selected_location');
     if (savedLocation) {
@@ -488,6 +490,7 @@ this.currentUserId.set(user?.id || '');
         ]
           .filter(Boolean)
           .join(' ')
+
           .toLowerCase();
 
         return locationHaystack.includes(locationSearch);
@@ -627,7 +630,7 @@ this.currentUserId.set(user?.id || '');
     this.minPrice = null;
     this.maxPrice = null;
     this.sortBy = 'Newest';
-    this.selectedRadiusKm = 10;
+    this.selectedRadiusKm = 50;
     this.subcategories.set([]);
 
     if (typeof window !== 'undefined') {
