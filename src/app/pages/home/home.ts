@@ -38,9 +38,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/products']);
   }
 
-  goToServices() {
-    this.router.navigate(['/service-list']);
-  }
+ 
 
   goToSubscriptionPlan() {
     this.router.navigateByUrl('/subscription-plan');
@@ -561,10 +559,27 @@ goToPage() {
     this.router.navigate(['/product-categories']);
   }
 
-  goToAllDeals() {
-    this.router.navigate(['/all-listings']);
-  }
-
+ goToAllDeals() {
+  this.router.navigate(['/all-listings'], {
+    queryParams: {
+      type: 'all'
+    }
+  });
+}
+goToProduct() {
+  this.router.navigate(['/search'], {
+    queryParams: {
+      type: 'product'
+    }
+  });
+}
+goToServices() {
+  this.router.navigate(['/search'], {
+    queryParams: {
+      type: 'service'
+    }
+  });
+}
   goToAllServiceCategories() {
     this.router.navigate(['/service-categories']);
   }
