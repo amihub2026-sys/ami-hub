@@ -15,16 +15,27 @@
 </button>
 
   <div class="media-section">
+<div class="image-wrapper">
 
-    <ng-container *ngIf="selectedMedia().type === 'image'">
-      <img [src]="selectedMedia().url" alt="Main Image" class="main-img">
-    </ng-container>
+  <button
+    class="nav-btn left"
+    *ngIf="postData()?.images?.length > 1"
+    (click)="prevImage()">
+    ❮
+  </button>
 
-    <ng-container *ngIf="selectedMedia().type === 'video'">
-      <video class="main-img" [src]="selectedMedia().url" controls></video>
-    </ng-container>
+  <img
+    [src]="selectedMedia().url"
+    class="main-img"
+    *ngIf="selectedMedia().type === 'image'"
+  >
 
-    <div class="thumbnail-slider" *ngIf="postData()?.images?.length || postData()?.videos?.length">
+  <button
+    class="nav-btn right"
+    *ngIf="postData()?.images?.length > 1"
+    (click)="nextImage()">
+    ❯
+  </button>
 
       <img
         *ngFor="let img of postData()?.images"

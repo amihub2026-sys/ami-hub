@@ -154,7 +154,7 @@ constructor(
   private cdr: ChangeDetectorRef,
   private ngZone: NgZone,
   private location: Location,
-  private snackbar: SnackbarService   // ✅ ADD THIS
+  private snackbar: SnackbarService   
 ) {}
 
   private isBrowser(): boolean {
@@ -585,6 +585,7 @@ this.isEditMode = !!id;
 
  mainPhotoPreview: string | null = null;
 
+otherImagePreviews: string[] = [];
 onMainPhotoChange(e: Event) {
 
   const input = e.target as HTMLInputElement;
@@ -609,10 +610,22 @@ onMainPhotoChange(e: Event) {
 
   }
 }
-  onOtherImagesChange(e: Event) {
-    const input = e.target as HTMLInputElement;
-    this.mainAd.otherImages = input.files ? Array.from(input.files) : [];
-  }
+onOtherImagesChange(e: Event) {
+  const input = e.target as HTMLInputElement;
+
+  this.mainAd.otherImages =
+    input.files ? Array.from(input.files) : [];
+
+  this.otherImagePreviews =
+    this.mainAd.otherImages.map(file =>
+      URL.createObjectURL(file)
+    );
+
+  console.log(
+    'Other images selected:',
+    this.mainAd.otherImages.length
+  );
+}
 
   onVideosChange(e: Event) {
     const input = e.target as HTMLInputElement;
@@ -1000,6 +1013,7 @@ if (this.mainAd.videos.length > 0) {
     );
 
 }
+
       const rawPayload: any = {
         userid: String(effectiveUserId),
         categoryid: selectedCategory?.categoryid ?? null,

@@ -688,23 +688,29 @@ if (userUuid) {
       const selectedIsFeatured = this.getSelectedPlanIsFeatured();
 
       const mainPhoto = await this.uploadMainPhoto(uploadedFiles);
-      const otherImages = await this.uploadOtherImages(uploadedFiles);
-      const videos = await this.uploadVideos(uploadedFiles);
-      const catalog = await this.buildCatalog(uploadedFiles);
+  const otherImages = this.parseJsonArray<string>(
+  pendingPost.image_urls
+);
 
-      const oldImageUrls = this.parseJsonArray<string>(pendingPost.image_urls);
-      const oldVideoUrls = this.parseJsonArray<string>(pendingPost.video_urls);
-      const oldCatalog = this.parseJsonArray<any>(pendingPost.catalog);
+const videos = this.parseJsonArray<string>(
+  pendingPost.video_urls
+);
+
+const catalog = this.parseJsonArray<any>(
+  pendingPost.catalog
+);
+      // const oldImageUrls = this.parseJsonArray<string>(pendingPost.image_urls);
+      // const oldVideoUrls = this.parseJsonArray<string>(pendingPost.video_urls);
+      // const oldCatalog = this.parseJsonArray<any>(pendingPost.catalog);
 
       const finalPayload: any = {
         ...pendingPost,
 
         image_url: mainPhoto || pendingPost.image_url || '',
-        image_urls: otherImages.length ? otherImages : oldImageUrls,
         video_url: videos[0] || pendingPost.video_url || '',
-        video_urls: videos.length ? videos : oldVideoUrls,
-        catalog: catalog.length ? catalog : oldCatalog,
-
+      image_urls: otherImages,
+video_urls: videos,
+catalog: catalog,
         isfeatured: selectedIsFeatured,
         is_featured: selectedIsFeatured,
         featured_plan_id: selectedPlanId,
