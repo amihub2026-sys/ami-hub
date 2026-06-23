@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
+import { supabase } from '../../../supabaseClient';
 
 @Component({
   selector: 'app-home',
@@ -99,6 +100,7 @@ currentUserId = signal<string>('');
   await this.loadFeaturedBusinesses();
   await this.loadTrendingPosts();
   await this.loadNewProducts();
+  await this.applyFavoriteStatus();
 
   this.startTrendingAutoScroll();
 }
@@ -109,6 +111,7 @@ currentUserId = signal<string>('');
       this.startCounter();
     }, 100);
   }
+  
 
   async loadBrowseCategories() {
     this.isCategoriesLoading.set(true);
@@ -195,6 +198,55 @@ currentUserId = signal<string>('');
       this.isLatestLoading.set(false);
     }
   }
+  async applyFavoriteStatus() {
+  const session = await this.supabaseService.getEffectiveAuthUser();
+
+  if (!session.isAuthenticated) return;
+
+  const userId =
+    session.authUser?.id ||
+    session.supabase_uid ||
+    this.currentUserId();
+
+  if (!userId) return;
+
+  const { data, error } = await supabase
+    .from('favorite_items')
+    .select('product_id')
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error('Favorite status load error:', error);
+    return;
+  }
+
+  const favoriteIds = new Set(
+    (data || []).map((x: any) => String(x.product_id))
+  );
+
+  this.featuredBusinesses.update(items =>
+    items.map(item => ({
+      ...item,
+      isFavourite: favoriteIds.has(String(item.postid))
+    }))
+  );
+
+  this.trendingPosts.update(items =>
+    items.map(item => ({
+      ...item,
+      isFavourite: favoriteIds.has(String(item.postid))
+    }))
+  );
+
+  this.latestProducts.update(items =>
+    items.map(item => ({
+      ...item,
+      isFavourite: favoriteIds.has(String(item.postid))
+    }))
+  );
+
+  this.cdr.detectChanges();
+}
 
   getCategoryImage(category: any): string {
     return (
@@ -276,10 +328,66 @@ currentUserId = signal<string>('');
     this.router.navigate(['/details', post.postid]);
   }
 
-  toggleFavourite(item: any, event: Event) {
-    event.stopPropagation();
-    
+ async toggleFavourite(item: any, event: Event) {
+  event.stopPropagation();
+
+  const session = await this.supabaseService.getEffectiveAuthUser();
+
+  if (!session.isAuthenticated) {
+    this.router.navigate(['/login']);
+    return;
   }
+
+  const userId =
+    session.authUser?.id ||
+    session.supabase_uid ||
+    this.currentUserId();
+
+  if (!userId) {
+    return;
+  }
+
+  const productId = String(item.postid || item.id || '');
+
+  if (!productId) {
+    return;
+  }
+
+  if (!item.isFavourite) {
+    const { error } = await supabase
+      .from('favorite_items')
+      .insert({
+        user_id: userId,
+        product_id: productId,
+        name: item.title || 'Product',
+        price: Number(item.price || 0),
+        location: item.location || item.address || 'Location not available',
+        image:
+          item.image_url ||
+          (Array.isArray(item.image_urls) && item.image_urls.length
+            ? item.image_urls[0]
+            : 'assets/no-image.png')
+      });
+
+    if (!error) {
+      item.isFavourite = true;
+    }
+
+  } else {
+    const { error } = await supabase
+      .from('favorite_items')
+      .delete()
+      .eq('user_id', userId)
+      .eq('product_id', productId);
+
+    if (!error) {
+      item.isFavourite = false;
+    }
+  }
+
+  this.cdr.detectChanges();
+}
+  
 
   openCategory(category: any) {
 
@@ -508,5 +616,4 @@ goToPage() {
   isMyPost(post: any): boolean {
   return String(post?.userid || '') === String(this.currentUserId() || '');
 }
-  
-}
+  }

@@ -280,21 +280,38 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
     </div>
 
     <div class="featured-grid" *ngIf="featuredBusinesses().length > 0">
-      <div class="featured-card" *ngFor="let business of featuredBusinesses()" (click)="openDetails(business)">
-        <div class="card-badge">Featured</div>
-        <div class="fav-btn">♡</div>
-        <img [src]="getFeaturedImage(business)" [alt]="business.title">
-        <div class="card-body">
-          <h4>{{ business.title }}</h4>
-          <p class="price-text" *ngIf="business.price && business.price > 0">
-  ₹{{ business.price }}
-</p>
-          <p class="location-text">📍 {{ business.location || business.address || 'Location not available' }}</p>
-          <a class="card-link">View Details ›</a>
-        </div>
-      </div>
+  <div
+    class="featured-card"
+    *ngFor="let business of featuredBusinesses()"
+    (click)="openDetails(business)"
+  >
+    <div class="card-badge">Featured</div>
+
+    <div
+      class="fav-btn"
+      [class.active]="business.isFavourite"
+      (click)="toggleFavourite(business, $event)"
+    >
+      {{ business.isFavourite ? '♥' : '♡' }}
     </div>
-  </section>
+
+    <img [src]="getFeaturedImage(business)" [alt]="business.title">
+
+    <div class="card-body">
+      <h4>{{ business.title }}</h4>
+
+      <p class="price-text" *ngIf="business.price && business.price > 0">
+        ₹{{ business.price }}
+      </p>
+
+      <p class="location-text">
+        📍 {{ business.location || business.address || 'Location not available' }}
+      </p>
+
+      <a class="card-link">View Details ›</a>
+    </div>
+  </div>
+</div>
 
   <!-- BOOST CTA -->
   <section class="boost-banner">
@@ -344,7 +361,12 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
 >
   {{ isMyPost(post) ? 'My Ads' : 'Hot' }}
 </div> -->
-          <div class="fav-btn">♡</div>
+  <div
+  class="fav-btn"
+  [class.active]="post.isFavourite"
+  (click)="toggleFavourite(post, $event)">
+  {{ post.isFavourite ? '♥' : '♡' }}
+</div>
 
           <img
             [src]="getTrendingImage(post)"
@@ -385,7 +407,12 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
     <div class="deals-grid" *ngIf="latestProducts().length > 0">
       <div class="featured-card" *ngFor="let post of latestProducts()" (click)="openDetails(post)">
         <div class="deal-tag">New</div>
-        <div class="fav-btn">♡</div>
+ <div
+  class="fav-btn"
+  [class.active]="post.isFavourite"
+  (click)="toggleFavourite(post, $event)">
+  {{ post.isFavourite ? '♥' : '♡' }}
+</div>
         <img [src]="getLatestProductImage(post)" [alt]="post.title">
         <div class="card-body">
           <h4>{{ post.title }}</h4>
@@ -484,4 +511,4 @@ AMI HUB creates smart, modern, and scalable digital solutions for businesses wor
     </div>
   </div>
 </section>
-  </div>
+
