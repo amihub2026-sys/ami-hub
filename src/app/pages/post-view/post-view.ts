@@ -260,7 +260,7 @@ isMyPost(): boolean {
       } else {
         this.selectedMedia.set({
           type: 'image',
-          url: 'https://via.placeholder.com/600x400?text=No+Image'
+        url: 'assets/icons/user.png'
         });
       }
     } catch (error) {
@@ -785,6 +785,5 @@ setTimeout(() => {
 goBack(): void {
   this.location.back();
 }
-
 
 }

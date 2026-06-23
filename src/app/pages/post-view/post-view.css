@@ -895,67 +895,15 @@ video.main-img:hover {
 }
 /* BACK BUTTON */
 
-.page-back-arrow{
 
-  position:absolute;
-  top:20px;
-  left:20px;
 
-  width:42px;
-  height:42px;
-
-  border:none;
-  border-radius:50%;
-
-  background:#ffffff;
-  color:#111827;
-
-  font-size:22px;
-  font-weight:700;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  cursor:pointer;
-
-  box-shadow:0 4px 14px rgba(0,0,0,0.12);
-
-  z-index:99999 !important;
-
-  pointer-events:auto !important;
-
-  transition:0.3s;
-}
-
-.page-back-arrow:hover{
-  transform:scale(1.08);
-  background:#f3f4f6;
-}
-
-/* MOBILE */
-
-@media(max-width:768px){
-
-  .page-back-arrow{
-
-    top:12px;
-    left:12px;
-
-    width:38px;
-    height:38px;
-
-    font-size:20px;
-  }
-
-}
 .image-wrapper {
   position: relative;
 }
 
 .nav-btn {
   position: absolute;
-top: 35%;
+top: 40%;
   transform: translateY(-50%);
 
   width: 58px;
@@ -996,4 +944,129 @@ top: 35%;
 
 .right {
   right: 15px;
+}
+.page-back-arrow {
+  position: fixed;
+  top: 40px;
+  left: 20px;
+
+  width: 48px;
+  height: 48px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #fff;
+  color: #4f46e5;
+
+  font-size: 32px;
+  font-weight: bold;
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,.12);
+
+  transition: .3s;
+}
+
+.page-back-arrow:hover {
+  background: #4f46e5;
+  color: white;
+  transform: scale(1.1);
+}
+.page-back-arrow:active {
+  transform: scale(0.95);
+}
+@media (max-width: 768px) {
+
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+
+    font-size: 20px;
+
+    top: 45%;
+
+    box-shadow:
+      0 4px 10px rgba(0,0,0,.12),
+      0 0 0 2px rgba(79,70,229,.08);
+  }
+
+  .left {
+    left: 6px;
+  }
+
+  .right {
+    right: 6px;
+  }
+}
+.back-arrow {
+  position: fixed;
+  top: 40px;
+  left: 15px;
+
+  width: 48px;
+  height: 48px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #ffffff;
+  color: #4f46e5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 24px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  z-index: 99999;
+
+  box-shadow:
+    0 6px 18px rgba(0,0,0,.12);
+
+  transition: all .3s ease;
+}
+
+.back-arrow:hover {
+  background: #4f46e5;
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+.back-arrow:active {
+  transform: scale(0.95);
+}
+
+.back-arrow span {
+  line-height: 1;
+}
+@media (max-width: 768px) {
+
+  .back-arrow {
+    top: 5px;
+    left: 10px;
+
+    width: 40px;
+    height: 40px;
+
+    font-size: 20px;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .back-arrow {
+    top: 20px;
+    left: 8px;
+
+    width: 36px;
+    height: 36px;
+
+    font-size: 18px;
+  }
+
 }
