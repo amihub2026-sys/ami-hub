@@ -274,15 +274,35 @@
                 Remove
               </button>
             </div>
+
+            
           </div>
         </div>
 
         <div class="form-group">
           <label>Other Images</label>
           <input type="file" accept="image/* " multiple (change)="onOtherImagesChange($event)" />
-          <small *ngIf="mainAd.otherImages.length">
-            {{ mainAd.otherImages.length }} image(s) selected
-          </small>
+         <div
+  *ngIf="otherImagePreviews.length"
+  style="
+    margin-top:10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  "
+>
+  <img
+    *ngFor="let img of otherImagePreviews"
+    [src]="img"
+    style="
+      width:120px;
+      height:100px;
+      object-fit:cover;
+      border-radius:8px;
+      border:1px solid #ddd;
+    "
+  />
+</div>
 
           <div *ngIf="isEditMode && existingImageUrls.length" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
             <div *ngFor="let img of existingImageUrls; let i = index">

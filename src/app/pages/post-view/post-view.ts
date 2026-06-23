@@ -381,11 +381,48 @@ isMyPost(): boolean {
     const post = this.postData();
     return Array.isArray(post?.catalogItems) && post.catalogItems.length > 0;
   }
+  currentImageIndex = 0;
 
-  selectMedia(type: 'image' | 'video', url: string) {
-    this.selectedMedia.set({ type, url });
-  }
+nextImage() {
+  const images = this.postData()?.images || [];
 
+  if (!images.length) return;
+
+  this.currentImageIndex =
+    (this.currentImageIndex + 1) % images.length;
+
+  this.selectMedia(
+    'image',
+    images[this.currentImageIndex]
+  );
+}
+
+prevImage() {
+  const images = this.postData()?.images || [];
+
+  if (!images.length) return;
+
+  this.currentImageIndex =
+    (this.currentImageIndex - 1 + images.length) %
+    images.length;
+
+  this.selectMedia(
+    'image',
+    images[this.currentImageIndex]
+  );
+}
+
+selectMedia(type: 'image' | 'video', url: string) {
+
+  console.log('Clicked:', url);
+
+  this.selectedMedia.set({
+    type,
+    url
+  });
+
+  console.log('Selected:', this.selectedMedia());
+}
   toNumberOrNull(value: any): number | null {
     const num = Number(value);
     return Number.isFinite(num) ? num : null;
