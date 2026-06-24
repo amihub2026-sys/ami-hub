@@ -57,7 +57,7 @@ export class Chats implements OnInit, OnDestroy {
         const tempChat = {
           post_id: this.postId,
           otherUserId: this.sellerId,
-          otherUserName: 'Seller',
+          otherUserName: await this.getUserNameById(this.sellerId),
           lastMessage: '',
           created_at: new Date().toISOString()
         };
@@ -68,7 +68,15 @@ export class Chats implements OnInit, OnDestroy {
 
     this.listenMessages();
   }
+async getUserNameById(userId: any) {
+  const { data } = await supabase
+    .from('users')
+    .select('fullname')
+    .eq('auth_user_id', userId)
+    .single();
 
+  return data?.fullname || 'User';
+}
   async loadConversations() {
     this.isLoading.set(true);
 
@@ -82,6 +90,39 @@ export class Chats implements OnInit, OnDestroy {
       if (error) throw error;
 
       const rows = data || [];
+      const postIds = [
+  ...new Set(rows.map(row => row.post_id).filter(Boolean))
+];
+
+const { data: postsData } = await supabase
+  .from('post')
+  .select('postid, image_url')
+  .in('postid', postIds);
+
+const getPostImage = (postId: any) => {
+  const post = postsData?.find(
+    p => String(p.postid) === String(postId)
+  );
+
+  return post?.image_url || '';
+};
+      const userIds = [
+  ...new Set(
+    rows.flatMap(row => [row.sender_id, row.receiver_id])
+  )
+];
+
+const { data: usersData } = await supabase
+  .from('users')
+  .select('auth_user_id, fullname')
+  .in('auth_user_id', userIds);
+
+const getUserName = (userId: any) => {
+const user = usersData?.find(
+  u => String(u.auth_user_id) === String(userId)
+);
+  return user?.fullname || 'User';
+};
       const grouped = new Map<string, any>();
 
       for (const row of rows) {
@@ -96,10 +137,8 @@ export class Chats implements OnInit, OnDestroy {
           grouped.set(key, {
             post_id: row.post_id,
             otherUserId,
-      otherUserName:
-  String(row.sender_id) === String(this.currentUser.id)
-    ? 'Seller'
-    : 'Buyer',
+            postImage: getPostImage(row.post_id),
+    otherUserName: getUserName(otherUserId),
        lastMessage: row.message,
             created_at: row.created_at,
             unreadCount:
