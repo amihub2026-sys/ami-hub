@@ -197,9 +197,10 @@
   <span>Profile</span>
 </div>
       </div>
-      <div style="margin-top: 16px; display:flex; flex-direction:column; gap:12px;">
-  
+      <div style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
+
   <a
+    *ngIf="!isLoggedInUser"
     [routerLink]="['/login']"
     (click)="closeMenu()"
     style="
@@ -221,6 +222,7 @@
   </a>
 
   <button
+    *ngIf="isLoggedInUser"
     class="logout-btn"
     style="width:100%; min-height:46px;"
     (click)="logout(); closeMenu()"
@@ -229,6 +231,7 @@
   </button>
 
 </div>
+
 
      
     </div>
