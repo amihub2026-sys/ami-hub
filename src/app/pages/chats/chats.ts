@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { supabase } from '../../../supabaseClient';
 import { SupabaseService } from '../../services/supabase.service';
@@ -29,6 +29,7 @@ export class Chats implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+     private router: Router,
     private supabaseService: SupabaseService
   ) {}
 
@@ -68,6 +69,13 @@ export class Chats implements OnInit, OnDestroy {
 
     this.listenMessages();
   }
+  openPost() {
+  const chat = this.selectedChat();
+
+  if (!chat?.post_id) return;
+
+  this.router.navigate(['/post-view', chat.post_id]);
+}
 async getUserNameById(userId: any) {
   const { data } = await supabase
     .from('users')

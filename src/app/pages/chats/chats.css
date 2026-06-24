@@ -596,3 +596,33 @@
   align-items: center;
   gap: 12px;
 }
+.chat-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 12px;
+  transition: all 0.25s ease;
+}
+
+.chat-user:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.user-name {
+  font-size: 18px;
+  font-weight: 700;
+  color:white;
+}
+
+.arrow-right {
+  font-size: 20px;
+  color: #8b8b8b;
+  transition: transform 0.25s ease;
+}
+
+.chat-user:hover .arrow-right {
+  transform: translateX(4px);
+  color: #2563eb;
+}
