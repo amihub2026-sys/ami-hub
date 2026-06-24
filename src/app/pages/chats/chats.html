@@ -10,9 +10,17 @@
           [class.active]="isSelected(chat)"
           (click)="openChat(chat)"
         >
-          <div class="chat-avatar">
-            {{ (chat.otherUserName || 'U').charAt(0) }}
-          </div>
+        <div class="chat-avatar">
+  <img
+    *ngIf="chat.postImage; else letterAvatar"
+    [src]="chat.postImage"
+    alt="Post"
+  />
+
+  <ng-template #letterAvatar>
+    {{ (chat.otherUserName || 'U').charAt(0) }}
+  </ng-template>
+</div>
 
           <div class="chat-info">
             <h4>{{ chat.otherUserName || 'User' }}</h4>
