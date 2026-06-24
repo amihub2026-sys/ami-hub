@@ -50,10 +50,17 @@
   <button class="back-btn" (click)="selectedChat.set(null)">
     ←
   </button>
+<div class="chat-user" (click)="openPost()">
+  <span class="user-name">
+    {{ selectedChat()?.otherUserName || 'User' }}
+  </span>
 
-  {{ selectedChat()?.otherUserName || 'Chat' }}
-
+  <span class="arrow-right">
+    ❯
+  </span>
 </div>
+</div>
+
       <div class="messages">
         <div
           *ngFor="let m of messages()"
