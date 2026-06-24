@@ -26,6 +26,7 @@ imports: [
   styleUrls: ['./app.css']
 })
 export class App implements OnInit {
+  isLoggedInUser = false;
   notificationCount = 0;
   chatCount = 0;
 
@@ -76,7 +77,7 @@ isRouteLoading = false;
   
   private supabaseService: SupabaseService,
   private cdr: ChangeDetectorRef,
-  private snackbar: SnackbarService,   // ✅ ADD THIS
+  private snackbar: SnackbarService,   
   @Inject(PLATFORM_ID) private platformId: Object
 ) {}
 
@@ -100,6 +101,10 @@ this.router.events.subscribe((event: any) => {
 
 if (event instanceof NavigationEnd) {
   this.currentUrl = event.urlAfterRedirects || event.url || this.router.url;
+  this.isLoggedIn().then(status => {
+      this.isLoggedInUser = status;
+      this.cdr.detectChanges();
+    });
 
   setTimeout(() => {
     window.scrollTo(0, 0);
@@ -112,11 +117,11 @@ if (event instanceof NavigationEnd) {
     this.cdr.detectChanges();
   }, 300);
 }
-
 });
     await this.loadSavedLocation();
     await this.loadNotificationCount();
     await this.loadChatCount();
+    this.isLoggedInUser = await this.isLoggedIn();
     setInterval(() => {
   this.loadChatCount();
 }, 3000);
@@ -669,6 +674,7 @@ async loadChatCount(): Promise<void> {
       localStorage.removeItem('userTypeId');
       localStorage.removeItem('supabase_uid');
       localStorage.removeItem('username');
+      localStorage.clear();
     }
 
     this.closeMenu();
