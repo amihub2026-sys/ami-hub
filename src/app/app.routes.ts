@@ -44,10 +44,8 @@ function adminGuard() {
 
 export const routes: Routes = [
   { path: '', component: Home },
-{
-  path: 'job',
-  component: Job
-},
+{ path: 'job', component: Job },
+{ path: 'job/:id', component: Job },
 {
   path: 'add-job',
   component: AddJob

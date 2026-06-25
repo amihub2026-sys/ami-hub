@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { supabase } from '../../../supabaseClient';
 
 @Component({
@@ -32,10 +32,25 @@ export class Job implements OnInit {
     message: ''
   };
 
-  constructor(private router: Router) {}
+  jobId: string | null = null;
+
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
-    this.loadJobs();
+    this.jobId = this.route.snapshot.paramMap.get('id');
+
+    if (this.jobId) {
+      this.showJobList = false;
+      this.showJobDetails = true;
+      this.loadJobDetails(this.jobId);
+    } else {
+      this.showJobList = true;
+      this.showJobDetails = false;
+      this.loadJobs();
+    }
   }
 
   async loadJobs() {
@@ -52,6 +67,22 @@ export class Job implements OnInit {
     this.jobs = data || [];
   }
 
+  async loadJobDetails(id: string) {
+    const { data, error } = await supabase
+      .from('job_vacancies')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Job details error:', error);
+      return;
+    }
+
+    this.selectedJob = data;
+  }
+
+  // FILTER JOBS
   filteredJobs() {
     if (this.selectedType === 'All') {
       return this.jobs;
@@ -72,6 +103,7 @@ export class Job implements OnInit {
   openJobDetails(job: any) {
     this.selectedJob = job;
     this.showJobDetails = true;
+    this.showJobList = false;
   }
 
   submitApplication() {
@@ -89,9 +121,7 @@ export class Job implements OnInit {
   onResumeSelected(event: Event) {
     const input = event.target as HTMLInputElement;
 
-    if (!input.files || input.files.length === 0) {
-      return;
-    }
+    if (!input.files || input.files.length === 0) return;
 
     this.selectedResume = input.files[0];
   }
