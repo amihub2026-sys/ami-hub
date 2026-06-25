@@ -15,7 +15,7 @@ import { SnackbarService } from '../../services/snackbar.service';
   styleUrls: ['./post-view.css']
 })
 export class PostViewComponent implements OnInit {
-  
+
 private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') {
   this.snackbar.show(message, type);
 }
@@ -129,7 +129,7 @@ async ngOnInit(): Promise<void> {
   await this.loadPost();
 }
 
-  
+
   setRating(star: number) {
     this.selectedRating = star;
   }
@@ -187,7 +187,7 @@ async ngOnInit(): Promise<void> {
   alert('Post removed successfully');
 
   this.router.navigate(['/my-posts']);
-} 
+}
 isMyPost(): boolean {
 
   const post = this.postData();
@@ -231,7 +231,7 @@ isMyPost(): boolean {
 
     try {
       const data = await this.supabaseService.getPostById(this.postId);
-      
+
 
       const imageList: string[] = Array.isArray(data?.image_urls)
         ? data.image_urls.filter((x: any) => typeof x === 'string' && x)
@@ -448,7 +448,7 @@ prevMedia() {
 
 
 
- 
+
   toNumberOrNull(value: any): number | null {
     const num = Number(value);
     return Number.isFinite(num) ? num : null;
@@ -783,12 +783,12 @@ setTimeout(() => {
             type: 'review',
             refid: String(post.postid)
           });
-          
+
         } else {
-          
+
         }
       } catch (notificationError) {
-        
+
       }
 
       alert('Review submitted successfully!');
