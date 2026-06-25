@@ -15,28 +15,56 @@
 </button>
 
   <div class="media-section">
-<div class="image-wrapper">
+  <div class="image-wrapper">
 
-  <button
-    class="nav-btn left" 
-    *ngIf="postData()?.images?.length > 1"
-    (click)="prevImage()">
-    ❮
-  </button>
+    <!-- LEFT SLIDE BUTTON -->
+    <button
+      type="button"
+      class="nav-btn left"
+      *ngIf="getAllMedia().length > 1"
+      (click)="prevMedia()">
+      ❮
+    </button>
 
-  <img
-    [src]="selectedMedia().url"
-    class="main-img"
-    *ngIf="selectedMedia().type === 'image'"
-  >
+    <!-- MAIN IMAGE -->
+    <img
+      *ngIf="selectedMedia().type === 'image'"
+      [src]="selectedMedia().url"
+      class="main-img"
+    >
 
-  <button
-    class="nav-btn right"
-    *ngIf="postData()?.images?.length > 1"
-    (click)="nextImage()">
-    ❯
-  </button>
+    <!-- MAIN VIDEO -->
+    <div
+      class="video-wrapper"
+      *ngIf="selectedMedia().type === 'video'">
 
+      <video
+        #videoPlayer
+        [src]="selectedMedia().url"
+        class="main-video"
+        controls>
+      </video>
+
+      <button
+        *ngIf="showVideoPlayButton()"
+        type="button"
+        class="video-play-overlay"
+        (click)="playMainVideo(videoPlayer)">
+        ▶
+      </button>
+    </div>
+
+    <!-- RIGHT SLIDE BUTTON -->
+    <button
+      type="button"
+      class="nav-btn right"
+      *ngIf="getAllMedia().length > 1"
+      (click)="nextMedia()">
+      ❯
+    </button>
+
+    <!-- THUMBNAILS -->
+    <div class="thumb-row">
       <img
         *ngFor="let img of postData()?.images"
         [src]="img"
@@ -51,11 +79,13 @@
         [class.active]="selectedMedia().url === video"
         (click)="selectMedia('video', video)"
       >
-        <video [src]="video"></video>
+        <video [src]="video" muted preload="metadata"></video>
         <span class="play-icon">▶</span>
       </div>
-
     </div>
+
+  </div>
+
 
     <!-- SERVICE CATALOG -->
     <div class="service-catalog-section" *ngIf="isServicePost()">

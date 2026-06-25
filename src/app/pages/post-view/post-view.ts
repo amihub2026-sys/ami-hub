@@ -19,6 +19,14 @@ export class PostViewComponent implements OnInit {
 private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') {
   this.snackbar.show(message, type);
 }
+selectMedia(type: 'image' | 'video', url: string) {
+  this.selectedMedia.set({ type, url });
+
+  if (type === 'video') {
+    this.showVideoPlayButton.set(true);
+  }
+}
+
   toggleReviewForm() {
     const next = !this.showReviewForm();
     this.showReviewForm.set(next);
@@ -31,6 +39,23 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') 
       this.reviewVideo = null;
     }
   }
+
+playMainVideo(video: HTMLVideoElement) {
+  video.play();
+  this.showVideoPlayButton.set(false);
+}
+  showVideoPopup = signal(false);
+popupVideoUrl = signal('');
+
+openVideoPopup(video: string) {
+  this.popupVideoUrl.set(video);
+  this.showVideoPopup.set(true);
+}
+
+closeVideoPopup() {
+  this.showVideoPopup.set(false);
+  this.popupVideoUrl.set('');
+}
 
   toggleReportForm() {
     this.showReportForm.set(!this.showReportForm());
@@ -383,46 +408,47 @@ isMyPost(): boolean {
   }
   currentImageIndex = 0;
 
-nextImage() {
-  const images = this.postData()?.images || [];
+showVideoPlayButton = signal(true);
 
-  if (!images.length) return;
+getAllMedia() {
+  const post = this.postData();
 
-  this.currentImageIndex =
-    (this.currentImageIndex + 1) % images.length;
-
-  this.selectMedia(
-    'image',
-    images[this.currentImageIndex]
-  );
+  return [
+    ...(post?.images || []).map((url: string) => ({
+      type: 'image' as const,
+      url
+    })),
+    ...(post?.videos || []).map((url: string) => ({
+      type: 'video' as const,
+      url
+    }))
+  ];
 }
 
-prevImage() {
-  const images = this.postData()?.images || [];
 
-  if (!images.length) return;
+nextMedia() {
+  const media = this.getAllMedia();
+  if (!media.length) return;
 
-  this.currentImageIndex =
-    (this.currentImageIndex - 1 + images.length) %
-    images.length;
+  const index = media.findIndex(x => x.url === this.selectedMedia().url);
+  const nextIndex = (index + 1) % media.length;
 
-  this.selectMedia(
-    'image',
-    images[this.currentImageIndex]
-  );
+  this.selectMedia(media[nextIndex].type, media[nextIndex].url);
 }
 
-selectMedia(type: 'image' | 'video', url: string) {
+prevMedia() {
+  const media = this.getAllMedia();
+  if (!media.length) return;
 
-  console.log('Clicked:', url);
+  const index = media.findIndex(x => x.url === this.selectedMedia().url);
+  const prevIndex = (index - 1 + media.length) % media.length;
 
-  this.selectedMedia.set({
-    type,
-    url
-  });
-
-  console.log('Selected:', this.selectedMedia());
+  this.selectMedia(media[prevIndex].type, media[prevIndex].url);
 }
+
+
+
+ 
   toNumberOrNull(value: any): number | null {
     const num = Number(value);
     return Number.isFinite(num) ? num : null;
