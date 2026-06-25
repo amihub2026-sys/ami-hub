@@ -24,7 +24,7 @@ import { supabase } from '../../../supabaseClient';
 export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
-    private router: Router,
+     public router: Router,
     private supabaseService: SupabaseService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
@@ -164,7 +164,9 @@ currentUserId = signal<string>('');
       this.isFeaturedLoading.set(false);
     }
   }
-
+ goToJobs() {
+  this.router.navigate(['/job']);
+}
   async loadNewProducts() {
     this.isLatestLoading.set(true);
 
@@ -533,6 +535,9 @@ currentUserId = signal<string>('');
       this.router.navigate(['/products']);
       return;
     }
+     if (tab === 'job') {
+    this.router.navigate(['/job']);
+  }
 
     this.router.navigate(['/search'], {
       queryParams: { type: 'all' }

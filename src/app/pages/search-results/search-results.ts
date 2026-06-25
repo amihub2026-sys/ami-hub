@@ -33,7 +33,7 @@ export class SearchResults {
   searchText = '';
   locationText = '';
   selectedRadiusKm = 5;
-  selectedType: 'all' | 'product' | 'service' = 'all';
+selectedType: 'all' | 'product' | 'service' | 'job' = 'all';
 
   selectedCategoryId: number | null = null;
   selectedSubcategoryId: number | null = null;
@@ -51,7 +51,7 @@ export class SearchResults {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
+     public router: Router,
     private cdr: ChangeDetectorRef,
       private location: Location
   ) {}
@@ -138,7 +138,7 @@ export class SearchResults {
     });
   }
 
-  async selectType(type: 'all' | 'product' | 'service') {
+async selectType(type: 'all' | 'product' | 'service' | 'job') {
     this.selectedType = type;
     await this.searchNow();
   }
@@ -316,7 +316,9 @@ export class SearchResults {
       } else if (this.selectedType === 'service') {
         query = query.eq('adtype', 'service');
       }
-
+        else if (this.selectedType === 'job') {
+  query = query.eq('adtype', 'job');
+}   
       if (this.selectedCategoryId !== null) {
         query = query.eq('categoryid', this.selectedCategoryId);
       }
@@ -477,6 +479,7 @@ export class SearchResults {
     }
     return 'https://via.placeholder.com/400x260?text=No+Image';
   }
+ 
 
   openDetails(item: any) {
     const id = item?.postid;
