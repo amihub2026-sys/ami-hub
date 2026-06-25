@@ -907,71 +907,114 @@ if (this.mainAd.whatsappnumber && !/^\d{10}$/.test(this.mainAd.whatsappnumber)) 
       );
 
       if (this.isEditMode && this.editPostId) {
-        const finalType = this.lockedAdType || this.adType;
+  const finalType = this.lockedAdType || this.adType;
 
-        const updatePayload: any = {
-          categoryid: selectedCategory?.categoryid ?? null,
-          subcategoryid: selectedSubcategory?.subcategoryid ?? null,
-          title: this.mainAd.title.trim(),
-          description: this.mainAd.description.trim(),
-          price: this.mainAd.price ?? 0,
-          currencycode: 'INR',
-          adtype: finalType,
-          conditiontype: finalType,
-          cityid: selectedCity?.cityid ?? null,
-          areaid: selectedArea?.areaid ?? null,
-          contactphone: this.mainAd.contactphone || '',
-          whatsappnumber: this.mainAd.whatsappnumber || '',
-          category: this.mainAd.category || '',
-          subcategory: this.mainAd.subcategory || '',
-          location: this.mainAd.full_address,
-          address: this.mainAd.full_address,
-          latitude: this.mainAd.latitude,
-          longitude: this.mainAd.longitude,
-          full_address: this.mainAd.full_address,
-          place_name: this.mainAd.place_name,
-          location_source: this.mainAd.location_source,
-          country: this.mainAd.country,
-          state: this.mainAd.state,
-          district: this.mainAd.district,
-          area: this.mainAd.area,
-          image_url: this.existingMainImageUrl || '',
-          image_urls: this.existingImageUrls,
-          video_urls: this.existingVideoUrls,
-          catalog: finalType === 'service' ? this.buildCatalogDraft() : [],
-          custom_fields: {
-            country: this.mainAd.country,
-            state: this.mainAd.state,
-            district: this.mainAd.district,
-            area: this.mainAd.area,
-            full_address: this.mainAd.full_address,
-            latitude: this.mainAd.latitude,
-            longitude: this.mainAd.longitude,
-            place_name: this.mainAd.place_name
-          }
-        };
+  let updatedMainImageUrl = this.existingMainImageUrl;
 
-        const { error } = await this.supabaseService.supabase
-          .from('post')
-          .update(updatePayload)
-          .eq('postid', this.editPostId);
+  if (this.mainAd.mainPhoto) {
+    const uploaded = await this.uploadToR2(
+      this.mainAd.mainPhoto,
+      'products'
+    );
 
-        if (error) {
-          console.error('Error updating post:', error);
-         this.showAlert('Error updating post', 'error');
-          return;
-        }
+    if (uploaded) {
+      updatedMainImageUrl = uploaded;
+    }
+  }
 
-      this.showAlert('Post updated successfully', 'success');
+  let updatedOtherImageUrls = [...this.existingImageUrls];
 
-if (this.adminEditPostId) {
-  // Admin edit - stay inside admin page
+  if (this.mainAd.otherImages.length > 0) {
+    const uploadedOthers = await this.uploadMultipleToR2(
+      this.mainAd.otherImages,
+      'products'
+    );
+
+    updatedOtherImageUrls = [
+      ...updatedOtherImageUrls,
+      ...uploadedOthers
+    ];
+  }
+
+  let updatedVideoUrls = [...this.existingVideoUrls];
+
+  if (this.mainAd.videos.length > 0) {
+    const uploadedVideos = await this.uploadMultipleToR2(
+      this.mainAd.videos,
+      'videos'
+    );
+
+    updatedVideoUrls = [
+      ...updatedVideoUrls,
+      ...uploadedVideos
+    ];
+  }
+
+  const updatePayload: any = {
+    categoryid: selectedCategory?.categoryid ?? null,
+    subcategoryid: selectedSubcategory?.subcategoryid ?? null,
+    title: this.mainAd.title.trim(),
+    description: this.mainAd.description.trim(),
+    price: this.mainAd.price ?? 0,
+    currencycode: 'INR',
+    adtype: finalType,
+    conditiontype: finalType,
+    cityid: selectedCity?.cityid ?? null,
+    areaid: selectedArea?.areaid ?? null,
+    contactphone: this.mainAd.contactphone || '',
+    whatsappnumber: this.mainAd.whatsappnumber || '',
+    category: this.mainAd.category || '',
+    subcategory: this.mainAd.subcategory || '',
+    location: this.mainAd.full_address,
+    address: this.mainAd.full_address,
+    latitude: this.mainAd.latitude,
+    longitude: this.mainAd.longitude,
+    full_address: this.mainAd.full_address,
+    place_name: this.mainAd.place_name,
+    location_source: this.mainAd.location_source,
+    country: this.mainAd.country,
+    state: this.mainAd.state,
+    district: this.mainAd.district,
+    area: this.mainAd.area,
+
+    image_url: updatedMainImageUrl || '',
+    image_urls: updatedOtherImageUrls,
+    video_url: updatedVideoUrls[0] || '',
+    video_urls: updatedVideoUrls,
+
+    catalog: finalType === 'service' ? this.buildCatalogDraft() : [],
+    custom_fields: {
+      country: this.mainAd.country,
+      state: this.mainAd.state,
+      district: this.mainAd.district,
+      area: this.mainAd.area,
+      full_address: this.mainAd.full_address,
+      latitude: this.mainAd.latitude,
+      longitude: this.mainAd.longitude,
+      place_name: this.mainAd.place_name
+    }
+  };
+
+  const { error } = await this.supabaseService.supabase
+    .from('post')
+    .update(updatePayload)
+    .eq('postid', this.editPostId);
+
+  if (error) {
+    console.error('Error updating post:', error);
+    this.showAlert('Error updating post', 'error');
+    return;
+  }
+
+  this.showAlert('Post updated successfully', 'success');
+
+  if (this.adminEditPostId) {
+    return;
+  }
+
+  this.router.navigate(['/my-posts']);
   return;
 }
-
-this.router.navigate(['/my-posts']);
-return;
-      }
 let mainImageUrl = '';
 
 let otherImageUrls: string[] = [];
