@@ -323,10 +323,13 @@ currentUserId = signal<string>('');
     return fallback;
   }
 
-  openDetails(post: any) {
-    if (!post?.postid) return;
-    this.router.navigate(['/details', post.postid]);
-  }
+openDetails(post: any) {
+  if (!post?.postid) return;
+
+  this.router.navigate(['/details', post.postid], {
+    state: { from: 'home' }
+  });
+}
 
  async toggleFavourite(item: any, event: Event) {
   event.stopPropagation();

@@ -809,6 +809,23 @@ setTimeout(() => {
     }
   }
 goBack(): void {
+  const from = history.state?.from;
+
+  if (from === 'home') {
+    this.router.navigate(['/']);
+    return;
+  }
+
+  if (from === 'products') {
+    this.router.navigate(['/products']);
+    return;
+  }
+
+  if (from === 'services') {
+    this.router.navigate(['/services']);
+    return;
+  }
+
   if (window.history.length > 1) {
     this.location.back();
   } else {
