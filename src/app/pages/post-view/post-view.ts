@@ -822,7 +822,17 @@ goBack(): void {
   }
 
   if (from === 'services') {
-    this.router.navigate(['/services']);
+    this.router.navigate(['/service-list']);
+    return;
+  }
+
+  if (from === 'search') {
+    this.location.back();
+    return;
+  }
+
+  if (from === 'my-posts') {
+    this.router.navigate(['/my-posts']);
     return;
   }
 

@@ -137,13 +137,17 @@ private showAlert(message: string, type: 'success' | 'error' | 'info' = 'info'):
     }
   }
 
-  openDetails(post: any): void {
-    if (!post?.postid) {
-      return;
-    }
-
-    this.router.navigate(['/details', String(post.postid)]);
+ openDetails(post: any): void {
+  if (!post?.postid) {
+    return;
   }
+
+  this.router.navigate(['/details', String(post.postid)], {
+    state: {
+      from: 'my-posts'
+    }
+  });
+}
 
   async editPost(post: any, event: MouseEvent): Promise<void> {
     event.preventDefault();
