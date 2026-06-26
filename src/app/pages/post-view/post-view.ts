@@ -830,12 +830,18 @@ goBack(): void {
     this.location.back();
     return;
   }
-
+     if (from === 'favorites') {
+  this.router.navigate(['/favt']);
+  return;
+}
   if (from === 'my-posts') {
     this.router.navigate(['/my-posts']);
     return;
   }
-
+  if (from === 'chats') {
+    this.router.navigate(['/chats']);
+    return;
+  }
   if (window.history.length > 1) {
     this.location.back();
   } else {

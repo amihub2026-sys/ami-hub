@@ -69,12 +69,16 @@ export class Chats implements OnInit, OnDestroy {
 
     this.listenMessages();
   }
-  openPost() {
+ openPost() {
   const chat = this.selectedChat();
 
   if (!chat?.post_id) return;
 
-  this.router.navigate(['/post-view', chat.post_id]);
+  this.router.navigate(['/post-view', chat.post_id], {
+    state: {
+      from: 'chats'
+    }
+  });
 }
 async getUserNameById(userId: any) {
   const { data } = await supabase
