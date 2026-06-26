@@ -165,51 +165,43 @@
         >
           No matching posts found.
         </div>
+<div
+  class="featured-card result-card"
+  *ngFor="let item of filteredResults"
+  (click)="openDetails(item)"
+>
+  <div class="card-badge">
+    {{ item.displayType === 'service' ? 'Service' : 'Product' }}
+  </div>
 
-        <div
-          class="result-card"
-          *ngFor="let item of filteredResults"
-          (click)="openDetails(item)"
-        >
-          <img
-            class="result-image"
-            [src]="item.mainImage"
-            [alt]="item.displayTitle"
-            loading="lazy"
-          />
+  <img
+    [src]="item.mainImage"
+    [alt]="item.displayTitle"
+    loading="lazy"
+  />
 
-          <div class="result-content-inner">
-            <div class="result-top">
-              <span
-                class="type-badge"
-                [class.service]="item.displayType === 'service'"
-              >
-                {{ item.displayType === 'service' ? 'Service' : 'Product' }}
-              </span>
-            </div>
+  <div class="card-body">
+    <h4>{{ item.displayTitle }}</h4>
 
-            <h4>{{ item.displayTitle }}</h4>
+    <p class="price-text" *ngIf="item.displayPrice > 0">
+      ₹{{ item.displayPrice }}
+    </p>
 
-            <div class="price" *ngIf="item.displayPrice > 0">
-              ₹{{ item.displayPrice }}
-            </div>
+    <p
+      class="price-text"
+      *ngIf="item.displayPrice <= 0 && item.displayType === 'service'"
+    >
+      Service
+    </p>
 
-            <div
-              class="price"
-              *ngIf="item.displayPrice <= 0 && item.displayType === 'service'"
-            >
-              Service
-            </div>
+    <p class="location-text">
+      📍 {{ item.displayLocation || 'Location not available' }}
+    </p>
 
-            <div class="meta">
-              {{ item.displayLocation }}
-            </div>
-
-            <p class="desc">
-              {{ item.description || 'No description available' }}
-            </p>
-          </div>
-        </div>
+    <a class="card-link">View Details ›</a>
+  </div>
+</div>
+        
       </div>
     </div>
   </div>
