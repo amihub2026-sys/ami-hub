@@ -142,14 +142,18 @@ this.showAlert(msg, 'error');
     }
   }
 
-  viewDetails(item: FavoriteItem): void {
-    if (item.product_id) {
-      this.router.navigate(['/post-view', item.product_id]);
-      return;
-    }
-
-    this.showAlert('Product id not available');
+ viewDetails(item: FavoriteItem): void {
+  if (item.product_id) {
+    this.router.navigate(['/post-view', item.product_id], {
+      state: {
+        from: 'favorites'
+      }
+    });
+    return;
   }
+
+  this.showAlert('Product id not available');
+}
 
   async removeItem(item: FavoriteItem): Promise<void> {
     try {
