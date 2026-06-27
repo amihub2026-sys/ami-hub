@@ -43,7 +43,7 @@ export class ProductList implements OnInit {
   allSubcategories: SubcategoryItem[] = [];
 
   private page = 0;
-  private readonly pageSize = 100;
+  private readonly pageSize = 20;
 
   private selectedLocation: any = null;
   selectedRadiusKm = 50;
@@ -146,8 +146,8 @@ this.currentUserId.set(user?.id || '');
         .from('categories')
         .select('categoryid, categoryname, category_type, isactive, sortorder')
         .eq('isactive', true)
-        .order('sortorder', { ascending: true });
-
+        .order('sortorder', { ascending: true })
+        .limit(20)
       if (error) {
         console.error('Error loading categories:', error);
         this.categoriesData = [];
@@ -433,6 +433,7 @@ this.currentUserId.set(user?.id || '');
     let data = [...this.posts()];
     if (this.currentUserId()) {
 
+      
   data = data.filter((post) =>
     String(post?.userid || '') !== String(this.currentUserId())
   );
@@ -670,14 +671,14 @@ this.currentUserId.set(user?.id || '');
       const allPosts = [...this.posts(), ...newPosts];
       this.posts.set(allPosts);
 
-      this.applyFilters();
-      this.page++;
-    } catch (error) {
-      console.error('Error loading products:', error);
-      this.hasMore.set(false);
-    } finally {
-      this.isLoading.set(false);
-    }
+   this.page++;
+
+requestAnimationFrame(() => {
+  this.applyFilters();
+});
+}finally {
+  this.isLoading.set(false);
+}
   }
 
   getShortLocation(post: any): string {
@@ -693,16 +694,26 @@ this.currentUserId.set(user?.id || '');
 
     return parts.slice(0, 2).join(', ');
   }
+private scrollLock = false;
 
-  @HostListener('window:scroll')
-  async onScroll(): Promise<void> {
-    const scrollPosition = window.innerHeight + window.scrollY;
-    const threshold = document.body.offsetHeight - 300;
+@HostListener('window:scroll')
+async onScroll(): Promise<void> {
+  if (this.scrollLock || this.isLoading() || !this.hasMore()) return;
 
-    if (scrollPosition >= threshold) {
-      await this.loadMorePosts();
-    }
+  const scrollPosition = window.innerHeight + window.scrollY;
+  const threshold = document.body.offsetHeight - 300;
+
+  if (scrollPosition >= threshold) {
+    this.scrollLock = true;
+
+    await this.loadMorePosts();
+
+    setTimeout(() => {
+      this.scrollLock = false;
+    }, 100);
   }
+}
+  
 
   getMainImage(post: any): string {
     const fallback = 'assets/no-image.png';
