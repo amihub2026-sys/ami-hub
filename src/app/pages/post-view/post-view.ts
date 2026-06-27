@@ -816,12 +816,12 @@ goBack(): void {
     return;
   }
 
-  if (from === 'products') {
-    this.router.navigate(['/products']);
+  if (from === 'product-list') {
+    this.router.navigate(['/product-list']);
     return;
   }
 
-  if (from === 'services') {
+  if (from === 'service-list') {
     this.router.navigate(['/service-list']);
     return;
   }

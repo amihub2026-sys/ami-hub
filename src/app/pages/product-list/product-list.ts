@@ -5,6 +5,7 @@ import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../services/supabase.service';
 import { supabase } from '../../../supabaseClient';
+import { Router } from '@angular/router';
 
 interface CategoryItem {
   categoryid: number;
@@ -61,7 +62,8 @@ export class ProductList implements OnInit {
 constructor(
   private supabaseService: SupabaseService,
   private route: ActivatedRoute,
-  private location: Location
+  private location: Location,
+    private router: Router
 ) {}
 
   async ngOnInit(): Promise<void> {
@@ -731,7 +733,19 @@ async onScroll(): Promise<void> {
 toggleFilter() {
   this.isFilterOpen = !this.isFilterOpen;
 }
+openDetails(id: number): void {
+  this.router.navigate(['/details', id], {
+    state: { from: 'product' }
+  });
+}
 goBack(): void {
-  this.location.back();
+  const from = history.state?.from;
+
+  if (from === 'product') {
+    this.router.navigate(['/product-list']);
+    return;
+  }
+
+  this.router.navigate(['/product-list']); // fallback
 }
 }
