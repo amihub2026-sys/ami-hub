@@ -2,6 +2,7 @@ import { Component, OnInit, HostListener, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../services/supabase.service';
 import { supabase } from '../../../supabaseClient';
@@ -59,7 +60,8 @@ export class ServiceList implements OnInit {
 constructor(
   private supabaseService: SupabaseService,
   private route: ActivatedRoute,
-  private location: Location
+  private location: Location,
+    private router: Router
 ) {}
 
   async ngOnInit(): Promise<void> {
@@ -790,7 +792,18 @@ constructor(
   toggleFilter(): void {
   this.isFilterOpen = !this.isFilterOpen;
 }
+openDetails(id: number): void {
+  this.router.navigate(['/details', id], {
+    queryParams: { from: 'service' }
+  });
+}
 goBack(): void {
-  this.location.back();
+  const from = history.state?.from;
+
+  if (from === 'list') {
+    this.router.navigate(['/service-list']);
+  } else {
+    this.router.navigate(['/service-list']);
+  }
 }
 }
