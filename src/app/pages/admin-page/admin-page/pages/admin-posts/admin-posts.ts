@@ -50,6 +50,7 @@ export class AdminPosts implements OnInit {
   posts: AdminPostItem[] = [];
   currentPage = 1;
 itemsPerPage = 5;
+adminRole = localStorage.getItem('adminRole') || '';
 
 editingPost: AdminPostItem | null = null;
 
@@ -131,23 +132,10 @@ editForm: any = {
     }
   }
 
-  get filteredPosts(): AdminPostItem[] {
-    const q = this.searchQuery.trim().toLowerCase();
-
-    if (!q) return this.posts;
-
-    return this.posts.filter((post) =>
-      String(post.id).includes(q) ||
-      post.title.toLowerCase().includes(q) ||
-      post.category.toLowerCase().includes(q) ||
-      post.subcategory.toLowerCase().includes(q) ||
-      post.type.toLowerCase().includes(q) ||
-      post.adType.toLowerCase().includes(q) ||
-      post.status.toLowerCase().includes(q) ||
-      String(post.userId).toLowerCase().includes(q)
-    );
-  }
-
+  
+get todayPosts(): number {
+  return this.filteredPosts.length;
+}
   get totalPosts(): number {
     return this.posts.length;
   }
@@ -163,6 +151,38 @@ editForm: any = {
   get inactivePosts(): number {
     return this.posts.filter((p) => !p.isActive).length;
   }
+get filteredPosts(): AdminPostItem[] {
+  const q = this.searchQuery.trim().toLowerCase();
+
+  let list = this.posts;
+
+  if (this.adminRole === 'post') {
+    const today = new Date();
+
+    list = list.filter(post => {
+      const created = new Date(post.rawCreatedOn);
+
+      return (
+        created.getFullYear() === today.getFullYear() &&
+        created.getMonth() === today.getMonth() &&
+        created.getDate() === today.getDate()
+      );
+    });
+  }
+
+  if (!q) return list;
+
+  return list.filter((post) =>
+    String(post.id).includes(q) ||
+    post.title.toLowerCase().includes(q) ||
+    post.category.toLowerCase().includes(q) ||
+    post.subcategory.toLowerCase().includes(q) ||
+    post.type.toLowerCase().includes(q) ||
+    post.adType.toLowerCase().includes(q) ||
+    post.status.toLowerCase().includes(q) ||
+    String(post.userId).toLowerCase().includes(q)
+  );
+}
 
   async togglePostStatus(post: AdminPostItem): Promise<void> {
     const previousValue = post.isActive;

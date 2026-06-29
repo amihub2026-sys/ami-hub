@@ -62,7 +62,25 @@ export class AdminSidebar {
     { key: 'notifications', label: 'Notifications', icon: '🔔' },
     { key: 'settings', label: 'Settings', icon: '⚙️' },
   ];
+adminRole = localStorage.getItem('adminRole');
+get visibleMenuItems() {
 
+  // Super Admin - show all menus
+  if (this.adminRole === 'super') {
+    return this.menuItems;
+  }
+
+  // Post Admin - show only these menus
+  if (this.adminRole === 'dashboard') {
+    return this.menuItems.filter(item =>
+      item.key === 'users' ||
+      item.key === 'posts' ||
+      item.key === 'advertise'
+    );
+  }
+
+  return [];
+}
   onMenuClick(menu: AdminMenuKey): void {
     this.menuChange.emit(menu);
   }

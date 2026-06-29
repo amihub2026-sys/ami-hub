@@ -53,11 +53,28 @@ export class AdminPage {
   searchQuery = '';
   activeMenu: AdminMenuKey = 'dashboard';
   editingPostId: number | null = null;
-  
+isSuperAdmin = false;
+isDashboardUser = false;
+adminRole = localStorage.getItem('adminRole');
+ngOnInit() {
+  this.adminRole = localStorage.getItem('adminRole') || '';
 
- 
+  if (this.adminRole === 'post') {
+    this.activeMenu = 'users';
+  }
+}
 
-  setActiveMenu(menu: AdminMenuKey): void {
+canAccess(menu: string): boolean {
+  if (this.adminRole === 'super') return true;
+
+  if (this.adminRole === 'post') {
+    return menu === 'users' || menu === 'posts' || menu === 'advertise';
+  }
+
+  return false;
+}
+
+setActiveMenu(menu: AdminMenuKey): void {
     this.sidebarOpen = false;
     this.searchQuery = '';
     this.activeMenu = menu;

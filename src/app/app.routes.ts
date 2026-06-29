@@ -19,7 +19,7 @@ import { SellerProfileComponent } from './pages/seller-profile/seller-profile';
 import { PostViewComponent } from './pages/post-view/post-view';
 import { SubscriptionPlan } from './pages/subscription-plan/subscription-plan';
 import { FeaturedPlan } from './pages/featured-plan/featured-plan';
-import { AdminPage } from './pages/admin-page/admin-page';
+
 import { AccountSetup } from './pages/account-setup/account-setup';
 import { MyPosts } from './pages/my-posts/my-posts';
 import { About } from './pages/about/about';
@@ -34,6 +34,9 @@ import { Cart } from './pages/cart/cart';
 import { Favt } from './pages/favt/favt';
 import { Payment } from './pages/payment/payment';
 import { DeleteAccount } from './pages/delete-account/delete-account';
+import { AdminLogin } from './pages/admin-login/admin-login';
+import { AdminPage } from './pages/admin-page/admin-page';
+
 import { AdminUserBoostPlansComponent } from './pages/admin-page/admin-page/pages/admin-user-boost-plans/admin-user-boost-plans';
 function adminGuard() {
   return () => {
@@ -50,6 +53,8 @@ export const routes: Routes = [
   path: 'add-job',
   component: AddJob
 },
+  { path: 'admin-login', component: AdminLogin },
+  { path: 'admin', component: AdminPage },
 {
   path: 'user-boost-plans',
   component: AdminUserBoostPlansComponent
