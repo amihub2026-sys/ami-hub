@@ -29,100 +29,102 @@
       </div>
     </div>
 
-    <app-admin-dashboard *ngIf="activeMenu === 'dashboard'"></app-admin-dashboard>
+    <app-admin-dashboard
+      *ngIf="activeMenu === 'dashboard' && canAccess('dashboard')"
+    ></app-admin-dashboard>
 
     <app-admin-users
-      *ngIf="activeMenu === 'users'"
+      *ngIf="activeMenu === 'users' && canAccess('users')"
       [searchQuery]="searchQuery"
     ></app-admin-users>
 
     <app-admin-posts
-      *ngIf="activeMenu === 'posts'"
+      *ngIf="activeMenu === 'posts' && canAccess('posts')"
       [searchQuery]="searchQuery"
       (adminEditPost)="openAdminEditPost($event)"
     ></app-admin-posts>
 
     <app-service
-      *ngIf="activeMenu === 'advertise'"
+      *ngIf="activeMenu === 'advertise' && canAccess('advertise')"
       [adminEditPostId]="null"
     ></app-service>
 
     <app-service
-      *ngIf="activeMenu === 'edit-post'"
+      *ngIf="activeMenu === 'edit-post' && canAccess('edit-post')"
       [adminEditPostId]="editingPostId"
     ></app-service>
 
     <app-admin-categories
-      *ngIf="activeMenu === 'categories'"
+      *ngIf="activeMenu === 'categories' && canAccess('categories')"
       [searchQuery]="searchQuery"
     ></app-admin-categories>
 
     <app-admin-subcategories
-      *ngIf="activeMenu === 'subcategories'"
+      *ngIf="activeMenu === 'subcategories' && canAccess('subcategories')"
       [searchQuery]="searchQuery"
     ></app-admin-subcategories>
 
     <app-admin-subscriptions
-      *ngIf="activeMenu === 'subscriptions'"
+      *ngIf="activeMenu === 'subscriptions' && canAccess('subscriptions')"
       [searchQuery]="searchQuery"
     ></app-admin-subscriptions>
 
     <app-admin-user-subscriptions
-      *ngIf="activeMenu === 'user-subscriptions'"
+      *ngIf="activeMenu === 'user-subscriptions' && canAccess('user-subscriptions')"
       [searchQuery]="searchQuery"
     ></app-admin-user-subscriptions>
 
     <app-admin-boost-plans
-      *ngIf="activeMenu === 'boost-plans'"
+      *ngIf="activeMenu === 'boost-plans' && canAccess('boost-plans')"
       [searchQuery]="searchQuery"
     ></app-admin-boost-plans>
 
     <app-admin-user-boost-plans
-      *ngIf="activeMenu === 'user-boost-plans'"
+      *ngIf="activeMenu === 'user-boost-plans' && canAccess('user-boost-plans')"
       [searchQuery]="searchQuery"
     ></app-admin-user-boost-plans>
 
     <app-admin-payments
-      *ngIf="activeMenu === 'payments'"
+      *ngIf="activeMenu === 'payments' && canAccess('payments')"
       [searchQuery]="searchQuery"
     ></app-admin-payments>
 
-    <div class="content-card" *ngIf="activeMenu === 'services'">
+    <div class="content-card" *ngIf="activeMenu === 'services' && canAccess('services')">
       <h1>Services</h1>
       <p>Services module will be connected next.</p>
     </div>
 
-    <div class="content-card" *ngIf="activeMenu === 'matrimony'">
+    <div class="content-card" *ngIf="activeMenu === 'matrimony' && canAccess('matrimony')">
       <h1>Matrimony</h1>
       <p>Matrimony module will be connected next.</p>
     </div>
 
-    <div class="content-card" *ngIf="activeMenu === 'jobs'">
+    <div class="content-card" *ngIf="activeMenu === 'jobs' && canAccess('jobs')">
       <h1>Jobs</h1>
       <p>Jobs module will be connected next.</p>
     </div>
 
     <app-admin-reports
-      *ngIf="activeMenu === 'reports'"
+      *ngIf="activeMenu === 'reports' && canAccess('reports')"
       [searchQuery]="searchQuery"
     ></app-admin-reports>
 
-    <div class="content-card" *ngIf="activeMenu === 'locations'">
+    <div class="content-card" *ngIf="activeMenu === 'locations' && canAccess('locations')">
       <h1>Locations</h1>
       <p>Locations module will be connected next.</p>
     </div>
 
-    <div class="content-card" *ngIf="activeMenu === 'banners'">
+    <div class="content-card" *ngIf="activeMenu === 'banners' && canAccess('banners')">
       <h1>Banners</h1>
       <p>Banners module will be connected next.</p>
     </div>
 
-    <div class="content-card" *ngIf="activeMenu === 'notifications'">
+    <div class="content-card" *ngIf="activeMenu === 'notifications' && canAccess('notifications')">
       <h1>Notifications</h1>
       <p>Notifications module will be connected next.</p>
     </div>
 
-    <div class="content-card" *ngIf="activeMenu === 'settings'">
+    <div class="content-card" *ngIf="activeMenu === 'settings' && canAccess('settings')">
       <h1>Settings</h1>
       <p>Settings module will be connected next.</p>
     </div>

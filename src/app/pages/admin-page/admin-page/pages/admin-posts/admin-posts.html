@@ -54,6 +54,15 @@
       </div>
       <h2>{{ inactivePosts }}</h2>
     </div>
+    <div class="summary-grid" *ngIf="adminRole === 'post'">
+  <div class="summary-card summary-blue">
+    <div class="summary-top">
+      <span>Today's Posts</span>
+      <div class="summary-icon">📅</div>
+    </div>
+    <h2>{{ todayPosts }}</h2>
+  </div>
+</div>
   </div>
 
  
