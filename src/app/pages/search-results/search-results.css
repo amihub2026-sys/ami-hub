@@ -245,13 +245,16 @@ body {
 
 .results-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 24px;
   width: 100%;
 }
 
+
+
 .result-card {
-  width:320px;
+  width: 100%;
+  min-width: 0;
   position: relative;
   background: #ffffff;
   border-radius: 22px;
@@ -333,7 +336,17 @@ body {
   padding: 30px 12px;
 }
 
+@media (max-width: 1400px) {
+  .results-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
 
+@media (max-width: 900px) {
+  .results-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 
 @media (max-width: 640px) {
   .results-page {
