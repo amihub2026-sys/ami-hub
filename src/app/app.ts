@@ -11,6 +11,7 @@ import { AppLocationResult } from './services/location-search';
 import { SnackbarService } from './services/snackbar.service';
 import { SnackbarComponent } from './snackbar/snackbar';
 
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -47,6 +48,7 @@ export class App implements OnInit {
   showAd = true;
   showTopAd = true;
   menuOpen = false;
+  showNavbar = true;
 
   searchTerm = '';
   searchCategory = 'All';
@@ -93,7 +95,11 @@ isRouteLoading = false;
     this.currentUrl = this.router.url;
 
 this.router.events.subscribe((event: any) => {
+  this.currentUrl = this.router.url;
 
+  this.router.events.subscribe(() => {
+    this.currentUrl = this.router.url;
+  });
   if (event.constructor.name === 'NavigationStart') {
     this.isRouteLoading = true;
     this.cdr.detectChanges();
@@ -137,6 +143,7 @@ if (event instanceof NavigationEnd) {
     return localStorage.getItem('userToken') === 'loggedUser';
   }
   
+
 
   private async isLoggedIn(): Promise<boolean> {
     if (!this.isBrowser()) return false;
