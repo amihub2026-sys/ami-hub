@@ -839,7 +839,7 @@ if (!existingUser && user.email) {
       .insert([payload])
       .select('postid')
       .single();
-
+ post_admin_id: Number(localStorage.getItem('adminId'));
     if (error) {
       console.error('Create Raw Post Error:', error);
       throw error;
@@ -951,7 +951,7 @@ if (!existingUser && user.email) {
       .insert([payload])
       .select('postid')
       .single();
-
+post_admin_id: Number(localStorage.getItem('adminId'));
     console.timeEnd('SUPABASE_POST_INSERT');
 
     if (error) {

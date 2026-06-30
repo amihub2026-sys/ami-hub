@@ -11,6 +11,7 @@ export type AdminMenuKey =
   | 'services'
   | 'matrimony'
   | 'jobs'
+   | 'admins' 
   | 'subscriptions'
   | 'user-subscriptions'
   | 'boost-plans'
@@ -51,6 +52,11 @@ export class AdminSidebar {
     { key: 'services', label: 'Services', icon: '🛠️' },
     { key: 'matrimony', label: 'Matrimony', icon: '💍' },
     { key: 'jobs', label: 'Jobs', icon: '💼' },
+    {
+  key: 'admins',
+  label: 'Admins',
+  icon: '👨‍💼'
+},
     { key: 'subscriptions', label: 'Subscriptions', icon: '📦' },
     { key: 'user-subscriptions', label: 'User Subscriptions', icon: '🧾' },
   { key: 'boost-plans', label: 'Boost Plans', icon: '🚀' },
