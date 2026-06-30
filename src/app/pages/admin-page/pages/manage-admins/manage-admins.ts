@@ -30,22 +30,45 @@ export class ManageAdmins implements OnInit {
     await this.loadAdmins();
   }
 
-  
 async loadAdmins() {
-  const { data, error } = await this.supabaseService.supabase
-    .from('admins')
-    .select('*')
-    .order('createdon', { ascending: false });
+  const { data: adminsData, error: adminsError } =
+    await this.supabaseService.supabase
+      .from('admins')
+      .select('*')
+      .eq('isactive', true)
+      .order('createdon', { ascending: false });
 
-  if (error) {
-    console.error(error);
-    alert(error.message);
+  if (adminsError) {
+    alert(adminsError.message);
     return;
   }
 
-  this.admins = data || [];
+  const { data: postsData, error: postsError } =
+    await this.supabaseService.supabase
+      .from('post')
+      .select('post_admin_id')
+      .not('post_admin_id', 'is', null);
+
+  if (postsError) {
+    alert(postsError.message);
+    return;
+    
+  }
+
+  this.admins = (adminsData || []).map((admin: any) => {
+    const postCount = (postsData || []).filter((post: any) =>
+      Number(post.post_admin_id) === Number(admin.adminid)
+    ).length;
+
+    return {
+      ...admin,
+      postCount
+    };
+  });
+
   this.cdr.detectChanges();
 }
+  
   openForm() {
     this.showForm = true;
   }
@@ -53,6 +76,7 @@ async loadAdmins() {
   closeForm() {
     this.showForm = false;
   }
+  
 
   async saveAdmin() {
     const roleId = this.formData.role === 'super' ? 1 : 2;
@@ -89,23 +113,25 @@ async loadAdmins() {
     alert('Admin saved successfully');
   }
 async removeAdmin(adminid: number) {
-  const confirmed = confirm('Remove this admin?');
-  if (!confirmed) return;
+  const ok = confirm('Do you want to deactivate this admin?');
+
+  if (!ok) return;
 
   const { error } = await this.supabaseService.supabase
     .from('admins')
-    .delete()
+    .update({
+      isactive: false
+    })
     .eq('adminid', adminid);
 
   if (error) {
-    console.error('Remove admin error:', error);
+    console.error(error);
     alert(error.message);
     return;
   }
 
-  this.admins = this.admins.filter(admin => admin.adminid !== adminid);
-  this.cdr.detectChanges();
+  await this.loadAdmins();
 
-  alert('Admin removed successfully');
+  alert('Admin deactivated successfully.');
 }
 }

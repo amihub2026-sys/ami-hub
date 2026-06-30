@@ -54,6 +54,10 @@ export class AdminLogin {
       this.errorMessage = 'Invalid admin email or password';
       return;
     }
+    if (!data.isactive) {
+  this.errorMessage = 'This admin account has been deactivated.';
+  return;
+}
 
     const adminRole = data.roleid === 1 ? 'super' : 'post';
 
