@@ -1,5 +1,11 @@
 <div class="wide">
-  <nav class="topbar">
+ <nav
+  class="topbar"
+  *ngIf="
+    !currentUrl.includes('admin') &&
+    !currentUrl.includes('admin-page')
+  "
+>
     <div class="nav-container">
 
       <div style="display:flex; align-items:center; gap:12px;">
@@ -9,7 +15,7 @@
   <span></span>
   <span></span>
   <span></span>
-
+ 
   <span *ngIf="chatCount > 0" class="menu-badge">
     {{ chatCount }}
   </span>
@@ -28,7 +34,15 @@
         </div>
       </div>
 
-      <div class="desktop-menu">
+   <div
+  class="menu-overlay"
+  *ngIf="
+    menuOpen &&
+    !currentUrl.includes('admin') &&
+    !currentUrl.includes('admin-page')
+  "
+  (click)="closeMenu()">
+
         <a [routerLink]="['/']" (click)="closeMenu()">Home</a>
         <!-- <a [routerLink]="['/news']" (click)="closeMenu()">News</a> -->
         <!-- <button type="button" (click)="logout(); closeMenu()">Logout</button> -->
@@ -130,7 +144,13 @@
     </div>
   </div>
     <div class="menu-overlay" *ngIf="menuOpen" (click)="closeMenu()"></div>
-  <div class="side-menu" [class.active]="menuOpen">
+<div
+  class="side-menu"
+  *ngIf="
+    !currentUrl.includes('admin') &&
+    !currentUrl.includes('admin-page')
+  "
+  [class.active]="menuOpen">
     <div class="menu-content">
       <div class="menu-header">
         <!-- <div class="logo">AMI<span>HUB</span></div> -->
