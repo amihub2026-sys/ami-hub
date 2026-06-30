@@ -732,6 +732,7 @@ catalog: catalog,
       const { error } = await supabase
         .from('post')
         .insert([finalPayload]);
+        post_admin_id: Number(localStorage.getItem('adminId'));
 
       if (error) {
         throw error;

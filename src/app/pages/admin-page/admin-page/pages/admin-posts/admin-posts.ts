@@ -12,7 +12,6 @@ import {
 
 import { SupabaseService } from '../../../../../services/supabase.service';
 
-
 interface AdminPostItem {
   id: number;
   userId: string;
@@ -28,6 +27,7 @@ interface AdminPostItem {
   createdOn: string;
   imageUrl: string;
   rawCreatedOn: string;
+  postAdminId: number | null;
 }
 
 @Component({
@@ -40,7 +40,6 @@ interface AdminPostItem {
 export class AdminPosts implements OnInit {
   private supabaseService = inject(SupabaseService);
   private cdr = inject(ChangeDetectorRef);
-  
 
   @Input() searchQuery = '';
   @Output() adminEditPost = new EventEmitter<number>();
@@ -48,23 +47,11 @@ export class AdminPosts implements OnInit {
   isLoading = true;
   errorMessage = '';
   posts: AdminPostItem[] = [];
+
   currentPage = 1;
-itemsPerPage = 5;
-adminRole = localStorage.getItem('adminRole') || '';
+  itemsPerPage = 5;
 
-editingPost: AdminPostItem | null = null;
-
-editForm: any = {
-  title: '',
-  price: 0,
-  category: '',
-  subcategory: '',
-  type: '',
-  adType: '',
-  isActive: true,
-  isFeatured: false,
-  imageUrl: ''
-};
+  adminRole = localStorage.getItem('adminRole') || '';
 
   async ngOnInit(): Promise<void> {
     await this.loadPosts();
@@ -91,7 +78,8 @@ editForm: any = {
           isactive,
           isfeatured,
           createdon,
-          image_url
+          image_url,
+          post_admin_id
         `)
         .order('createdon', { ascending: false });
 
@@ -118,6 +106,7 @@ editForm: any = {
         createdOn: this.formatDate(row.createdon),
         imageUrl: row.image_url || '',
         rawCreatedOn: row.createdon || '',
+        postAdminId: row.post_admin_id ? Number(row.post_admin_id) : null,
       }));
 
       this.cdr.detectChanges();
@@ -132,10 +121,45 @@ editForm: any = {
     }
   }
 
-  
-get todayPosts(): number {
-  return this.filteredPosts.length;
-}
+  get filteredPosts(): AdminPostItem[] {
+    const q = this.searchQuery.trim().toLowerCase();
+
+    let list = this.posts;
+
+    if (this.adminRole === 'post') {
+      const today = new Date();
+      const adminId = Number(localStorage.getItem('adminId'));
+
+      list = list.filter((post) => {
+        const created = new Date(post.rawCreatedOn);
+
+        return (
+          post.postAdminId === adminId &&
+          created.getFullYear() === today.getFullYear() &&
+          created.getMonth() === today.getMonth() &&
+          created.getDate() === today.getDate()
+        );
+      });
+    }
+
+    if (!q) return list;
+
+    return list.filter((post) =>
+      String(post.id).includes(q) ||
+      post.title.toLowerCase().includes(q) ||
+      post.category.toLowerCase().includes(q) ||
+      post.subcategory.toLowerCase().includes(q) ||
+      post.type.toLowerCase().includes(q) ||
+      post.adType.toLowerCase().includes(q) ||
+      post.status.toLowerCase().includes(q) ||
+      String(post.userId).toLowerCase().includes(q)
+    );
+  }
+
+  get todayPosts(): number {
+    return this.filteredPosts.length;
+  }
+
   get totalPosts(): number {
     return this.posts.length;
   }
@@ -151,38 +175,6 @@ get todayPosts(): number {
   get inactivePosts(): number {
     return this.posts.filter((p) => !p.isActive).length;
   }
-get filteredPosts(): AdminPostItem[] {
-  const q = this.searchQuery.trim().toLowerCase();
-
-  let list = this.posts;
-
-  if (this.adminRole === 'post') {
-    const today = new Date();
-
-    list = list.filter(post => {
-      const created = new Date(post.rawCreatedOn);
-
-      return (
-        created.getFullYear() === today.getFullYear() &&
-        created.getMonth() === today.getMonth() &&
-        created.getDate() === today.getDate()
-      );
-    });
-  }
-
-  if (!q) return list;
-
-  return list.filter((post) =>
-    String(post.id).includes(q) ||
-    post.title.toLowerCase().includes(q) ||
-    post.category.toLowerCase().includes(q) ||
-    post.subcategory.toLowerCase().includes(q) ||
-    post.type.toLowerCase().includes(q) ||
-    post.adType.toLowerCase().includes(q) ||
-    post.status.toLowerCase().includes(q) ||
-    String(post.userId).toLowerCase().includes(q)
-  );
-}
 
   async togglePostStatus(post: AdminPostItem): Promise<void> {
     const previousValue = post.isActive;
@@ -199,12 +191,10 @@ get filteredPosts(): AdminPostItem[] {
         .eq('postid', post.id);
 
       if (error) {
-        console.error('Toggle post status error:', error);
         post.isActive = previousValue;
         this.errorMessage = 'Failed to update post status.';
       }
-    } catch (error) {
-      console.error('Toggle post status exception:', error);
+    } catch {
       post.isActive = previousValue;
       this.errorMessage = 'Failed to update post status.';
     } finally {
@@ -226,12 +216,10 @@ get filteredPosts(): AdminPostItem[] {
         .eq('postid', post.id);
 
       if (error) {
-        console.error('Toggle featured error:', error);
         post.isFeatured = previousValue;
         this.errorMessage = 'Failed to update featured status.';
       }
-    } catch (error) {
-      console.error('Toggle featured exception:', error);
+    } catch {
       post.isFeatured = previousValue;
       this.errorMessage = 'Failed to update featured status.';
     } finally {
@@ -254,12 +242,10 @@ get filteredPosts(): AdminPostItem[] {
         .eq('postid', post.id);
 
       if (error) {
-        console.error('Delete post error:', error);
         this.posts = previousPosts;
         this.errorMessage = 'Failed to delete post.';
       }
-    } catch (error) {
-      console.error('Delete post exception:', error);
+    } catch {
       this.posts = previousPosts;
       this.errorMessage = 'Failed to delete post.';
     } finally {
@@ -275,37 +261,37 @@ get filteredPosts(): AdminPostItem[] {
     return post.isActive ? 'status-active' : 'status-inactive';
   }
 
- trackByPost(index: number, post: AdminPostItem): number {
-  return post.id;
-}
+  trackByPost(index: number, post: AdminPostItem): number {
+    return post.id;
+  }
 
-editPost(post: AdminPostItem): void {
-  this.adminEditPost.emit(post.id);
-}
+  editPost(post: AdminPostItem): void {
+    this.adminEditPost.emit(post.id);
+  }
 
-get totalPages(): number {
-  return Math.ceil(this.filteredPosts.length / this.itemsPerPage) || 1;
-}
+  get totalPages(): number {
+    return Math.ceil(this.filteredPosts.length / this.itemsPerPage) || 1;
+  }
 
-get paginatedPosts(): AdminPostItem[] {
-  const start = (this.currentPage - 1) * this.itemsPerPage;
-  return this.filteredPosts.slice(start, start + this.itemsPerPage);
-}
+  get paginatedPosts(): AdminPostItem[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredPosts.slice(start, start + this.itemsPerPage);
+  }
 
-goToPage(page: number): void {
-  if (page < 1 || page > this.totalPages) return;
-  this.currentPage = page;
-}
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+  }
 
-private formatDate(value: string | null | undefined): string {
-  if (!value) return '-';
+  private formatDate(value: string | null | undefined): string {
+    if (!value) return '-';
 
-  const date = new Date(value);
+    const date = new Date(value);
 
-  return date.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
+    return date.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  }
 }

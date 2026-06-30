@@ -18,10 +18,8 @@ import { AdminSubscriptionsComponent } from './admin-page/pages/admin-subscripti
 import { AdminUserSubscriptionsComponent } from './admin-page/pages/admin-user-subscriptions/admin-user-subscriptions';
 import { AdminBoostPlansComponent } from './admin-page/pages/admin-boost-plans/admin-boost-plans';
 import { AdminPaymentsComponent } from './admin-page/pages/admin-payments/admin-payments';
-
-
-type AdminMenuKey = SidebarAdminMenuKey | 'advertise' | 'edit-post';
-
+import { ManageAdmins } from './pages/manage-admins/manage-admins';
+type AdminMenuKey = SidebarAdminMenuKey | 'advertise' | 'edit-post' | 'admins';
 @Component({
   selector: 'app-admin-page',
   standalone: true,
@@ -42,6 +40,7 @@ type AdminMenuKey = SidebarAdminMenuKey | 'advertise' | 'edit-post';
   AdminBoostPlansComponent,
   AdminUserBoostPlansComponent,
   AdminPaymentsComponent,
+  ManageAdmins,
   Service
 ],
   templateUrl: './admin-page.html',
@@ -136,6 +135,8 @@ case 'payments':
 
 case 'edit-post':
   return 'Edit Post';
+  case 'admins':
+  return 'Admins';
     }
   }
 
@@ -149,6 +150,7 @@ case 'edit-post':
       this.activeMenu === 'user-subscriptions' ||
       this.activeMenu === 'boost-plans' ||
       this.activeMenu === 'user-boost-plans' ||
+      this.activeMenu === 'admins' ||
       this.activeMenu === 'payments'
     );
   }
@@ -175,6 +177,8 @@ case 'edit-post':
         return 'Search payments by id, user id, auth user id, plan, amount, payment id, order id or status';
       default:
         return 'Search here...';
+        case 'admins':
+  return 'Search admins by name, email or phone';
     }
   }
 }

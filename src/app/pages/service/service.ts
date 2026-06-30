@@ -998,7 +998,9 @@ if (this.mainAd.whatsappnumber && !/^\d{10}$/.test(this.mainAd.whatsappnumber)) 
   const { error } = await this.supabaseService.supabase
     .from('post')
     .update(updatePayload)
+    
     .eq('postid', this.editPostId);
+  
 
   if (error) {
     console.error('Error updating post:', error);
@@ -1058,7 +1060,9 @@ if (this.mainAd.videos.length > 0) {
 }
 
       const rawPayload: any = {
+        
         userid: String(effectiveUserId),
+         post_admin_id: Number(localStorage.getItem('adminId')) || null,
         categoryid: selectedCategory?.categoryid ?? null,
         subcategoryid: selectedSubcategory?.subcategoryid ?? null,
         title: this.mainAd.title.trim(),

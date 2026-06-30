@@ -37,6 +37,7 @@ import { DeleteAccount } from './pages/delete-account/delete-account';
 import { AdminLogin } from './pages/admin-login/admin-login';
 import { AdminPage } from './pages/admin-page/admin-page';
 
+
 import { AdminUserBoostPlansComponent } from './pages/admin-page/admin-page/pages/admin-user-boost-plans/admin-user-boost-plans';
 function adminGuard() {
   return () => {
@@ -53,6 +54,7 @@ export const routes: Routes = [
   path: 'add-job',
   component: AddJob
 },
+
   { path: 'admin-login', component: AdminLogin },
   { path: 'admin', component: AdminPage },
 {

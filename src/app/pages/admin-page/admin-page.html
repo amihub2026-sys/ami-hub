@@ -88,6 +88,9 @@
       *ngIf="activeMenu === 'payments' && canAccess('payments')"
       [searchQuery]="searchQuery"
     ></app-admin-payments>
+<app-manage-admins
+  *ngIf="activeMenu === 'admins' && canAccess('admins')">
+</app-manage-admins>
 
     <div class="content-card" *ngIf="activeMenu === 'services' && canAccess('services')">
       <h1>Services</h1>
