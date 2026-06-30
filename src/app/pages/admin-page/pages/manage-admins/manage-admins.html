@@ -73,14 +73,15 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let admin of admins">
-            <td>{{ admin.adminname }}</td>
-            <td>{{ admin.adminemail }}</td>
-            <td>{{ admin.passwordhash }}</td>
-            <td>{{ admin.phone || '-' }}</td>
-            <td>{{ admin.roleid === 1 ? 'Super Admin' : 'Post Admin' }}</td>
-            <td>0</td>
-            <td>
+       <tr *ngFor="let admin of admins">
+  <td>{{ admin.adminname }}</td>
+  <td>{{ admin.adminemail }}</td>
+  <td>{{ admin.passwordhash }}</td>
+  <td>{{ admin.phone || '-' }}</td>
+  <td>{{ admin.roleid === 1 ? 'Super Admin' : 'Post Admin' }}</td>
+
+  <td>{{ admin.postCount || 0 }}</td>
+    <td>
             <button
   class="remove-btn"
   type="button"
