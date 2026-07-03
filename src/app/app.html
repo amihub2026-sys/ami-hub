@@ -35,24 +35,24 @@
       </div>
 
    <div
-  class="menu-overlay"
+ 
   *ngIf="
     menuOpen &&
     !currentUrl.includes('admin') &&
     !currentUrl.includes('admin-page')
   "
   (click)="closeMenu()">
-
-        <a [routerLink]="['/']" (click)="closeMenu()">Home</a>
+  </div>
+        
+        <a [routerLink]="['/home']" class="homee" (click)="closeMenu()">Home</a>
         <!-- <a [routerLink]="['/news']" (click)="closeMenu()">News</a> -->
         <!-- <button type="button" (click)="logout(); closeMenu()">Logout</button> -->
         <!-- <a (click)="postProduct(); closeMenu()" class="post-btn">Post Product</a> -->
         <a (click)="postService(); closeMenu()" class="post-btn service-btn">📢 ADVERTISE</a>
         
-        <a (click)="goToMyPosts(); closeMenu()">My Posts</a>
+        <a class="post" (click)="goToMyPosts(); closeMenu()">My Posts</a>
 
-      </div>
-
+  
       <div class="nav-actions">
         <a (click)="postService(); closeMenu()" class="mobile-ad-btn" aria-label="Advertise">
           <i class="fas fa-bullhorn"></i>

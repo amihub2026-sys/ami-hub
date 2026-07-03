@@ -3848,4 +3848,20 @@ body app-root {
     border-radius: 20px;
   }
 }
+.homee{
+  color: #000;
+  font-weight: bold;
+  padding-left: 90px;
+  font-size: 18px;
+  text-decoration: none;
+}
+.post{
+    color: #000;
+  font-weight: bold;
+   font-size: 18px;
+   padding-right: 5px;
+}
+
+
+
 
