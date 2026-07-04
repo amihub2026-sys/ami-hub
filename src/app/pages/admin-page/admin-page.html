@@ -16,6 +16,8 @@
       [username]="username"
       [pageTitle]="pageTitle"
       (menuToggle)="toggleSidebar()"
+        (logoutClick)="logout()"
+
     ></app-admin-topbar>
 
     <div class="search-bar-wrap" *ngIf="isSearchVisible">
