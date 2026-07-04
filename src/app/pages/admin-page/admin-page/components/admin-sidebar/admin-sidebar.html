@@ -22,5 +22,17 @@
       <span class="menu-icon">{{ item.icon }}</span>
       <span class="menu-label">{{ item.label }}</span>
     </button>
+
+  <!-- Logout -->
+  <div class="sidebar-footer">
+    <button
+      type="button"
+      class="menu-item logout-item"
+      (click)="logout()"
+    >
+      <span class="menu-icon">🚪</span>
+      <span class="menu-label">Logout</span>
+    </button>
+  </div>
   </nav>
 </aside>

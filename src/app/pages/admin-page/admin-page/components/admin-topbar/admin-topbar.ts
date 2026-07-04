@@ -11,10 +11,14 @@ import { CommonModule } from '@angular/common';
 export class AdminTopbar {
   @Input() username = 'Admin';
   @Input() pageTitle = 'Dashboard';
-
+   @Output() logoutClick = new EventEmitter<void>();
   @Output() menuToggle = new EventEmitter<void>();
 
   onMenuToggle(): void {
     this.menuToggle.emit();
+  }
+
+  onLogout(): void {
+    this.logoutClick.emit();
   }
 }

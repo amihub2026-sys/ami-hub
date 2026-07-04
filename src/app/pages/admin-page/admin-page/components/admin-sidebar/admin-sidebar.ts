@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 export type AdminMenuKey =
   | 'dashboard'
@@ -86,6 +87,16 @@ get visibleMenuItems() {
   }
 
   return [];
+}
+constructor(private router: Router) {}
+logout(): void {
+  localStorage.removeItem('adminLogin');
+  localStorage.removeItem('adminRole');
+  localStorage.removeItem('adminId');
+  localStorage.removeItem('adminEmail');
+  localStorage.removeItem('adminName');
+
+  this.router.navigate(['/admin-login']);
 }
   onMenuClick(menu: AdminMenuKey): void {
     this.menuChange.emit(menu);

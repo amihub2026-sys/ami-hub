@@ -8,6 +8,8 @@ import {
   AdminSidebar,
   AdminMenuKey as SidebarAdminMenuKey,
 } from './admin-page/components/admin-sidebar/admin-sidebar';
+import { Router } from '@angular/router';
+
 import { AdminTopbar } from './admin-page/components/admin-topbar/admin-topbar';
 import { AdminDashboard } from './admin-page/pages/admin-dashboard/admin-dashboard';
 import { AdminUsers } from './admin-page/pages/admin-users/admin-users';
@@ -46,6 +48,7 @@ type AdminMenuKey = SidebarAdminMenuKey | 'advertise' | 'edit-post' | 'admins';
   templateUrl: './admin-page.html',
   styleUrls: ['./admin-page.css'],
 })
+
 export class AdminPage {
   username = 'Admin';
   sidebarOpen = false;
@@ -139,7 +142,7 @@ case 'edit-post':
   return 'Admins';
     }
   }
-
+   
   get isSearchVisible(): boolean {
     return (
       this.activeMenu === 'users' ||
@@ -181,4 +184,19 @@ case 'edit-post':
   return 'Search admins by name, email or phone';
     }
   }
+constructor(
+  private router: Router
+) {}
+
+logout(): void {
+  localStorage.removeItem('adminLogin');
+  localStorage.removeItem('adminRole');
+  localStorage.removeItem('adminId');
+  localStorage.removeItem('adminEmail');
+  localStorage.removeItem('adminName');
+
+  this.router.navigate(['/admin-login']);
+}
+
+
 }
