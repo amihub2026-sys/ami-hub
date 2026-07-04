@@ -141,7 +141,7 @@
   type="text"
   [(ngModel)]="seller.salesId"
   placeholder="Enter Sales ID"
-  [readonly]="isSalesIdLocked"
+  [disabled]="isLoading || isSalesIdLocked"
   [class.locked-input]="isSalesIdLocked">
   <button
     type="button"

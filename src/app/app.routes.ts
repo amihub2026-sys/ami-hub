@@ -36,14 +36,24 @@ import { Payment } from './pages/payment/payment';
 import { DeleteAccount } from './pages/delete-account/delete-account';
 import { AdminLogin } from './pages/admin-login/admin-login';
 import { AdminPage } from './pages/admin-page/admin-page';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 
 
 import { AdminUserBoostPlansComponent } from './pages/admin-page/admin-page/pages/admin-user-boost-plans/admin-user-boost-plans';
+
+
 function adminGuard() {
-  return () => {
-    const token = localStorage.getItem('adminToken');
-    return token === 'loggedAdmin';
-  };
+  const router = inject(Router);
+
+  const adminLogin = localStorage.getItem('adminLogin');
+
+  if (adminLogin === 'true') {
+    return true;
+  }
+
+  router.navigate(['/admin-login']);
+  return false;
 }
 
 export const routes: Routes = [
@@ -55,8 +65,13 @@ export const routes: Routes = [
   component: AddJob
 },
 
-  { path: 'admin-login', component: AdminLogin },
-  { path: 'admin', component: AdminPage },
+{ path: 'admin-login', component: AdminLogin },
+
+{
+  path: 'admin',
+  component: AdminPage,
+  canActivate: [adminGuard]
+},
 {
   path: 'user-boost-plans',
   component: AdminUserBoostPlansComponent
@@ -124,11 +139,7 @@ export const routes: Routes = [
       import('./pages/news/news').then(m => m.News)
   },
 
-  {
-    path: 'admin-page',
-    component: AdminPage,
-    canActivate: [adminGuard]
-  },
+
 
   { path: '**', redirectTo: '' }
 ];
