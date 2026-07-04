@@ -29,6 +29,7 @@ interface AdminUserItem {
   isonboardingcompleted: boolean;
   usertypeid: number | null;
   createdonRaw: string;
+    salesId: string;
   
 }
 
@@ -83,7 +84,8 @@ supabase_uid,
           isactive,
           createdon,
           termsaccepted,
-          isonboardingcompleted
+          isonboardingcompleted,
+            sales_id
         `)
         .order('createdon', { ascending: false });
         
@@ -127,6 +129,7 @@ supabase_uid: row.supabase_uid || null,
           isonboardingcompleted: !!row.isonboardingcompleted,
           usertypeid: row.usertypeid ?? null,
           createdonRaw: row.createdon || '',
+            salesId: row.sales_id || '-',
         };
       });
 

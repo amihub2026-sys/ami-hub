@@ -28,6 +28,7 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
     email: '',
     phone: '',
     username: '',
+      salesId: '',
     password: '',
     accountType: '',
     category: '',
@@ -47,6 +48,7 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
   isEditMode = false;
   authChecked = false;
   showPassword = false;
+  isSalesIdLocked = false;
 
   private hasLoadedProfile = false;
   private authSubscription: { unsubscribe: () => void } | null = null;
@@ -134,6 +136,7 @@ constructor(
         email: profileById?.email || '',
         phone: profileById?.phone_number || profileById?.phonenumber || '',
         username: profileById?.username || '',
+        salesId: profileById?.sales_id || '',
         accountType: profileById?.accounttype || '',
         category: profileById?.category || '',
         profileImage: profileById?.profileimageurl || profileById?.avatar_url || null,
@@ -141,6 +144,7 @@ constructor(
         qrCodeImage: profileById?.qrcodeimage || null,
         rating: profileById?.rating ?? 4,
         verified: profileById?.isverified ?? true,
+        
         termsAccepted: profileById?.termsaccepted ?? false
       };
 
@@ -184,7 +188,7 @@ constructor(
             email: profileById?.email || session.email || '',
             phone: profileById?.phone_number || profileById?.phonenumber || '',
             username: profileById?.username || session.username || '',
-
+             salesId: profileById?.sales_id || '',
             accountType: profileById?.accounttype || '',
             category: profileById?.category || '',
             profileImage: profileById?.profileimageurl || profileById?.avatar_url || null,
@@ -199,6 +203,7 @@ constructor(
           this.hasLoadedProfile = true;
           this.authChecked = true;
           this.isLoading = false;
+this.isSalesIdLocked = !!this.seller.salesId;
 
           this.cdr.detectChanges();
         });
@@ -254,6 +259,7 @@ constructor(
           email: profile?.email || user?.email || session.email || '',
           phone: profile?.phone_number || profile?.phonenumber || '',
           username: profile?.username || session.username || '',
+          salesId: profile?.sales_id || '',
           password: profile?.password || '',
           accountType: profile?.accounttype || '',
           category: profile?.category || '',
@@ -264,7 +270,8 @@ constructor(
           verified: profile?.isverified ?? true,
           termsAccepted: profile?.termsaccepted ?? false
         };
-
+this.isSalesIdLocked = !!this.seller.salesId;
+        
         this.isEditMode = !isNew && this.hasExistingProfileData(profile);
         this.hasLoadedProfile = true;
         this.authChecked = true;
@@ -475,6 +482,7 @@ if (!session.authUser && session.userid) {
   name: this.seller.name || '',
   email: (this.seller.email || '').trim().toLowerCase(),
   username: this.seller.username || '',
+  sales_id: this.seller.salesId || null,
   password: this.seller.password || '',
   profileimageurl: this.seller.profileImage || null,
   avatar_url: this.seller.profileImage || null,
@@ -498,6 +506,8 @@ const { data: updatedUser, error } = await this.supabaseService.supabase
   .update({
     ...payload,
     email: (this.seller.email || '').trim().toLowerCase(),
+      sales_id: this.seller.salesId || null,
+
     password: this.seller.password || '',
     isonboardingcompleted: true
   })
@@ -530,6 +540,7 @@ await Promise.race([
       });
 
       this.showMessage('Profile saved successfully', 'success');
+      this.isSalesIdLocked = true;
 
       if (this.redirectTo === 'post-service') {
         await this.router.navigate(['/service']);
@@ -559,6 +570,8 @@ await Promise.race([
       profile?.phonenumber ||
       profile?.phone_number ||
       profile?.username ||
+        profile?.sales_id ||
+
       profile?.password ||
       profile?.accounttype ||
       profile?.category ||

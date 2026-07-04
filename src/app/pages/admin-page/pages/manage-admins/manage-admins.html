@@ -28,7 +28,13 @@
         <label>Phone</label>
         <input type="text" [(ngModel)]="formData.phone">
       </div>
-
+     <div class="form-group">
+  <label>Sales ID</label>
+<input
+  type="text"
+  [(ngModel)]="formData.salesId"
+  placeholder="Enter Sales ID">
+  </div>
       <div class="form-group">
         <label>Password</label>
         <input type="password" [(ngModel)]="formData.password">
@@ -62,6 +68,7 @@
       <table>
         <thead>
           <tr>
+     <th>Sales ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>Password</th>
@@ -74,6 +81,7 @@
 
         <tbody>
        <tr *ngFor="let admin of admins">
+<td>{{ admin.sales_id }}</td>
   <td>{{ admin.adminname }}</td>
   <td>{{ admin.adminemail }}</td>
   <td>{{ admin.passwordhash }}</td>
@@ -82,6 +90,7 @@
 
   <td>{{ admin.postCount || 0 }}</td>
     <td>
+      
             <button
   class="remove-btn"
   type="button"
@@ -92,7 +101,8 @@
           </tr>
 
           <tr *ngIf="!admins.length">
-            <td colspan="7" class="empty-cell">No admins found</td>
+           
+            <td colspan="8" class="empty-cell">No admins found</td>
           </tr>
         </tbody>
       </table>

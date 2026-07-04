@@ -603,6 +603,7 @@ if (!existingUser && user.email) {
       phone_number: seller.phone || '',
       username: seller.username || existingUser?.username || '',
       password: seller.password || existingUser?.password || '',
+      sales_id: seller.salesId || existingUser?.sales_id || null,
       profileimageurl: seller.profileImage || null,
       avatar_url: seller.profileImage || null,
       accounttype: seller.accountType || '',
@@ -915,6 +916,7 @@ if (!existingUser && user.email) {
       userid: String(post.userid ?? ''),
       categoryid: post.categoryid ?? null,
       subcategoryid: post.subcategoryid ?? null,
+    
       title: (post.title ?? '').trim(),
       description: (post.description ?? '').trim(),
       price: post.price ?? 0,

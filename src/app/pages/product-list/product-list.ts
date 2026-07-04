@@ -44,7 +44,7 @@ export class ProductList implements OnInit {
   allSubcategories: SubcategoryItem[] = [];
 
   private page = 0;
-  private readonly pageSize = 20;
+  private readonly pageSize = 100;
 
   private selectedLocation: any = null;
   selectedRadiusKm = 50;

@@ -137,7 +137,12 @@
       [disabled]="isLoading">
     <span>I accept Terms & Conditions</span>
   </label>
-
+<input
+  type="text"
+  [(ngModel)]="seller.salesId"
+  placeholder="Enter Sales ID"
+  [readonly]="isSalesIdLocked"
+  [class.locked-input]="isSalesIdLocked">
   <button
     type="button"
     class="submit-btn"
