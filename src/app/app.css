@@ -3861,7 +3861,76 @@ body app-root {
    font-size: 18px;
    padding-right: 5px;
 }
+/* Desktop */
+.mobile-ad-btn,
+.mobile-my-posts-btn{
+    display:none;
+}
 
+@media (max-width:768px){
 
+  .topbar .nav-container{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 10px !important;
+    height:64px !important;
+  }
 
+  .logo img{
+    width:68px !important;
+  }
 
+  .homee{
+    font-size:10px !important;
+    padding:0 5px !important;
+    margin:0 !important;
+  }
+
+  .post{
+    font-size:10px !important;
+    padding:0 5px !important;
+    margin:0 !important;
+  }
+
+  .post-btn.service-btn{
+    display:inline-flex !important;
+    align-items:center;
+    justify-content:center;
+    position:static !important;
+    transform:none !important;
+    margin:0 6px !important;
+    padding:4px 10px !important;
+    font-weight: 20px;
+    height:25px !important;
+    font-size:7px !important;
+    border-radius:15px !important;
+    min-width:75px !important;
+    width: 25px !important;
+  }
+
+  .nav-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+
+  .mobile-ad-btn{
+    display:none !important;
+  }
+
+  .fav-animate,
+  .chat-animate,
+  .bell-animate{
+    display:none !important;
+  }
+
+   .profile{
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    margin-left:0 !important;
+    margin-right:70% !important;
+    flex-shrink:0;
+  }
+}

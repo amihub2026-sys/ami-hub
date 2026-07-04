@@ -22,6 +22,7 @@ export class ManageAdmins implements OnInit {
     email: '',
     phone: '',
     password: '',
+      salesId: '',
     role: 'post',
     status: true
   };
@@ -69,49 +70,66 @@ async loadAdmins() {
   this.cdr.detectChanges();
 }
   
-  openForm() {
-    this.showForm = true;
-  }
+ openForm() {
+  this.showForm = true;
+}
 
   closeForm() {
     this.showForm = false;
   }
   
 
-  async saveAdmin() {
-    const roleId = this.formData.role === 'super' ? 1 : 2;
+async saveAdmin() {
+  const roleId = this.formData.role === 'super' ? 1 : 2;
 
-    const { error } = await this.supabaseService.supabase
-      .from('admins')
-      .insert({
-        adminname: this.formData.name,
-        adminemail: this.formData.email,
-        phone: this.formData.phone,
-        passwordhash: this.formData.password,
-        roleid: roleId,
-        isactive: this.formData.status,
-        createdon: new Date().toISOString()
-      });
+  const { data: lastAdmin } = await this.supabaseService.supabase
+    .from('admins')
+    .select('sales_id')
+    .not('sales_id', 'is', null)
+    .order('adminid', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+  let salesId = '';
+if (!this.formData.salesId.trim()) {
+  alert('Please enter Sales ID');
+  return;
+}
 
-    await this.loadAdmins();
+  const { error } = await this.supabaseService.supabase
+    .from('admins')
+    .insert({
+      adminname: this.formData.name,
+      adminemail: this.formData.email,
+      phone: this.formData.phone,
+      passwordhash: this.formData.password,
+      roleid: roleId,
+       sales_id: this.formData.salesId.trim(),
 
-    this.formData = {
-      name: '',
-      email: '',
-      phone: '',
-      password: '',
-      role: 'post',
-      status: true
-    };
+      isactive: this.formData.status,
+      createdon: new Date().toISOString()
+    });
 
-    this.showForm = false;
-    alert('Admin saved successfully');
+  if (error) {
+    alert(error.message);
+    return;
   }
+
+  await this.loadAdmins();
+
+  this.formData = {
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+      salesId: '',
+    role: 'post',
+    status: true
+  };
+
+  this.showForm = false;
+  alert(`Admin saved successfully. Sales ID: ${salesId}`);
+}
 async removeAdmin(adminid: number) {
   const ok = confirm('Do you want to deactivate this admin?');
 
