@@ -150,6 +150,7 @@ constructor(
 
       this.isEditMode = this.hasExistingProfileData(profileById);
       this.hasLoadedProfile = true;
+      this.isSalesIdLocked = !!this.seller.salesId;
       this.authChecked = true;
       this.isLoading = false;
       this.cdr.detectChanges();
