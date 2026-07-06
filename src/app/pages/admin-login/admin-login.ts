@@ -27,14 +27,16 @@ export class AdminLogin {
 
   const { data, error } = await this.supabaseService.supabase
     .from('admins')
-    .select(`
-      adminid,
-      adminname,
-      adminemail,
-      passwordhash,
-      roleid,
-      isactive
-    `)
+.select(`
+  *,
+  admin_activity(
+    login_time,
+    logout_time,
+    login_date,
+    total_posts,
+    total_users
+  )
+`)
     .eq('adminemail', this.email.trim())
     .single();
 
@@ -54,7 +56,34 @@ export class AdminLogin {
     this.errorMessage = 'Invalid admin email or password';
     return;
   }
+const now = new Date().toLocaleString('sv-SE', {
+  timeZone: 'Asia/Kolkata'
+});
 
+const today = new Date().toLocaleDateString('en-CA', {
+  timeZone: 'Asia/Kolkata'
+});
+
+const { data: activityData, error: activityError } =
+  await this.supabaseService.supabase
+    .from('admin_activity')
+    .insert({
+      admin_id: data.adminid,
+      login_time: now,
+      login_date: today,
+      total_posts: 0,
+      total_users: 0
+    })
+    .select('id')
+    .single();
+
+if (activityError) {
+  console.error(activityError);
+  alert(activityError.message);
+  return;
+}
+
+localStorage.setItem('adminActivityId', String(activityData.id));
   // SAVE LOGIN TIME HERE
  const { error: loginUpdateError } = await this.supabaseService.supabase
   .from('admins')
@@ -78,4 +107,5 @@ if (loginUpdateError) {
 
   this.router.navigate(['/admin']);
 }
+
 }

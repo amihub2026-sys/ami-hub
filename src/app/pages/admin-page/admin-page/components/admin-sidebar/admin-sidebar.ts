@@ -88,22 +88,37 @@ get visibleMenuItems() {
 
   return [];
 }
-constructor(
+  constructor(
   private router: Router,
   private supabaseService: SupabaseService
 ) {}
-async logout(): Promise<void> {
-  const adminId = localStorage.getItem('adminId');
 
-  if (adminId) {
-    await this.supabaseService.supabase
-      .from('admins')
+async logout(): Promise<void> {
+  const activityId = localStorage.getItem('adminActivityId');
+
+  const now = new Date().toLocaleString('sv-SE', {
+    timeZone: 'Asia/Kolkata'
+  });
+ if (!activityId) {
+  alert('adminActivityId missing. Please login again.');
+  return;
+}
+  if (activityId) {
+    const { error } = await this.supabaseService.supabase
+      .from('admin_activity')
       .update({
-        last_logout_at: new Date().toISOString()
+        logout_time: now
       })
-      .eq('adminid', Number(adminId));
+      .eq('id', Number(activityId));
+
+    if (error) {
+      console.error(error);
+      alert(error.message);
+      return;
+    }
   }
 
+  localStorage.removeItem('adminActivityId');
   localStorage.removeItem('adminLogin');
   localStorage.removeItem('adminRole');
   localStorage.removeItem('adminId');
@@ -112,11 +127,12 @@ async logout(): Promise<void> {
 
   this.router.navigate(['/admin-login']);
 }
-  onMenuClick(menu: AdminMenuKey): void {
-    this.menuChange.emit(menu);
-  }
 
-  trackByMenu(index: number, item: AdminMenuItem): AdminMenuKey {
-    return item.key;
-  }
+onMenuClick(menu: AdminMenuKey): void {
+  this.menuChange.emit(menu);
+}
+
+trackByMenu(index: number, item: AdminMenuItem): AdminMenuKey {
+  return item.key;
+}
 }
