@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-
+import { SupabaseService } from '../../../../../services/supabase.service';
 export type AdminMenuKey =
   | 'dashboard'
   | 'users'
@@ -88,8 +88,22 @@ get visibleMenuItems() {
 
   return [];
 }
-constructor(private router: Router) {}
-logout(): void {
+constructor(
+  private router: Router,
+  private supabaseService: SupabaseService
+) {}
+async logout(): Promise<void> {
+  const adminId = localStorage.getItem('adminId');
+
+  if (adminId) {
+    await this.supabaseService.supabase
+      .from('admins')
+      .update({
+        last_logout_at: new Date().toISOString()
+      })
+      .eq('adminid', Number(adminId));
+  }
+
   localStorage.removeItem('adminLogin');
   localStorage.removeItem('adminRole');
   localStorage.removeItem('adminId');

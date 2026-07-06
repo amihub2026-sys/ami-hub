@@ -22,51 +22,60 @@ export class AdminLogin {
   constructor(private router: Router) {}
 
   async login() {
-    this.errorMessage = '';
-    this.isLoading = true;
+  this.errorMessage = '';
+  this.isLoading = true;
 
-    const { data, error } = await this.supabaseService.supabase
-      .from('admins')
-      .select(`
-        adminid,
-        adminname,
-        adminemail,
-        passwordhash,
-        roleid,
-        isactive
-      `)
-      .eq('adminemail', this.email.trim())
-      .single();
+  const { data, error } = await this.supabaseService.supabase
+    .from('admins')
+    .select(`
+      adminid,
+      adminname,
+      adminemail,
+      passwordhash,
+      roleid,
+      isactive
+    `)
+    .eq('adminemail', this.email.trim())
+    .single();
 
-    this.isLoading = false;
+  this.isLoading = false;
 
-    if (error || !data) {
-      this.errorMessage = 'Invalid admin email or password';
-      return;
-    }
+  if (error || !data) {
+    this.errorMessage = 'Invalid admin email or password';
+    return;
+  }
 
-    if (!data.isactive) {
-      this.errorMessage = 'Admin account is inactive';
-      return;
-    }
+  if (!data.isactive) {
+    this.errorMessage = 'This admin account has been deactivated.';
+    return;
+  }
 
-    if (data.passwordhash !== this.password) {
-      this.errorMessage = 'Invalid admin email or password';
-      return;
-    }
-    if (!data.isactive) {
-  this.errorMessage = 'This admin account has been deactivated.';
-  return;
+  if (data.passwordhash !== this.password) {
+    this.errorMessage = 'Invalid admin email or password';
+    return;
+  }
+
+  // SAVE LOGIN TIME HERE
+ const { error: loginUpdateError } = await this.supabaseService.supabase
+  .from('admins')
+  .update({
+    last_login_at: new Date().toISOString()
+  })
+  .eq('adminid', data.adminid);
+
+if (loginUpdateError) {
+  console.error('Login time update error:', loginUpdateError);
+  alert(loginUpdateError.message);
 }
 
-    const adminRole = data.roleid === 1 ? 'super' : 'post';
+  const adminRole = data.roleid === 1 ? 'super' : 'post';
 
-    localStorage.setItem('adminLogin', 'true');
-    localStorage.setItem('adminRole', adminRole);
-    localStorage.setItem('adminId', String(data.adminid));
-    localStorage.setItem('adminEmail', data.adminemail);
-    localStorage.setItem('adminName', data.adminname);
+  localStorage.setItem('adminLogin', 'true');
+  localStorage.setItem('adminRole', adminRole);
+  localStorage.setItem('adminId', String(data.adminid));
+  localStorage.setItem('adminEmail', data.adminemail);
+  localStorage.setItem('adminName', data.adminname);
 
-    this.router.navigate(['/admin']);
-  }
+  this.router.navigate(['/admin']);
+}
 }
