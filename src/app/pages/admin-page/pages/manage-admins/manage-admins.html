@@ -75,6 +75,8 @@
             <th>Phone</th>
             <th>Role</th>
             <th>Post Count</th>
+            <th>Last Login</th>
+<th>Last Logout</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -89,6 +91,14 @@
   <td>{{ admin.roleid === 1 ? 'Super Admin' : 'Post Admin' }}</td>
 
   <td>{{ admin.postCount || 0 }}</td>
+  <td>
+  {{ admin.last_login_at ? (admin.last_login_at + 'Z' | date:'dd-MM-yyyy hh:mm a':'Asia/Kolkata') : '-' }}
+</td>
+
+<td>
+  {{ admin.last_logout_at ? (admin.last_logout_at + 'Z' | date:'dd-MM-yyyy hh:mm a':'Asia/Kolkata') : '-' }}
+</td>
+
     <td>
       
             <button
@@ -102,7 +112,7 @@
 
           <tr *ngIf="!admins.length">
            
-            <td colspan="8" class="empty-cell">No admins found</td>
+            <td colspan="10" class="empty-cell">No admins found</td>
           </tr>
         </tbody>
       </table>

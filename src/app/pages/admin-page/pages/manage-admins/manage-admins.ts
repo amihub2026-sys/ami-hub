@@ -128,7 +128,7 @@ if (!this.formData.salesId.trim()) {
   };
 
   this.showForm = false;
-  alert(`Admin saved successfully. Sales ID: ${salesId}`);
+alert(`Admin saved successfully. Sales ID: ${this.formData.salesId}`);
 }
 async removeAdmin(adminid: number) {
   const ok = confirm('Do you want to deactivate this admin?');
@@ -147,9 +147,24 @@ async removeAdmin(adminid: number) {
     alert(error.message);
     return;
   }
+  
 
   await this.loadAdmins();
 
   alert('Admin deactivated successfully.');
+}
+formatDateTime(value: string | null): string {
+  if (!value) return '-';
+
+  const date = new Date(value);
+
+  return date.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
 }
 }
