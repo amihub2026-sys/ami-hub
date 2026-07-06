@@ -91,13 +91,9 @@
   <td>{{ admin.roleid === 1 ? 'Super Admin' : 'Post Admin' }}</td>
 
   <td>{{ admin.postCount || 0 }}</td>
-  <td>
-  {{ admin.last_login_at ? (admin.last_login_at + 'Z' | date:'dd-MM-yyyy hh:mm a':'Asia/Kolkata') : '-' }}
-</td>
+<td>{{ admin.latestLogin ? (admin.latestLogin | date:'dd-MM-yyyy hh:mm a') : '-' }}</td>
 
-<td>
-  {{ admin.last_logout_at ? (admin.last_logout_at + 'Z' | date:'dd-MM-yyyy hh:mm a':'Asia/Kolkata') : '-' }}
-</td>
+<td>{{ admin.latestLogout ? (admin.latestLogout | date:'dd-MM-yyyy hh:mm a') : '-' }}</td>
 
     <td>
       
@@ -116,6 +112,9 @@
           </tr>
         </tbody>
       </table>
+      <button class="save-btn" type="button" (click)="exportAdminActivityExcel()">
+  Export Excel
+</button>
     </div>
   </div>
 </section>

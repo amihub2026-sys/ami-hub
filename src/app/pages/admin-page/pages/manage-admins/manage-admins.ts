@@ -2,6 +2,7 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../../services/supabase.service';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-manage-admins',
@@ -16,6 +17,7 @@ export class ManageAdmins implements OnInit {
   private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
   showForm = false;
   admins: any[] = [];
+  adminActivities: any[] = [];
 
   formData = {
     name: '',
@@ -29,13 +31,21 @@ export class ManageAdmins implements OnInit {
 
   async ngOnInit() {
     await this.loadAdmins();
+     await this.loadDailyAdminActivity();
   }
 
 async loadAdmins() {
   const { data: adminsData, error: adminsError } =
     await this.supabaseService.supabase
       .from('admins')
-      .select('*')
+    .select(`
+      *,
+      admin_activity(
+        login_time,
+        logout_time,
+        login_date
+      )
+    `)
       .eq('isactive', true)
       .order('createdon', { ascending: false });
 
@@ -60,11 +70,20 @@ async loadAdmins() {
     const postCount = (postsData || []).filter((post: any) =>
       Number(post.post_admin_id) === Number(admin.adminid)
     ).length;
+const activities = admin.admin_activity || [];
 
-    return {
-      ...admin,
-      postCount
-    };
+const latestActivity = activities.length
+  ? activities.sort((a: any, b: any) =>
+      new Date(b.login_time).getTime() - new Date(a.login_time).getTime()
+    )[0]
+  : null;
+
+return {
+  ...admin,
+  postCount,
+  latestLogin: latestActivity?.login_time || null,
+  latestLogout: latestActivity?.logout_time || null
+};
   });
 
   this.cdr.detectChanges();
@@ -130,6 +149,38 @@ if (!this.formData.salesId.trim()) {
   this.showForm = false;
 alert(`Admin saved successfully. Sales ID: ${this.formData.salesId}`);
 }
+async loadDailyAdminActivity() {
+  const today = new Date().toISOString().substring(0, 10);
+
+  const { data, error } = await this.supabaseService.supabase
+    .from('admin_activity')
+    .select(`
+      id,
+      admin_id,
+      login_time,
+      logout_time,
+      login_date,
+      total_posts,
+      total_users,
+      admins (
+        adminname,
+        adminemail,
+        sales_id,
+        roleid
+      )
+    `)
+    .eq('login_date', today)
+    .order('login_time', { ascending: false });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  this.adminActivities = data || [];
+  this.cdr.detectChanges();
+}
+
 async removeAdmin(adminid: number) {
   const ok = confirm('Do you want to deactivate this admin?');
 
@@ -166,5 +217,24 @@ formatDateTime(value: string | null): string {
     minute: '2-digit',
     hour12: true
   });
+}
+exportAdminActivityExcel() {
+  const exportData = this.adminActivities.map((item: any) => ({
+    'Sales ID': item.admins?.sales_id || '-',
+    'Admin Name': item.admins?.adminname || '-',
+    'Email': item.admins?.adminemail || '-',
+    'Date': item.login_date || '-',
+    'Login Time': item.login_time || '-',
+    'Logout Time': item.logout_time || '-',
+    'Total Posts': item.total_posts || 0,
+    'Total Users': item.total_users || 0
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Admin Activity');
+
+  XLSX.writeFile(workbook, 'admin-activity-report.xlsx');
 }
 }

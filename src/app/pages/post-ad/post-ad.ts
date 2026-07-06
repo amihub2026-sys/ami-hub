@@ -177,6 +177,15 @@ export class PostAd implements OnInit {
       };
 
       await this.supabaseService.addPost(post);
+      // increase admin daily post count
+const activityId = localStorage.getItem('adminActivityId');
+
+if (activityId) {
+  await this.supabaseService.supabase.rpc('increment_admin_post_count', {
+    activity_id_input: Number(activityId)
+  });
+}
+
 
       alert("Ad posted successfully");
       this.router.navigate(['/custom-fields'], { state: post });
