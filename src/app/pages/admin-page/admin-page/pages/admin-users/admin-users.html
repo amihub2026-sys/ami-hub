@@ -77,10 +77,13 @@
            
             <th>Phone</th>
               <th>Sales ID</th>
+                   <th>Today Posts</th>
+             <th>Total Posts</th>
             <th>Role</th>
             <th>Status</th>
             <th>Joined</th>
             <th class="action-col">Action</th>
+       
           </tr>
         </thead>
 
@@ -103,6 +106,8 @@
 
             <td>{{ user.phone }}</td>
             <td>{{ user.salesId || '-' }}</td>
+            <td>{{ user.todayPosts || 0 }}</td>
+<td>{{ user.totalPosts || 0 }}</td>
             <td>{{ user.role }}</td>
 
             <td>
@@ -138,15 +143,12 @@
               </button>
             </td>
           </tr>
-
-          <tr *ngIf="!filteredUsers.length && !isLoading">
-            <td colspan="7" class="empty-cell">
-              No users found.
-            </td>
-            <td colspan="8" class="empty-cell">
-  No users found.
-</td>
-          </tr>
+<tr *ngIf="!filteredUsers.length && !isLoading">
+  <td colspan="10" class="empty-cell">
+    No users found.
+  </td>
+</tr>
+  
         </tbody>
       </table>
 
