@@ -14,7 +14,7 @@ type UserStatus = 'Active' | 'Blocked' | 'Pending';
 
 interface AdminUserItem {
   id: number;
-    auth_user_id: string | null;
+  auth_user_id: string | null;
   supabase_uid: string | null;
   name: string;
   email: string;
@@ -29,14 +29,15 @@ interface AdminUserItem {
   isonboardingcompleted: boolean;
   usertypeid: number | null;
   createdonRaw: string;
-    salesId: string;
-  
+  salesId: string;
+  todayPosts: number;
+  totalPosts: number;
 }
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-imports: [CommonModule, Service],
+  imports: [CommonModule, Service],
   templateUrl: './admin-users.html',
   styleUrls: ['./admin-users.css'],
 })
@@ -44,17 +45,18 @@ export class AdminUsers implements OnInit {
   private supabaseService = inject(SupabaseService);
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
-    currentPage = 1;
+
+  currentPage = 1;
   pageSize = 5;
 
   @Input() searchQuery = '';
- 
+
   isLoading = true;
   errorMessage = '';
   users: AdminUserItem[] = [];
-  showPostModal = false;
-selectedUser: AdminUserItem | null = null;
 
+  showPostModal = false;
+  selectedUser: AdminUserItem | null = null;
 
   async ngOnInit(): Promise<void> {
     await this.loadUsers();
@@ -71,7 +73,7 @@ selectedUser: AdminUserItem | null = null;
         .select(`
           userid,
           auth_user_id,
-supabase_uid,
+          supabase_uid,
           fullname,
           name,
           email,
@@ -85,26 +87,46 @@ supabase_uid,
           createdon,
           termsaccepted,
           isonboardingcompleted,
-            sales_id
+          sales_id
         `)
         .order('createdon', { ascending: false });
-        
 
       if (error) {
         console.error('Load users error:', error);
         this.errorMessage = 'Failed to load users.';
         this.users = [];
-        this.cdr.detectChanges();
         return;
       }
 
+      const { data: postsData, error: postsError } =
+        await this.supabaseService.supabase
+          .from('post')
+          .select('userid, createdon');
+
+      if (postsError) {
+        console.error('Posts count error:', postsError);
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+
       this.users = (data || []).map((row: any) => {
+    const userPosts = (postsData || []).filter((p: any) =>
+  String(p.userid) === String(row.userid) ||
+  String(p.userid) === String(row.auth_user_id) ||
+  String(p.userid) === String(row.supabase_uid)
+);
+        const todayPostCount = userPosts.filter((p: any) =>
+          p.createdon?.startsWith(today)
+        ).length;
+
+        const totalPostCount = userPosts.length;
+
         const resolvedName =
           row.fullname?.trim() ||
           row.name?.trim() ||
           row.email?.split('@')?.[0] ||
           'User';
-             
+
         const resolvedPhone =
           row.phonenumber?.trim() ||
           row.phone_number?.trim() ||
@@ -115,7 +137,7 @@ supabase_uid,
         return {
           id: Number(row.userid),
           auth_user_id: row.auth_user_id || null,
-supabase_uid: row.supabase_uid || null,
+          supabase_uid: row.supabase_uid || null,
           name: resolvedName,
           email: row.email || '-',
           phone: resolvedPhone,
@@ -129,16 +151,15 @@ supabase_uid: row.supabase_uid || null,
           isonboardingcompleted: !!row.isonboardingcompleted,
           usertypeid: row.usertypeid ?? null,
           createdonRaw: row.createdon || '',
-            salesId: row.sales_id || '-',
+          salesId: row.sales_id || '-',
+          todayPosts: todayPostCount,
+          totalPosts: totalPostCount,
         };
       });
-
-      this.cdr.detectChanges();
     } catch (error) {
       console.error('Users page error:', error);
       this.errorMessage = 'Something went wrong while loading users.';
       this.users = [];
-      this.cdr.detectChanges();
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -175,7 +196,6 @@ supabase_uid: row.supabase_uid || null,
   get pendingUsers(): number {
     return this.users.filter((u) => u.status === 'Pending').length;
   }
-  
 
   async toggleStatus(user: AdminUserItem): Promise<void> {
     const nextIsActive = user.status !== 'Active';
@@ -212,26 +232,28 @@ supabase_uid: row.supabase_uid || null,
       this.cdr.detectChanges();
     }
   }
-get totalPages(): number {
-  return Math.ceil(this.filteredUsers.length / this.pageSize);
-}
 
-get paginatedUsers() {
-  const start = (this.currentPage - 1) * this.pageSize;
-  return this.filteredUsers.slice(start, start + this.pageSize);
-}
-
-nextPage(): void {
-  if (this.currentPage < this.totalPages) {
-    this.currentPage++;
+  get totalPages(): number {
+    return Math.ceil(this.filteredUsers.length / this.pageSize);
   }
-}
 
-prevPage(): void {
-  if (this.currentPage > 1) {
-    this.currentPage--;
+  get paginatedUsers(): AdminUserItem[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredUsers.slice(start, start + this.pageSize);
   }
-}
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
   getActionLabel(user: AdminUserItem): string {
     return user.status === 'Active' ? 'Block' : 'Activate';
   }
@@ -256,9 +278,7 @@ prevPage(): void {
   }
 
   private getStatusFromRow(row: any): UserStatus {
-    if (row.isactive) {
-      return 'Active';
-    }
+    if (row.isactive) return 'Active';
 
     if (!row.termsaccepted || !row.isonboardingcompleted) {
       return 'Pending';
@@ -277,19 +297,15 @@ prevPage(): void {
       month: 'short',
       year: 'numeric',
     });
-    
   }
 
+  createPostForUser(user: AdminUserItem): void {
+    this.selectedUser = user;
+    this.showPostModal = true;
+  }
 
- createPostForUser(user: AdminUserItem): void {
-  this.selectedUser = user;
-  this.showPostModal = true;
-}
-
-closePostModal(): void {
-  this.showPostModal = false;
-  this.selectedUser = null;
-}
-
- 
+  closePostModal(): void {
+    this.showPostModal = false;
+    this.selectedUser = null;
+  }
 }
