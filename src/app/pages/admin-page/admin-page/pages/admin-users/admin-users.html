@@ -141,6 +141,13 @@
               >
                 Post
               </button>
+    <button
+  type="button"
+  class="action-btn posts-view-btn"
+  (click)="viewUserPosts(user)"
+>
+  Post View
+</button>
             </td>
           </tr>
 <tr *ngIf="!filteredUsers.length && !isLoading">
@@ -187,5 +194,38 @@
         <div class="loading-card" *ngFor="let i of [1, 2, 3, 4, 5]"></div>
       </div>
     </ng-template>
+  </div>
+</div>
+<div class="modal-backdrop" *ngIf="showUserPostsModal">
+  <div class="post-modal">
+    <h2>{{ selectedPostUser?.name }} Posts</h2>
+
+    <p *ngIf="!selectedUserPosts.length">No posts found for this user.</p>
+
+    <table *ngIf="selectedUserPosts.length">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let post of selectedUserPosts">
+          <td>#{{ post.postid }}</td>
+          <td>{{ post.title }}</td>
+          <td>{{ post.price }}</td>
+          <td>{{ post.status }}</td>
+          <td>{{ post.createdon | date:'dd MMM yyyy' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button type="button" (click)="showUserPostsModal = false">
+      Close
+    </button>
   </div>
 </div>
