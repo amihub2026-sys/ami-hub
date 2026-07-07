@@ -57,6 +57,9 @@ export class AdminUsers implements OnInit {
 
   showPostModal = false;
   selectedUser: AdminUserItem | null = null;
+  showUserPostsModal = false;
+selectedUserPosts: any[] = [];
+selectedPostUser: AdminUserItem | null = null;
 
   async ngOnInit(): Promise<void> {
     await this.loadUsers();
@@ -298,7 +301,27 @@ export class AdminUsers implements OnInit {
       year: 'numeric',
     });
   }
+async viewUserPosts(user: AdminUserItem): Promise<void> {
+  this.selectedPostUser = user;
 
+  const postUserId = user.auth_user_id || user.supabase_uid;
+
+  const { data, error } = await this.supabaseService.supabase
+    .from('post')
+    .select('*')
+    .eq('userid', postUserId)
+    .order('createdon', { ascending: false });
+
+  if (error) {
+    console.error('User posts error:', error);
+    alert('Failed to load posts');
+    return;
+  }
+
+  this.selectedUserPosts = data || [];
+  this.showUserPostsModal = true;
+  this.cdr.detectChanges();
+}
   createPostForUser(user: AdminUserItem): void {
     this.selectedUser = user;
     this.showPostModal = true;
