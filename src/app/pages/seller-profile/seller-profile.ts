@@ -542,6 +542,14 @@ await Promise.race([
 
       this.showMessage('Profile saved successfully', 'success');
       this.isSalesIdLocked = true;
+      if (this.seller.salesId) {
+  await this.supabaseService.supabase.rpc(
+    'update_sales_user_count',
+    {
+      sales_id_input: this.seller.salesId
+    }
+  );
+}
 
       if (this.redirectTo === 'post-service') {
         await this.router.navigate(['/service']);

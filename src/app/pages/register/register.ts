@@ -7,3 +7,4 @@ import { Component } from '@angular/core';
   styleUrl: './register.css',
 })
 export class Register {}
+
