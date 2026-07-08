@@ -16,11 +16,11 @@
         Email/Password
       </button>
 
-      <button
+      <!-- <button
         (click)="selectUserLogin('admin')"
         [class.active]="userLoginMethod === 'admin'">
         Admin Login
-      </button>
+      </button> -->
     </div>
 
     <div *ngIf="userLoginMethod === 'mobileOtp'">
@@ -79,7 +79,7 @@
 </button> 
 </div>
 
-    <div *ngIf="userLoginMethod === 'admin'">
+    <!-- <div *ngIf="userLoginMethod === 'admin'">
       <div class="input-group">
         <input type="text" placeholder="Admin Username" [(ngModel)]="adminUsername">
       </div>
@@ -99,7 +99,7 @@
   class="submit-btn"
   (click)="loginAdmin()">
   Admin Login
-</button>    </div>
+</button>    </div> -->
 
     <div class="divider" *ngIf="userLoginMethod !== 'admin'">OR</div>
 

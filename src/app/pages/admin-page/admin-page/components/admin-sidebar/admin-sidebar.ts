@@ -125,7 +125,7 @@ async logout(): Promise<void> {
   localStorage.removeItem('adminEmail');
   localStorage.removeItem('adminName');
 
-  this.router.navigate(['/login']);
+  this.router.navigate(['/admin-login']);
 }
 
 onMenuClick(menu: AdminMenuKey): void {
