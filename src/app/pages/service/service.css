@@ -17,7 +17,7 @@ body {
   padding: 28px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   position: relative;
-  z-index: 10000;
+  z-index: 1;
 }
 
 .header {
@@ -640,3 +640,17 @@ small {
         width:100%;
     }
 } 
+@media (max-width: 768px) {
+  .service-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 14px !important;
+    border-radius: 16px;
+    z-index: 1 !important;
+  }
+
+  .submit-actions {
+    flex-direction: column;
+  }
+}
