@@ -402,43 +402,102 @@ setTimeout(async () => {
 }, 1000);
 }
 
-  async loginAdmin() {
-    if (!this.adminUsername || !this.adminPassword) {
-      this.showAlert('Enter admin username and password');
-      return;
-    }
+async loginAdmin() {
 
-    const { data, error } =
-      await this.supabaseService.getAdminByUsername(this.adminUsername.trim());
 
-    if (error || !data) {
-      this.showAlert('Admin not found');
-      return;
-    }
-
-    if (data.isactive === false) {
-      this.showAlert('Admin account is inactive');
-      return;
-    }
-
-    if (data.passwordhash !== this.adminPassword.trim()) {
-      this.showAlert('Invalid admin password');
-      return;
-    }
-
-    if (this.isBrowser) {
-      localStorage.setItem('adminToken', 'loggedAdmin');
-      localStorage.removeItem('userToken');
-      localStorage.setItem('adminId', String(data.adminid || ''));
-      localStorage.setItem('adminUsername', data.adminname || this.adminUsername);
-    }
-
-    this.showAlert('Admin Login Successful', 'success');
-
-    setTimeout(async () => {
-      await this.router.navigate(['/admin-page']);
-    }, 1200);
+  if (!this.adminUsername || !this.adminPassword) {
+    this.showAlert('Enter admin username and password', 'error');
+    return;
   }
+
+  const { data, error } = await this.supabaseService.supabase
+    .from('admins')
+    .select(`
+      *,
+      admin_activity(
+        login_time,
+        logout_time,
+        login_date,
+        total_posts,
+        total_users
+      )
+    `)
+    .eq('adminemail', this.adminUsername.trim())
+    .single();
+
+  if (error || !data) {
+    this.showAlert('Invalid admin email or password', 'error');
+    return;
+  }
+
+  if (!data.isactive) {
+    this.showAlert('This admin account has been deactivated.', 'error');
+    return;
+  }
+
+  if (data.passwordhash !== this.adminPassword.trim()) {
+    this.showAlert('Invalid admin email or password', 'error');
+    return;
+  }
+
+  const now = new Date().toLocaleString('sv-SE', {
+    timeZone: 'Asia/Kolkata'
+  });
+
+  const today = new Date().toLocaleDateString('en-CA', {
+    timeZone: 'Asia/Kolkata'
+  });
+
+  const { data: activityData, error: activityError } =
+    await this.supabaseService.supabase
+      .from('admin_activity')
+      .insert({
+        admin_id: data.adminid,
+        login_time: now,
+        login_date: today,
+        total_posts: 0,
+        total_users: 0
+      })
+      .select('id')
+      .single();
+
+  if (activityError) {
+    console.error(activityError);
+    this.showAlert(activityError.message, 'error');
+    return;
+  }
+
+  localStorage.setItem('adminActivityId', String(activityData.id));
+
+  const { error: loginUpdateError } =
+    await this.supabaseService.supabase
+      .from('admins')
+      .update({
+        last_login_at: new Date().toISOString()
+      })
+      .eq('adminid', data.adminid);
+
+  if (loginUpdateError) {
+    console.error('Login time update error:', loginUpdateError);
+  }
+
+  const adminRole = data.roleid === 1 ? 'super' : 'post';
+
+  localStorage.setItem('adminLogin', 'true');
+  localStorage.setItem('adminToken', 'loggedAdmin');
+  localStorage.removeItem('userToken');
+
+  localStorage.setItem('adminRole', adminRole);
+  localStorage.setItem('adminId', String(data.adminid));
+  localStorage.setItem('adminEmail', data.adminemail);
+  localStorage.setItem('adminName', data.adminname);
+
+  this.showAlert('Admin Login Successful', 'success');
+
+  setTimeout(async () => {
+    await this.router.navigate(['/admin']);
+  }, 1000);
+}
 
   async sendOtp() {
     if (!this.email) {
