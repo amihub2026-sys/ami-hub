@@ -40,7 +40,7 @@ interface AdminMenuItem {
 export class AdminSidebar {
   @Input() activeMenu: AdminMenuKey = 'dashboard';
   @Input() sidebarOpen = false;
-
+    
   @Output() menuChange = new EventEmitter<AdminMenuKey>();
 
   readonly menuItems: AdminMenuItem[] = [
