@@ -116,11 +116,11 @@ openAdminEditPost(postId: number): void {
       case 'user-subscriptions':
         return 'User Subscriptions';
      case 'boost-plans':
-  return 'Boost Plans';
-case 'user-boost-plans':
-  return 'User Boost Plans';
-case 'payments':
-  return 'Payments';
+    return 'Boost Plans';
+    case 'user-boost-plans':
+    return 'User Boost Plans';
+      case 'payments':
+      return 'Payments';
       case 'reports':
         return 'Reports';
       case 'locations':
@@ -157,16 +157,16 @@ case 'edit-post':
       this.activeMenu === 'payments'
     );
   }
-
-  get searchPlaceholder(): string {
+   
+    get searchPlaceholder(): string {
     switch (this.activeMenu) {
-      case 'users':
-        return 'Search users by name, email, phone, role or status';
-      case 'posts':
-        return 'Search posts by title, category, subcategory, type or status';
-      case 'categories':
+        case 'users':
+         return 'Search users by name, email, phone, role or status';
+        case 'posts':
+          return 'Search posts by title, category, subcategory, type or status';
+        case 'categories':
         return 'Search categories by name, slug, type, sort order or status';
-      case 'subcategories':
+       case 'subcategories':
         return 'Search subcategories by name, category, slug, sort order or status';
       case 'subscriptions':
         return 'Search plans by name, description, price, validity or status';

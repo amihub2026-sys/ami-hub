@@ -150,7 +150,22 @@ if (!this.formData.salesId.trim()) {
 alert(`Admin saved successfully. Sales ID: ${this.formData.salesId}`);
 }
 async loadDailyAdminActivity() {
-  const today = new Date().toISOString().substring(0, 10);
+  const today = new Date();
+
+  const firstDayOfMonth = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1
+  );
+
+  const lastDayOfMonth = new Date(
+    today.getFullYear(),
+    today.getMonth() + 1,
+    0
+  );
+
+  const fromDate = firstDayOfMonth.toISOString().substring(0, 10);
+  const toDate = lastDayOfMonth.toISOString().substring(0, 10);
 
   const { data, error } = await this.supabaseService.supabase
     .from('admin_activity')
@@ -169,24 +184,25 @@ async loadDailyAdminActivity() {
         roleid
       )
     `)
-    .eq('login_date', today)
+    .gte('login_date', fromDate)
+    .lte('login_date', toDate)
+    .order('login_date', { ascending: false })
     .order('login_time', { ascending: false });
 
-  if (error) {
+     if (error) {
     alert(error.message);
     return;
+    }
+
+   this.adminActivities = data || [];
+   this.cdr.detectChanges();
   }
-
-  this.adminActivities = data || [];
-  this.cdr.detectChanges();
-}
-
-async removeAdmin(adminid: number) {
-  const ok = confirm('Do you want to deactivate this admin?');
+   async removeAdmin(adminid: number) {
+   const ok = confirm('Do you want to deactivate this admin?');
 
   if (!ok) return;
 
-  const { error } = await this.supabaseService.supabase
+   const { error } = await this.supabaseService.supabase
     .from('admins')
     .update({
       isactive: false
@@ -219,22 +235,53 @@ formatDateTime(value: string | null): string {
   });
 }
 exportAdminActivityExcel() {
-  const exportData = this.adminActivities.map((item: any) => ({
-    'Sales ID': item.admins?.sales_id || '-',
-    'Admin Name': item.admins?.adminname || '-',
-    'Email': item.admins?.adminemail || '-',
-    'Date': item.login_date || '-',
-    'Login Time': item.login_time || '-',
-    'Logout Time': item.logout_time || '-',
-    'Total Posts': item.total_posts || 0,
-    'Total Users': item.total_users || 0
-  }));
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+  const exportData: any[] = [];
+
+  for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
+    const dateObj = new Date(year, month, day);
+    const dateStr = dateObj.toISOString().substring(0, 10);
+
+    const dayRecords = this.adminActivities.filter(
+      (item: any) => item.login_date === dateStr
+    );
+
+      if (dayRecords.length) {
+       dayRecords.forEach((item: any) => {
+         exportData.push({
+          'Sales ID': item.admins?.sales_id || '-',
+          'Admin Name': item.admins?.adminname || '-',
+          'Email': item.admins?.adminemail || '-',
+          'Date': dateStr,
+          'Login Time': item.login_time || '-',
+          'Logout Time': item.logout_time || '-',
+          'Total Posts': item.total_posts || 0,
+          'Total Users': item.total_users || 0
+        });
+      });
+    } else {
+      exportData.push({
+        'Sales ID': '-',
+        'Admin Name': '-',
+        'Email': '-',
+        'Date': dateStr,
+        'Login Time': '-',
+        'Logout Time': '-',
+        'Total Posts': 0,
+        'Total Users': 0
+      });
+    }
+  }
 
   const worksheet = XLSX.utils.json_to_sheet(exportData);
   const workbook = XLSX.utils.book_new();
 
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Admin Activity');
 
-  XLSX.writeFile(workbook, 'admin-activity-report.xlsx');
+  XLSX.writeFile(workbook, `admin-activity-${year}-${month + 1}.xlsx`);
 }
 }
